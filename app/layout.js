@@ -19,7 +19,7 @@ export default function RootLayout({ children }) {
       <AppContextProvider>
         <html lang="en">
           <body className={outfit.className}>
-            <Navbar />
+            {/* <Navbar /> */}
             <Toaster />
             <main className="min-h-screen">
               {children}

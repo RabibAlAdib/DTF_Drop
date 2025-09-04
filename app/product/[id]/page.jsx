@@ -38,7 +38,7 @@ const Product = () => {
       try {
         setLoading(true);
         
-        // First try to find in local products array
+        // Find product in local products array
         const product = products.find(p => p._id === params.id);
         
         if (product) {
@@ -48,19 +48,8 @@ const Product = () => {
           setSelectedColor(product.colors?.[0] || '');
           setSelectedSize(product.sizes?.[0] || '');
         } else {
-          // If not found in local array, fetch from API
-          const response = await fetch(`/api/product/${params.id}`);
-          const data = await response.json();
-          
-          if (data.success) {
-            setProductData(data.product);
-            setMainImage(data.product.images?.[0] || '');
-            // Set default selected color and size
-            setSelectedColor(data.product.colors?.[0] || '');
-            setSelectedSize(data.product.sizes?.[0] || '');
-          } else {
-            toast.error('Product not found');
-          }
+          // Product not found in local array
+          toast.error('Product not found');
         }
       } catch (error) {
         console.error('Error fetching product:', error);
@@ -70,7 +59,7 @@ const Product = () => {
       }
     };
     
-    if (params.id) {
+    if (params.id && products.length > 0) {
       fetchProduct();
     }
   }, [params.id, products]);
@@ -124,6 +113,8 @@ const Product = () => {
       size: selectedSize,
       quantity: quantity
     });
+    
+    toast.success('Added to cart!');
   };
   
   // Handle size selection properly

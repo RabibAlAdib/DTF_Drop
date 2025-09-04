@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server'
-import products from '@/data/products.json'
+import Product from "@/models/Product";
 
 export async function GET(request, { params }) {
   try {
     const { id } = params
     
     // Find product by ID
-    const product = products.find(p => p._id === id)
+    const product = Product.find(p => p._id === id)
     
     if (!product) {
       return NextResponse.json(
