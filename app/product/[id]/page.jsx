@@ -126,15 +126,15 @@ const Product = () => {
     });
   };
 
-  // FIXED: Handle size selection properly
+  // Handle size selection properly
   const handleSizeSelect = (size) => {
-    console.log('Size selected:', size); // Debug log
+    console.log('Size selected:', size);
     setSelectedSize(size);
   };
 
-  // FIXED: Handle color selection properly
+  // Handle color selection properly
   const handleColorSelect = (color) => {
-    console.log('Color selected:', color); // Debug log
+    console.log('Color selected:', color);
     setSelectedColor(color);
   };
 
@@ -191,6 +191,20 @@ const Product = () => {
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
               {productData.name || 'Product Name'}
             </h1>
+            
+            {/* NEW: Display Gender and Design Type */}
+            <div className="flex flex-wrap gap-2 mb-4">
+              <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
+                {productData.gender?.charAt(0).toUpperCase() + productData.gender?.slice(1)}
+              </span>
+              <span className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm">
+                {productData.designType}
+              </span>
+              <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">
+                {productData.category}
+              </span>
+            </div>
+            
             <div className="flex items-center gap-2 mb-4">
               <div className="flex text-yellow-400">
                 {'★'.repeat(Math.floor(productData.ratings || 0))}
@@ -241,12 +255,11 @@ const Product = () => {
             </div>
           </div>
 
-          {/* FIXED: Size Selection */}
+          {/* Size Selection */}
           <div className="space-y-3">
             <h3 className="text-lg font-semibold">Size: {selectedSize}</h3>
             <div className="flex flex-wrap gap-2">
               {AVAILABLE_SIZES.map((size) => {
-                // Check if this size is available for the product
                 const isSizeAvailable = productData.sizes?.includes(size);
                 const isSelected = selectedSize === size;
                 
@@ -267,11 +280,6 @@ const Product = () => {
                   </button>
                 );
               })}
-            </div>
-            
-            {/* Debug info - remove in production */}
-            <div className="text-xs text-gray-500">
-              Available sizes: {productData.sizes?.join(', ') || 'None'}
             </div>
           </div>
 
@@ -341,13 +349,6 @@ const Product = () => {
             >
               Add to Cart
             </button>
-          </div>
-
-          {/* Debug info - remove in production */}
-          <div className="text-xs text-gray-500 border-t pt-2">
-            <div>Selected Color: {selectedColor}</div>
-            <div>Selected Size: {selectedSize}</div>
-            <div>Variant Available: {isVariantAvailable() ? 'Yes' : 'No'}</div>
           </div>
         </div>
       </div>

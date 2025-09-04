@@ -34,12 +34,14 @@ export async function POST(request) {
     const offerPrice = formData.get('offerPrice');
     const files = formData.getAll('images');
     
-    // NEW: Get color and size data
+    // NEW: Get additional fields
+    const gender = formData.get('gender');
+    const designType = formData.get('designType');
     const colors = formData.getAll('colors');
     const sizes = formData.getAll('sizes');
 
     // Validate required fields
-    if (!name || !description || !category || !price) {
+    if (!name || !description || !category || !price || !gender || !designType) {
       return NextResponse.json({
         success: false,
         message: "Please fill all required fields."
@@ -94,14 +96,14 @@ export async function POST(request) {
     // Connect to database
     await connectDB();
 
-    // NEW: Generate variants for each color-size combination
+    // Generate variants for each color-size combination
     const variants = [];
     colors.forEach(color => {
       sizes.forEach(size => {
         variants.push({
           color,
           size,
-          stock: 12, // Default stock for each variant
+          stock: 10, // Default stock for each variant
           sku: `${name.substring(0, 3).toUpperCase()}-${color.substring(0, 2).toUpperCase()}-${size}-${Date.now()}`
         });
       });
@@ -121,7 +123,7 @@ export async function POST(request) {
     });
     */
 
-    // Updated product creation with variants
+    // Updated product creation with all new fields
     const newProduct = new Product({
       userId,
       name,
@@ -130,9 +132,13 @@ export async function POST(request) {
       price: Number(price),
       offerPrice: offerPrice ? Number(offerPrice) : undefined,
       images: images,
+      gender: gender,
+      designType: designType,
       colors: colors,
       sizes: sizes,
       variants: variants,
+      ratings: 4.3, // Default rating
+      numOfReviews: 2, // Default number of reviews
       date: Date.now()
     });
 
