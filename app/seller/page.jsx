@@ -20,7 +20,9 @@ const AddProduct = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    
     const formData = new FormData();
+    console.log(formData);
     formData.append('name', name);
     formData.append('description', description);
     formData.append('category', category);
@@ -157,7 +159,6 @@ const AddProduct = () => {
             <input
               id="offer-price"
               type="number"
-              placeholder="0"
               className="outline-none md:py-2.5 py-2 px-3 rounded border border-gray-500/40"
               onChange={(e) => setOfferPrice(e.target.value)}
               value={offerPrice}
