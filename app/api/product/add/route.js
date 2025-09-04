@@ -20,9 +20,9 @@ export async function POST(request) {
     // Check if user is a seller
     const isSeller = await authSeller(userId);
     if (!isSeller) {
-      return NextResponse.json({ 
-        success: false, 
-        message: "Unauthorized Access. Only Sellers are allowed to add products." 
+      return NextResponse.json({
+        success: false,
+        message: "Unauthorized Access. Only Sellers are allowed to add products."
       });
     }
 
@@ -33,19 +33,38 @@ export async function POST(request) {
     const price = formData.get('price');
     const offerPrice = formData.get('offerPrice');
     const files = formData.getAll('images');
+    
+    // NEW: Get color and size data
+    const colors = formData.getAll('colors');
+    const sizes = formData.getAll('sizes');
 
     // Validate required fields
     if (!name || !description || !category || !price) {
-      return NextResponse.json({ 
-        success: false, 
-        message: "Please fill all required fields." 
+      return NextResponse.json({
+        success: false,
+        message: "Please fill all required fields."
       });
     }
 
     if (!files || files.length === 0) {
-      return NextResponse.json({ 
-        success: false, 
-        message: "Please upload at least one image." 
+      return NextResponse.json({
+        success: false,
+        message: "Please upload at least one image."
+      });
+    }
+
+    // NEW: Validate colors and sizes
+    if (!colors || colors.length === 0) {
+      return NextResponse.json({
+        success: false,
+        message: "Please select at least one color."
+      });
+    }
+
+    if (!sizes || sizes.length === 0) {
+      return NextResponse.json({
+        success: false,
+        message: "Please select at least one size."
       });
     }
 
@@ -75,7 +94,21 @@ export async function POST(request) {
     // Connect to database
     await connectDB();
 
-    // Create and save the product - THIS IS THE CRITICAL FIX!
+    // NEW: Generate variants for each color-size combination
+    const variants = [];
+    colors.forEach(color => {
+      sizes.forEach(size => {
+        variants.push({
+          color,
+          size,
+          stock: 10, // Default stock for each variant
+          sku: `${name.substring(0, 3).toUpperCase()}-${color.substring(0, 2).toUpperCase()}-${size}-${Date.now()}`
+        });
+      });
+    });
+
+    // Previous product creation (commented for reference)
+    /*
     const newProduct = new Product({
       userId,
       name,
@@ -83,26 +116,41 @@ export async function POST(request) {
       category,
       price: Number(price),
       offerPrice: Number(offerPrice),
-      images: images, // Fixed: changed from 'image' to 'images' to match schema
+      images: images,
+      date: Date.now()
+    });
+    */
+
+    // Updated product creation with variants
+    const newProduct = new Product({
+      userId,
+      name,
+      description,
+      category,
+      price: Number(price),
+      offerPrice: offerPrice ? Number(offerPrice) : undefined,
+      images: images,
+      colors: colors,
+      sizes: sizes,
+      variants: variants,
       date: Date.now()
     });
 
     // SAVE THE PRODUCT TO DATABASE
     const savedProduct = await newProduct.save();
-
     console.log("Product saved successfully:", savedProduct); // Debug log
 
-    return NextResponse.json({ 
-      success: true, 
-      product: savedProduct, 
-      message: "Product added successfully." 
+    return NextResponse.json({
+      success: true,
+      product: savedProduct,
+      message: "Product added successfully."
     });
 
   } catch (error) {
     console.error("Error adding product:", error); // Debug log
-    return NextResponse.json({ 
-      success: false, 
-      message: error.message 
+    return NextResponse.json({
+      success: false,
+      message: error.message
     });
   }
 }

@@ -1,143 +1,329 @@
-"use client"
-import { useEffect, useState } from "react";
-import { assets } from "@/assets/assets";
-import ProductCard from "@/components/ProductCard";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-import Image from "next/image";
-import { useParams } from "next/navigation";
-import Loading from "@/components/Loading";
-import { useAppContext } from "@/context/AppContext";
-import React from "react";
+'use client';
+import { useState, useEffect } from 'react';
+import { useParams } from 'next/navigation';
+import { useAppContext } from '@/context/AppContext';
+import { assets } from '@/assets/assets';
+import Image from 'next/image';
+import Loading from '@/components/Loading';
+import toast from 'react-hot-toast';
+
+// Available colors and sizes
+const AVAILABLE_COLORS = ['Black', 'White', 'Lite Pink', 'Coffee', 'Offwhite', 'NevyBlue'];
+const AVAILABLE_SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
+
+// Color mapping for display
+const COLOR_MAP = {
+  'Black': 'bg-black',
+  'White': 'bg-white border border-gray-300',
+  'Lite Pink': 'bg-pink-200',
+  'Coffee': 'bg-amber-800',
+  'Offwhite': 'bg-gray-100 border border-gray-300',
+  'NevyBlue': 'bg-blue-900'
+};
 
 const Product = () => {
+  const { products, addToCart } = useAppContext();
+  const params = useParams();
+  const [productData, setProductData] = useState(null);
+  const [mainImage, setMainImage] = useState('');
+  const [loading, setLoading] = useState(true);
+  
+  // NEW: State for selected variants
+  const [selectedColor, setSelectedColor] = useState('');
+  const [selectedSize, setSelectedSize] = useState('');
+  const [quantity, setQuantity] = useState(1);
 
-    const { id } = useParams();
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        setLoading(true);
+        
+        // First try to find in local products array
+        const product = products.find(p => p._id === params.id);
+        
+        if (product) {
+          setProductData(product);
+          setMainImage(product.images?.[0] || '');
+          // Set default selected color and size
+          setSelectedColor(product.colors?.[0] || '');
+          setSelectedSize(product.sizes?.[0] || '');
+        } else {
+          // If not found in local array, fetch from API
+          const response = await fetch(`/api/product/${params.id}`);
+          const data = await response.json();
+          
+          if (data.success) {
+            setProductData(data.product);
+            setMainImage(data.product.images?.[0] || '');
+            // Set default selected color and size
+            setSelectedColor(data.product.colors?.[0] || '');
+            setSelectedSize(data.product.sizes?.[0] || '');
+          } else {
+            toast.error('Product not found');
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching product:', error);
+        toast.error('Failed to load product');
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    const { products, router, addToCart } = useAppContext()
-
-    const [mainImage, setMainImage] = useState(null);
-    const [productData, setProductData] = useState(null);
-
-    const fetchProductData = async () => {
-        const product = products.find(product => product._id === id);
-        setProductData(product);
+    if (params.id) {
+      fetchProduct();
     }
+  }, [params.id, products]);
 
-    useEffect(() => {
-        fetchProductData();
-    }, [id, products.length])
+  // Loading state
+  if (loading) {
+    return <Loading />;
+  }
 
-    return productData ? (<>
-        <Navbar />
-        <div className="px-6 md:px-16 lg:px-32 pt-14 space-y-10">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
-                <div className="px-5 lg:px-16 xl:px-20">
-                    <div className="rounded-lg overflow-hidden bg-gray-500/10 mb-4">
-                        <Image
-                            src={mainImage || productData.image[0]}
-                            alt="alt"
-                            className="w-full h-auto object-cover mix-blend-multiply"
-                            width={1280}
-                            height={720}
-                        />
-                    </div>
+  // Product not found state
+  if (!productData) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <h1 className="text-2xl font-bold text-gray-800 mb-4">Product Not Found</h1>
+        <p className="text-gray-600 mb-6">The product you're looking for doesn't exist.</p>
+        <button 
+          onClick={() => window.history.back()}
+          className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors"
+        >
+          Go Back
+        </button>
+      </div>
+    );
+  }
 
-                    <div className="grid grid-cols-4 gap-4">
-                        {productData.image.map((image, index) => (
-                            <div
-                                key={index}
-                                onClick={() => setMainImage(image)}
-                                className="cursor-pointer rounded-lg overflow-hidden bg-gray-500/10"
-                            >
-                                <Image
-                                    src={image}
-                                    alt="alt"
-                                    className="w-full h-auto object-cover mix-blend-multiply"
-                                    width={1280}
-                                    height={720}
-                                />
-                            </div>
+  // NEW: Check if selected variant is available
+  const isVariantAvailable = () => {
+    if (!selectedColor || !selectedSize) return false;
+    
+    const variant = productData.variants?.find(
+      v => v.color === selectedColor && v.size === selectedSize
+    );
+    
+    return variant && variant.stock > 0;
+  };
 
-                        ))}
-                    </div>
+  // NEW: Handle add to cart with variants
+  const handleAddToCart = () => {
+    if (!selectedColor || !selectedSize) {
+      toast.error('Please select color and size');
+      return;
+    }
+    
+    if (!isVariantAvailable()) {
+      toast.error('Selected variant is not available');
+      return;
+    }
+    
+    addToCart(productData._id, {
+      color: selectedColor,
+      size: selectedSize,
+      quantity: quantity
+    });
+  };
+
+  return (
+    <div className="px-4 md:px-8 lg:px-16 py-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {/* Product Images */}
+        <div className="space-y-4">
+          <div className="rounded-lg overflow-hidden bg-gray-500/10 mb-4">
+            <Image
+              src={mainImage || '/placeholder-image.jpg'}
+              alt={productData.name || 'Product image'}
+              className="w-full h-auto object-cover mix-blend-multiply"
+              width={1280}
+              height={720}
+              onError={(e) => {
+                e.target.src = '/placeholder-image.jpg';
+              }}
+            />
+          </div>
+          
+          {/* Thumbnail Images */}
+          <div className="grid grid-cols-4 gap-2">
+            {productData.images && productData.images.length > 0 ? (
+              productData.images.map((image, index) => (
+                <div 
+                  key={index}
+                  className="rounded-lg overflow-hidden bg-gray-500/10 cursor-pointer border-2 border-transparent hover:border-blue-500 transition-colors"
+                  onClick={() => setMainImage(image)}
+                >
+                  <Image
+                    src={image || '/placeholder-image.jpg'}
+                    alt={`${productData.name} ${index + 1}`}
+                    className="w-full h-20 object-cover"
+                    width={100}
+                    height={80}
+                    onError={(e) => {
+                      e.target.src = '/placeholder-image.jpg';
+                    }}
+                  />
                 </div>
-
-                <div className="flex flex-col">
-                    <h1 className="text-3xl font-medium text-gray-800/90 mb-4">
-                        {productData.name}
-                    </h1>
-                    <div className="flex items-center gap-2">
-                        <div className="flex items-center gap-0.5">
-                            <Image className="h-4 w-4" src={assets.star_icon} alt="star_icon" />
-                            <Image className="h-4 w-4" src={assets.star_icon} alt="star_icon" />
-                            <Image className="h-4 w-4" src={assets.star_icon} alt="star_icon" />
-                            <Image className="h-4 w-4" src={assets.star_icon} alt="star_icon" />
-                            <Image
-                                className="h-4 w-4"
-                                src={assets.star_dull_icon}
-                                alt="star_dull_icon"
-                            />
-                        </div>
-                        <p>(4.5)</p>
-                    </div>
-                    <p className="text-gray-600 mt-3">
-                        {productData.description}
-                    </p>
-                    <p className="text-3xl font-medium mt-6">
-                        ${productData.offerPrice}
-                        <span className="text-base font-normal text-gray-800/60 line-through ml-2">
-                            ${productData.price}
-                        </span>
-                    </p>
-                    <hr className="bg-gray-600 my-6" />
-                    <div className="overflow-x-auto">
-                        <table className="table-auto border-collapse w-full max-w-72">
-                            <tbody>
-                                <tr>
-                                    <td className="text-gray-600 font-medium">Brand</td>
-                                    <td className="text-gray-800/50 ">Generic</td>
-                                </tr>
-                                <tr>
-                                    <td className="text-gray-600 font-medium">Color</td>
-                                    <td className="text-gray-800/50 ">Multi</td>
-                                </tr>
-                                <tr>
-                                    <td className="text-gray-600 font-medium">Category</td>
-                                    <td className="text-gray-800/50">
-                                        {productData.category}
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div className="flex items-center mt-10 gap-4">
-                        <button onClick={() => addToCart(productData._id)} className="w-full py-3.5 bg-gray-100 text-gray-800/80 hover:bg-gray-200 transition">
-                            Add to Cart
-                        </button>
-                        <button onClick={() => { addToCart(productData._id); router.push('/cart') }} className="w-full py-3.5 bg-orange-500 text-white hover:bg-orange-600 transition">
-                            Buy now
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <div className="flex flex-col items-center">
-                <div className="flex flex-col items-center mb-4 mt-16">
-                    <p className="text-3xl font-medium">Featured <span className="font-medium text-orange-600">Products</span></p>
-                    <div className="w-28 h-0.5 bg-orange-600 mt-2"></div>
-                </div>
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 mt-6 pb-14 w-full">
-                    {products.slice(0, 5).map((product, index) => <ProductCard key={index} product={product} />)}
-                </div>
-                <button className="px-8 py-2 mb-16 border rounded text-gray-500/70 hover:bg-slate-50/90 transition">
-                    See more
-                </button>
-            </div>
+              ))
+            ) : (
+              <div className="col-span-4 text-center py-8 text-gray-500">
+                No images available
+              </div>
+            )}
+          </div>
         </div>
-        <Footer />
-    </>
-    ) : <Loading />
+
+        {/* Product Details */}
+        <div className="space-y-6">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              {productData.name || 'Product Name'}
+            </h1>
+            <div className="flex items-center gap-2 mb-4">
+              <div className="flex text-yellow-400">
+                {'★'.repeat(Math.floor(productData.ratings || 0))}
+                {'☆'.repeat(5 - Math.floor(productData.ratings || 0))}
+              </div>
+              <span className="text-gray-600">
+                ({productData.numOfReviews || 0} reviews)
+              </span>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <div className="flex items-center gap-3">
+              {productData.offerPrice ? (
+                <>
+                  <span className="text-3xl font-bold text-green-600">
+                    ${productData.offerPrice}
+                  </span>
+                  <span className="text-xl text-gray-500 line-through">
+                    ${productData.price}
+                  </span>
+                  <span className="bg-red-100 text-red-800 px-2 py-1 rounded text-sm">
+                    Save ${productData.price - productData.offerPrice}
+                  </span>
+                </>
+              ) : (
+                <span className="text-3xl font-bold text-gray-900">
+                  ${productData.price || '0.00'}
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* NEW: Color Selection */}
+          <div className="space-y-3">
+            <h3 className="text-lg font-semibold">Color: {selectedColor}</h3>
+            <div className="flex flex-wrap gap-2">
+              {productData.colors?.map((color) => (
+                <button
+                  key={color}
+                  className={`w-8 h-8 rounded-full ${COLOR_MAP[color]} border-2 ${
+                    selectedColor === color ? 'border-blue-500 ring-2 ring-blue-200' : 'border-transparent'
+                  } transition-all cursor-pointer hover:scale-110`}
+                  onClick={() => setSelectedColor(color)}
+                  title={color}
+                  disabled={!productData.colors.includes(color)}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* NEW: Size Selection */}
+          <div className="space-y-3">
+            <h3 className="text-lg font-semibold">Size: {selectedSize}</h3>
+            <div className="flex flex-wrap gap-2">
+              {AVAILABLE_SIZES.map((size) => (
+                <button
+                  key={size}
+                  className={`px-4 py-2 border rounded-lg transition-all ${
+                    selectedSize === size
+                      ? 'bg-blue-500 text-white border-blue-500'
+                      : productData.sizes?.includes(size)
+                      ? 'bg-white text-gray-700 border-gray-300 hover:border-blue-500'
+                      : 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
+                  }`}
+                  onClick={() => productData.sizes?.includes(size) && setSelectedSize(size)}
+                  disabled={!productData.sizes?.includes(size)}
+                >
+                  {size}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* NEW: Quantity Selection */}
+          <div className="space-y-3">
+            <h3 className="text-lg font-semibold">Quantity</h3>
+            <div className="flex items-center gap-3">
+              <button
+                className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center hover:bg-gray-300 transition-colors disabled:opacity-50"
+                onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                disabled={quantity <= 1}
+              >
+                -
+              </button>
+              <span className="text-lg font-semibold min-w-[2rem] text-center">{quantity}</span>
+              <button
+                className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center hover:bg-gray-300 transition-colors"
+                onClick={() => setQuantity(quantity + 1)}
+              >
+                +
+              </button>
+            </div>
+          </div>
+
+          {/* NEW: Variant Availability */}
+          {selectedColor && selectedSize && (
+            <div className="text-sm">
+              {isVariantAvailable() ? (
+                <span className="text-green-600">✓ In Stock</span>
+              ) : (
+                <span className="text-red-600">✗ Out of Stock</span>
+              )}
+            </div>
+          )}
+
+          <div>
+            <h3 className="text-lg font-semibold mb-2">Description</h3>
+            <p className="text-gray-700 leading-relaxed">
+              {productData.description || 'No description available.'}
+            </p>
+          </div>
+
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <span className="font-semibold">Category:</span>
+              <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
+                {productData.category || 'Uncategorized'}
+              </span>
+            </div>
+            
+            <div className="flex items-center gap-2">
+              <span className="font-semibold">Sold:</span>
+              <span>{productData.numberofSales || 0} units</span>
+            </div>
+          </div>
+
+          {/* Add to Cart Button */}
+          <div className="pt-6">
+            <button
+              className={`w-full py-3 px-6 rounded-lg font-semibold transition-colors ${
+                isVariantAvailable()
+                  ? 'bg-blue-600 text-white hover:bg-blue-700'
+                  : 'bg-gray-400 text-gray-200 cursor-not-allowed'
+              }`}
+              onClick={handleAddToCart}
+              disabled={!isVariantAvailable()}
+            >
+              Add to Cart
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default Product;
