@@ -28,7 +28,7 @@ const Product = () => {
   const [mainImage, setMainImage] = useState('');
   const [loading, setLoading] = useState(true);
   
-  // NEW: State for selected variants
+  // State for selected variants
   const [selectedColor, setSelectedColor] = useState('');
   const [selectedSize, setSelectedSize] = useState('');
   const [quantity, setQuantity] = useState(1);
@@ -96,7 +96,7 @@ const Product = () => {
     );
   }
 
-  // NEW: Check if selected variant is available
+  // Check if selected variant is available
   const isVariantAvailable = () => {
     if (!selectedColor || !selectedSize) return false;
     
@@ -107,7 +107,7 @@ const Product = () => {
     return variant && variant.stock > 0;
   };
 
-  // NEW: Handle add to cart with variants
+  // Handle add to cart with variants
   const handleAddToCart = () => {
     if (!selectedColor || !selectedSize) {
       toast.error('Please select color and size');
@@ -124,6 +124,18 @@ const Product = () => {
       size: selectedSize,
       quantity: quantity
     });
+  };
+
+  // FIXED: Handle size selection properly
+  const handleSizeSelect = (size) => {
+    console.log('Size selected:', size); // Debug log
+    setSelectedSize(size);
+  };
+
+  // FIXED: Handle color selection properly
+  const handleColorSelect = (color) => {
+    console.log('Color selected:', color); // Debug log
+    setSelectedColor(color);
   };
 
   return (
@@ -212,7 +224,7 @@ const Product = () => {
             </div>
           </div>
 
-          {/* NEW: Color Selection */}
+          {/* Color Selection */}
           <div className="space-y-3">
             <h3 className="text-lg font-semibold">Color: {selectedColor}</h3>
             <div className="flex flex-wrap gap-2">
@@ -222,38 +234,48 @@ const Product = () => {
                   className={`w-8 h-8 rounded-full ${COLOR_MAP[color]} border-2 ${
                     selectedColor === color ? 'border-blue-500 ring-2 ring-blue-200' : 'border-transparent'
                   } transition-all cursor-pointer hover:scale-110`}
-                  onClick={() => setSelectedColor(color)}
+                  onClick={() => handleColorSelect(color)}
                   title={color}
-                  disabled={!productData.colors.includes(color)}
                 />
               ))}
             </div>
           </div>
 
-          {/* NEW: Size Selection */}
+          {/* FIXED: Size Selection */}
           <div className="space-y-3">
             <h3 className="text-lg font-semibold">Size: {selectedSize}</h3>
             <div className="flex flex-wrap gap-2">
-              {AVAILABLE_SIZES.map((size) => (
-                <button
-                  key={size}
-                  className={`px-4 py-2 border rounded-lg transition-all ${
-                    selectedSize === size
-                      ? 'bg-blue-500 text-white border-blue-500'
-                      : productData.sizes?.includes(size)
-                      ? 'bg-white text-gray-700 border-gray-300 hover:border-blue-500'
-                      : 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
-                  }`}
-                  onClick={() => productData.sizes?.includes(size) && setSelectedSize(size)}
-                  disabled={!productData.sizes?.includes(size)}
-                >
-                  {size}
-                </button>
-              ))}
+              {AVAILABLE_SIZES.map((size) => {
+                // Check if this size is available for the product
+                const isSizeAvailable = productData.sizes?.includes(size);
+                const isSelected = selectedSize === size;
+                
+                return (
+                  <button
+                    key={size}
+                    className={`px-4 py-2 border rounded-lg transition-all ${
+                      isSelected
+                        ? 'bg-blue-500 text-white border-blue-500'
+                        : isSizeAvailable
+                        ? 'bg-white text-gray-700 border-gray-300 hover:border-blue-500 hover:bg-blue-50'
+                        : 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
+                    }`}
+                    onClick={() => isSizeAvailable && handleSizeSelect(size)}
+                    disabled={!isSizeAvailable}
+                  >
+                    {size}
+                  </button>
+                );
+              })}
+            </div>
+            
+            {/* Debug info - remove in production */}
+            <div className="text-xs text-gray-500">
+              Available sizes: {productData.sizes?.join(', ') || 'None'}
             </div>
           </div>
 
-          {/* NEW: Quantity Selection */}
+          {/* Quantity Selection */}
           <div className="space-y-3">
             <h3 className="text-lg font-semibold">Quantity</h3>
             <div className="flex items-center gap-3">
@@ -274,7 +296,7 @@ const Product = () => {
             </div>
           </div>
 
-          {/* NEW: Variant Availability */}
+          {/* Variant Availability */}
           {selectedColor && selectedSize && (
             <div className="text-sm">
               {isVariantAvailable() ? (
@@ -319,6 +341,13 @@ const Product = () => {
             >
               Add to Cart
             </button>
+          </div>
+
+          {/* Debug info - remove in production */}
+          <div className="text-xs text-gray-500 border-t pt-2">
+            <div>Selected Color: {selectedColor}</div>
+            <div>Selected Size: {selectedSize}</div>
+            <div>Variant Available: {isVariantAvailable() ? 'Yes' : 'No'}</div>
           </div>
         </div>
       </div>

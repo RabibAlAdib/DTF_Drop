@@ -101,7 +101,7 @@ export async function POST(request) {
         variants.push({
           color,
           size,
-          stock: 10, // Default stock for each variant
+          stock: 12, // Default stock for each variant
           sku: `${name.substring(0, 3).toUpperCase()}-${color.substring(0, 2).toUpperCase()}-${size}-${Date.now()}`
         });
       });
