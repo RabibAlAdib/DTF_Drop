@@ -8,11 +8,9 @@ import Loading from '@/components/Loading';
 import toast from 'react-hot-toast';
 import ProductRecommendations from '@/components/ProductRecommendations'
 
-
 // Available colors and sizes
 const AVAILABLE_COLORS = ['Black', 'White', 'Lite Pink', 'Coffee', 'Offwhite', 'NevyBlue'];
-const AVAILABLE_SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
-
+const AVAILABLE_SIZES = ['M', 'L', 'XL', ]; //'XXL(Special Order)'
 // Color mapping for display
 const COLOR_MAP = {
   'Black': 'bg-black',
@@ -71,17 +69,17 @@ const Product = () => {
         setLoading(false);
       }
     };
-
+    
     if (params.id) {
       fetchProduct();
     }
   }, [params.id, products]);
-
+  
   // Loading state
   if (loading) {
     return <Loading />;
   }
-
+  
   // Product not found state
   if (!productData) {
     return (
@@ -97,7 +95,7 @@ const Product = () => {
       </div>
     );
   }
-
+  
   // Check if selected variant is available
   const isVariantAvailable = () => {
     if (!selectedColor || !selectedSize) return false;
@@ -108,7 +106,7 @@ const Product = () => {
     
     return variant && variant.stock > 0;
   };
-
+  
   // Handle add to cart with variants
   const handleAddToCart = () => {
     if (!selectedColor || !selectedSize) {
@@ -127,13 +125,13 @@ const Product = () => {
       quantity: quantity
     });
   };
-
+  
   // Handle size selection properly
   const handleSizeSelect = (size) => {
     console.log('Size selected:', size);
     setSelectedSize(size);
   };
-
+  
   // Handle color selection properly
   const handleColorSelect = (color) => {
     console.log('Color selected:', color);
@@ -152,6 +150,8 @@ const Product = () => {
                 className="w-full h-auto object-cover mix-blend-multiply"
                 width={1280}
                 height={720}
+                priority
+                sizes="(max-width: 768px) 100vw, 50vw"
                 onError={(e) => {
                     e.target.src = '/placeholder-image.jpg';
                 }}
@@ -173,6 +173,8 @@ const Product = () => {
                         className="w-full h-20 object-cover"
                         width={100}
                         height={80}
+                        sizes="80px"
+                        loading="lazy"
                         onError={(e) => {
                         e.target.src = '/placeholder-image.jpg';
                         }}
@@ -186,7 +188,7 @@ const Product = () => {
                 )}
             </div>
             </div>
-
+            
             {/* Product Details */}
             <div className="space-y-6">
             <div>
@@ -194,7 +196,7 @@ const Product = () => {
                 {productData.name || 'Product Name'}
                 </h1>
                 
-                {/* NEW: Display Gender and Design Type */}
+                {/* Display Gender and Design Type */}
                 <div className="flex flex-wrap gap-2 mb-4">
                 <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
                     {productData.gender ? 
@@ -219,7 +221,7 @@ const Product = () => {
                 </span>
                 </div>
             </div>
-
+            
             <div className="space-y-2">
                 <div className="flex items-center gap-3">
                 {productData.offerPrice ? (
@@ -241,7 +243,7 @@ const Product = () => {
                 )}
                 </div>
             </div>
-
+            
             {/* Color Selection */}
             <div className="space-y-3">
                 <h3 className="text-lg font-semibold">Color: {selectedColor}</h3>
@@ -258,7 +260,7 @@ const Product = () => {
                 ))}
                 </div>
             </div>
-
+            
             {/* Size Selection */}
             <div className="space-y-3">
                 <h3 className="text-lg font-semibold">Size: {selectedSize}</h3>
@@ -286,7 +288,7 @@ const Product = () => {
                 })}
                 </div>
             </div>
-
+            
             {/* Quantity Selection */}
             <div className="space-y-3">
                 <h3 className="text-lg font-semibold">Quantity</h3>
@@ -307,7 +309,7 @@ const Product = () => {
                 </button>
                 </div>
             </div>
-
+            
             {/* Variant Availability */}
             {selectedColor && selectedSize && (
                 <div className="text-sm">
@@ -318,14 +320,14 @@ const Product = () => {
                 )}
                 </div>
             )}
-
+            
             <div>
                 <h3 className="text-lg font-semibold mb-2">Description</h3>
                 <p className="text-gray-700 leading-relaxed">
                 {productData.description || 'No description available.'}
                 </p>
             </div>
-
+            
             <div className="space-y-4">
                 <div className="flex items-center gap-2">
                 <span className="font-semibold">Category:</span>
@@ -339,7 +341,7 @@ const Product = () => {
                 <span>{productData.numberofSales || 0} units</span>
                 </div>
             </div>
-
+            
             {/* Add to Cart Button */}
             <div className="pt-6">
                 <button
@@ -357,11 +359,11 @@ const Product = () => {
             </div>
         </div>
         
-        // Add this component after the product description section:
+        {/* Product Recommendations */}
         <div className="mt-12">
         <h2 className="text-2xl font-bold mb-6">You May Also Like</h2>
         <ProductRecommendations 
-            currentProductId={productData.id} 
+            currentProductId={productData._id} 
             category={productData.category} 
         />
         </div>

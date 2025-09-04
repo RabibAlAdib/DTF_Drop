@@ -3,14 +3,14 @@ import { AppContextProvider } from '@/context/AppContext'
 import { Outfit } from 'next/font/google'
 import './globals.css'
 import { Toaster } from 'react-hot-toast'
-import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import Navbar from '@/components/Navbar'
 
 const outfit = Outfit({ subsets: ['latin'] })
 
 export const metadata = {
-  title: 'QuickCart',
-  description: 'Ecommerce website',
+  title: 'DTF Drop',
+  description: 'Online Drop Shoulder Shop..',
 }
 
 export default function RootLayout({ children }) {
@@ -19,12 +19,12 @@ export default function RootLayout({ children }) {
       <AppContextProvider>
         <html lang="en">
           <body className={outfit.className}>
-            <Header />
+            <Navbar />
+            <Toaster />
             <main className="min-h-screen">
               {children}
             </main>
             <Footer />
-            <Toaster />
           </body>
         </html>
       </AppContextProvider>

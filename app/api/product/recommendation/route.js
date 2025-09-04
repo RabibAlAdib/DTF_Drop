@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 
 // Sample product data - replace with your actual data source
 const products = [
-  // ... your product data ...
+  // Your product data here
 ]
 
 export async function GET(request) {
@@ -13,15 +13,13 @@ export async function GET(request) {
   try {
     // Filter products by category and exclude current product
     const recommendations = products.filter(
-      product => 
-        product.category === category && 
-        product.id !== parseInt(excludeId)
+      product => product.category === category && product._id !== excludeId
     )
     
-    // Sort by popularity or rating if available
-    recommendations.sort((a, b) => (b.popularity || 0) - (a.popularity || 0))
+    // Limit to 4 recommendations
+    const limitedRecommendations = recommendations.slice(0, 4)
     
-    return NextResponse.json(recommendations)
+    return NextResponse.json(limitedRecommendations)
   } catch (error) {
     return NextResponse.json(
       { error: 'Failed to fetch recommendations' },
