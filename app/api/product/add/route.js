@@ -1,6 +1,9 @@
 import { v2 as cloudinary } from "cloudinary";
 import { getAuth } from '@clerk/nextjs/server';
 import authSeller from "@/lib/authSeller";
+import connectDB from "@/config/db";
+import Product from "@/models/Product";
+import { NextResponse } from "next/server";
 
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,

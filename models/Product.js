@@ -13,7 +13,7 @@ const productSchema = new mongoose.Schema({
     numOfReviews: {type: Number, required: false, default: 0},
     reviews: {type: Array, required: false, default: []},
     numberofSales: {type: Number, required: false, default: 0}
-})
+},{ timestamps: true })
 
 const Product = mongoose.models.product || mongoose.model('product', productSchema);
 
