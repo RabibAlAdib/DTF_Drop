@@ -7,6 +7,10 @@ import NewsLetter from "@/components/NewsLetter";
 import FeaturedProduct from "@/components/FeaturedProduct";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+// Add these imports:
+import Link from 'next/link'
+import Image from 'next/image'
+
 
 const Home = () => {
   return (
