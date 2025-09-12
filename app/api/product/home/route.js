@@ -1,0 +1,27 @@
+import { NextResponse } from 'next/server';
+import connectDB from '@/config/db';
+import Product from '@/models/Product';
+
+export async function GET(request) {
+  try {
+    await connectDB();
+    
+    // Get only the first 20 products for home page with optimized query
+    const products = await Product.find({})
+      .sort({ date: -1 })
+      .limit(20)
+      .lean() // Use lean() for better performance
+      .select('name price offerPrice images category date description'); // Select only needed fields
+    
+    return NextResponse.json({
+      success: true,
+      products
+    });
+  } catch (error) {
+    console.error('Error fetching home products:', error);
+    return NextResponse.json(
+      { success: false, message: 'Failed to fetch home products' },
+      { status: 500 }
+    );
+  }
+}

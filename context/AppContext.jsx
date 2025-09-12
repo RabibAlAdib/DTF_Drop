@@ -25,7 +25,8 @@ export const AppContextProvider = (props) => {
   const fetchProductData = async () => {
     // setProducts(productsDummyData)
     try {
-      const { data } = await axios.get('/api/product/list')
+      // Use optimized home endpoint for better performance
+      const { data } = await axios.get('/api/product/home')
       if (data.success) {
         setProducts(data.products)
       } else {
