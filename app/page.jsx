@@ -5,26 +5,16 @@ import HomeProducts from "@/components/HomeProducts";
 import Banner from "@/components/Banner";
 import NewsLetter from "@/components/NewsLetter";
 import FeaturedProduct from "@/components/FeaturedProduct";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-// Add these imports:
-import Link from 'next/link'
-import Image from 'next/image'
-
 
 const Home = () => {
   return (
-    <>
-      <Navbar/>
-      <div className="px-6 md:px-16 lg:px-32">
-        <HeaderSlider />
-        <HomeProducts />
-        <FeaturedProduct />
-        <Banner />
-        <NewsLetter />
-      </div>
-      <Footer />
-    </>
+    <div className="px-6 md:px-16 lg:px-32">
+      <HeaderSlider />
+      <HomeProducts />
+      <FeaturedProduct />
+      <Banner />
+      <NewsLetter />
+    </div>
   );
 };
 
