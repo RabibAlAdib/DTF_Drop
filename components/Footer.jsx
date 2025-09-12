@@ -1,6 +1,7 @@
 import React from "react";
 import { assets } from "@/assets/assets";
 import Image from "next/image";
+import Link from "next/link";
 
 const Footer = () => {
   return (
@@ -9,10 +10,10 @@ const Footer = () => {
         <div className="w-4/5">
           <Image className="w-28 md:w-32" src={assets.logo} alt="logo" />
           <p className="mt-6 text-sm">
-            Lorem Ipsum is simply dummy text of the printing and typesetting
-            industry. Lorem Ipsum has been the industry's standard dummy text
-            ever since the 1500s, when an unknown printer took a galley of type
-            and scrambled it to make a type specimen book.
+            DTF Drop is your premier destination for premium drop shoulder clothing. 
+            We combine style with functionality, offering high-quality, comfortable 
+            clothing designed for the modern lifestyle. Experience the perfect blend 
+            of contemporary fashion and unmatched comfort.
           </p>
         </div>
 
@@ -21,16 +22,16 @@ const Footer = () => {
             <h2 className="font-medium text-gray-900 mb-5">Company</h2>
             <ul className="text-sm space-y-2">
               <li>
-                <a className="hover:underline transition" href="#">Home</a>
+                <Link className="hover:underline transition" href="/">Home</Link>
               </li>
               <li>
-                <a className="hover:underline transition" href="#">About us</a>
+                <Link className="hover:underline transition" href="/about">About us</Link>
               </li>
               <li>
-                <a className="hover:underline transition" href="#">Contact us</a>
+                <Link className="hover:underline transition" href="/contact">Contact us</Link>
               </li>
               <li>
-                <a className="hover:underline transition" href="#">Privacy policy</a>
+                <Link className="hover:underline transition" href="/customization">Customization</Link>
               </li>
             </ul>
           </div>
@@ -38,16 +39,75 @@ const Footer = () => {
 
         <div className="w-1/2 flex items-start justify-start md:justify-center">
           <div>
-            <h2 className="font-medium text-gray-900 mb-5">Get in touch</h2>
+            <h2 className="font-medium text-gray-900 dark:text-white mb-5">Get in touch</h2>
             <div className="text-sm space-y-2">
-              <p>+1-234-567-890</p>
-              <p>contact@greatstack.dev</p>
+              <a 
+                href="https://wa.me/+8801344823831" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="hover:text-green-600 transition-colors"
+              >
+                +8801344823831
+              </a>
+              <p>dtfdrop25@gmail.com</p>
+            </div>
+            
+            {/* Social Media Icons */}
+            <div className="mt-6">
+              <h3 className="font-medium text-gray-900 dark:text-white mb-3">Follow Us</h3>
+              <div className="flex space-x-4">
+                <a 
+                  href="https://facebook.com/dtfdrop" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:text-blue-700 transition-colors text-xl"
+                  title="Facebook"
+                >
+                  📘
+                </a>
+                <a 
+                  href="https://www.facebook.com/groups/dtfdrop" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:text-blue-700 transition-colors text-xl"
+                  title="Facebook Group"
+                >
+                  🏠
+                </a>
+                <a 
+                  href="https://www.instagram.com/dtfdrop/" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-pink-600 hover:text-pink-700 transition-colors text-xl"
+                  title="Instagram"
+                >
+                  📷
+                </a>
+                <a 
+                  href="https://www.tiktok.com/@dtf.drop" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-gray-800 dark:text-white hover:text-gray-600 transition-colors text-xl"
+                  title="TikTok"
+                >
+                  🎵
+                </a>
+                <a 
+                  href="https://wa.me/+8801344823831" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-green-600 hover:text-green-700 transition-colors text-xl"
+                  title="WhatsApp"
+                >
+                  💬
+                </a>
+              </div>
             </div>
           </div>
         </div>
       </div>
       <p className="py-4 text-center text-xs md:text-sm">
-        Copyright 2025 © GreatStack.dev All Right Reserved.
+        Copyright 2025 © DTF Drop. All Rights Reserved.
       </p>
     </footer>
   );
