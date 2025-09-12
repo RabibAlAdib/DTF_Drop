@@ -212,7 +212,7 @@ const Product = () => {
     <>
       <Navbar />
       <div className="px-4 md:px-8 lg:px-16 py-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
             {/* Product Images */}
             <div className="space-y-4">
             <div className="rounded-lg overflow-hidden bg-gray-500/10 mb-4">
@@ -231,7 +231,7 @@ const Product = () => {
             </div>
             
             {/* Thumbnail Images - Show images for selected color */}
-            <div className="grid grid-cols-4 gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
                 {(() => {
                   const currentImages = selectedColor ? getImagesForColor(selectedColor) : getAllImages();
                   
@@ -323,15 +323,15 @@ const Product = () => {
             </div>
             
             {/* Color Selection */}
-            <div className="space-y-3">
+            <div className="space-y-3 animate-fade-in">
                 <h3 className="text-lg font-semibold dark:text-gray-200">Color: {selectedColor}</h3>
                 <div className="flex flex-wrap gap-2">
                 {productData.colors?.map((color) => (
                     <button
                     key={color}
-                    className={`w-8 h-8 rounded-full ${COLOR_MAP[color]} border-2 ${
-                        selectedColor === color ? 'border-blue-500 ring-2 ring-blue-200' : 'border-transparent'
-                    } transition-all cursor-pointer hover:scale-110`}
+                    className={`w-10 h-10 md:w-8 md:h-8 rounded-full ${COLOR_MAP[color]} border-2 ${
+                        selectedColor === color ? 'border-blue-500 ring-2 ring-blue-200 shadow-lg' : 'border-transparent'
+                    } transition-all duration-300 cursor-pointer hover:scale-110 transform hover:shadow-md min-h-[44px] min-w-[44px]`}
                     onClick={() => handleColorSelect(color)}
                     title={color}
                     />
@@ -340,7 +340,7 @@ const Product = () => {
             </div>
             
             {/* Size Selection */}
-            <div className="space-y-3">
+            <div className="space-y-3 animate-fade-in">
                 <h3 className="text-lg font-semibold dark:text-gray-200">Size: {selectedSize}</h3>
                 <div className="flex flex-wrap gap-2">
                 {(productData.sizes || []).map((size) => {
@@ -349,10 +349,10 @@ const Product = () => {
                     return (
                     <button
                         key={size}
-                        className={`px-4 py-2 border rounded-lg transition-all ${
+                        className={`px-4 py-2 border rounded-lg transition-all duration-300 transform hover:scale-105 min-h-[44px] min-w-[44px] ${
                         isSelected
-                            ? 'bg-blue-500 text-white border-blue-500'
-                            : 'bg-white text-gray-700 border-gray-300 hover:border-blue-500 hover:bg-blue-50 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600 dark:hover:border-blue-500'
+                            ? 'bg-blue-500 text-white border-blue-500 shadow-lg'
+                            : 'bg-white text-gray-700 border-gray-300 hover:border-blue-500 hover:bg-blue-50 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600 dark:hover:border-blue-500 hover:shadow-md'
                         }`}
                         onClick={() => handleSizeSelect(size)}
                     >
@@ -364,7 +364,7 @@ const Product = () => {
             </div>
             
             {/* Quantity Selection */}
-            <div className="space-y-3">
+            <div className="space-y-3 animate-fade-in">
                 <h3 className="text-lg font-semibold dark:text-gray-200">Quantity</h3>
                 <div className="flex items-center gap-3">
                 <button

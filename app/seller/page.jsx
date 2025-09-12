@@ -132,7 +132,7 @@ const AddProduct = () => {
           </label>
           <div className="space-y-4">
             {imageSlots.map((slot, index) => (
-              <div key={index} className="flex gap-4 p-4 border border-gray-200 dark:border-gray-600 rounded-lg">
+              <div key={index} className="flex flex-col sm:flex-row gap-4 p-4 border border-gray-200 dark:border-gray-600 rounded-lg">
                 <div className="flex-1">
                   <label 
                     htmlFor={`image${index}`}
@@ -159,7 +159,7 @@ const AddProduct = () => {
                   />
                 </div>
                 
-                <div className="w-48 space-y-2">
+                <div className="w-full sm:w-48 space-y-2">
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Color for this image
                   </label>
