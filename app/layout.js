@@ -1,5 +1,6 @@
 import { ClerkProvider } from '@clerk/nextjs'
 import { AppContextProvider } from '@/context/AppContext'
+import { ThemeProvider } from '@/context/ThemeContext'
 import { Outfit } from 'next/font/google'
 import './globals.css'
 import { Toaster } from 'react-hot-toast'
@@ -17,16 +18,18 @@ export default function RootLayout({ children }) {
   return (
     <ClerkProvider>
       <AppContextProvider>
-        <html lang="en">
-          <body className={outfit.className} suppressHydrationWarning={true}>
-            {/* <Navbar /> */}
-            <Toaster />
-            <main className="min-h-screen">
-              {children}
-            </main>
-            <Footer />
-          </body>
-        </html>
+        <ThemeProvider>
+          <html lang="en">
+            <body className={outfit.className} suppressHydrationWarning={true}>
+              {/* <Navbar /> */}
+              <Toaster />
+              <main className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors duration-300">
+                {children}
+              </main>
+              <Footer />
+            </body>
+          </html>
+        </ThemeProvider>
       </AppContextProvider>
     </ClerkProvider>
   )
