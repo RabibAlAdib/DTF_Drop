@@ -168,6 +168,10 @@ export const AppContextProvider = (props) => {
 
   // Add to favorites
   const addToFavorites = (productId) => {
+    if (!user) {
+      toast.error('Please log in to add items to favorites');
+      return;
+    }
     if (!favorites.includes(productId)) {
       setFavorites([...favorites, productId]);
       toast.success('Added to favorites!');
@@ -176,12 +180,17 @@ export const AppContextProvider = (props) => {
 
   // Remove from favorites
   const removeFromFavorites = (productId) => {
+    if (!user) {
+      toast.error('Please log in to manage favorites');
+      return;
+    }
     setFavorites(favorites.filter(id => id !== productId));
     toast.success('Removed from favorites!');
   }
 
   // Check if product is in favorites
   const isFavorite = (productId) => {
+    if (!user) return false;
     return favorites.includes(productId);
   }
 
