@@ -14,6 +14,24 @@ const nextConfig = {
             },
         ],
     },
+    // Configure for Replit environment
+    experimental: {
+        allowedHosts: true,
+    },
+    // Allow iframe embedding for Replit preview
+    async headers() {
+        return [
+            {
+                source: '/(.*)',
+                headers: [
+                    {
+                        key: 'X-Frame-Options',
+                        value: 'SAMEORIGIN',
+                    },
+                ],
+            },
+        ];
+    },
 };
 
 export default nextConfig;
