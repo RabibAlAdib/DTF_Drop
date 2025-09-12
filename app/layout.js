@@ -16,22 +16,22 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <ClerkProvider>
-      <AppContextProvider>
-        <ThemeProvider>
-          <html lang="en">
-            <body className={outfit.className} suppressHydrationWarning={true}>
-              {/* <Navbar /> */}
+    <html lang="en">
+      <body className={outfit.className} suppressHydrationWarning={true}>
+        <ClerkProvider>
+          <AppContextProvider>
+            <ThemeProvider>
+              <Navbar />
               <Toaster />
-              <main className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors duration-300">
+              <main className="min-h-screen bg-white dark:bg-black text-gray-900 dark:text-white transition-colors duration-300">
                 {children}
               </main>
               <Footer />
-            </body>
-          </html>
-        </ThemeProvider>
-      </AppContextProvider>
-    </ClerkProvider>
+            </ThemeProvider>
+          </AppContextProvider>
+        </ClerkProvider>
+      </body>
+    </html>
   )
 }
 

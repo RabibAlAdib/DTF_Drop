@@ -5,8 +5,8 @@ import Link from "next/link";
 
 const Footer = () => {
   return (
-    <footer>
-      <div className="flex flex-col md:flex-row items-start justify-center px-6 md:px-16 lg:px-32 gap-10 py-14 border-b border-gray-500/30 text-gray-500">
+    <footer className="bg-white dark:bg-black transition-colors duration-300">
+      <div className="flex flex-col md:flex-row items-start justify-center px-6 md:px-16 lg:px-32 gap-10 py-14 border-b border-gray-500/30 dark:border-gray-700 text-gray-500 dark:text-gray-300">
         <div className="w-4/5">
           <Image className="w-28 md:w-32" src={assets.logo} alt="logo" />
           <p className="mt-6 text-sm">
@@ -19,19 +19,19 @@ const Footer = () => {
 
         <div className="w-1/2 flex items-center justify-start md:justify-center">
           <div>
-            <h2 className="font-medium text-gray-900 mb-5">Company</h2>
+            <h2 className="font-medium text-gray-900 dark:text-white mb-5">Company</h2>
             <ul className="text-sm space-y-2">
               <li>
-                <Link className="hover:underline transition" href="/">Home</Link>
+                <Link className="hover:underline hover:text-gray-800 dark:hover:text-gray-100 transition" href="/">Home</Link>
               </li>
               <li>
-                <Link className="hover:underline transition" href="/about">About us</Link>
+                <Link className="hover:underline hover:text-gray-800 dark:hover:text-gray-100 transition" href="/about">About us</Link>
               </li>
               <li>
-                <Link className="hover:underline transition" href="/contact">Contact us</Link>
+                <Link className="hover:underline hover:text-gray-800 dark:hover:text-gray-100 transition" href="/contact">Contact us</Link>
               </li>
               <li>
-                <Link className="hover:underline transition" href="/customization">Customization</Link>
+                <Link className="hover:underline hover:text-gray-800 dark:hover:text-gray-100 transition" href="/customization">Customization</Link>
               </li>
             </ul>
           </div>
@@ -106,7 +106,7 @@ const Footer = () => {
           </div>
         </div>
       </div>
-      <p className="py-4 text-center text-xs md:text-sm">
+      <p className="py-4 text-center text-xs md:text-sm text-gray-600 dark:text-gray-400 bg-white dark:bg-black transition-colors duration-300">
         Copyright 2025 © DTF Drop. All Rights Reserved.
       </p>
     </footer>

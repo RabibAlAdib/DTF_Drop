@@ -48,8 +48,8 @@ const FeaturedProduct = () => {
             }`}
             style={{ transitionDelay: `${index * 200}ms` }}
           >
-            {/* Glowing border effect */}
-            <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-lg blur opacity-0 group-hover:opacity-50 transition duration-1000 group-hover:animate-pulse"></div>
+            {/* Glowing border shadow effect - transparent fill */}
+            <div className="absolute -inset-0.5 border-2 border-transparent bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-lg opacity-0 group-hover:opacity-60 transition duration-1000 group-hover:animate-pulse" style={{backgroundClip: 'padding-box, border-box', background: 'linear-gradient(white, white) padding-box, linear-gradient(45deg, #3b82f6, #8b5cf6, #ec4899) border-box'}}></div>
             <div className="relative">
             <Image
               src={image}

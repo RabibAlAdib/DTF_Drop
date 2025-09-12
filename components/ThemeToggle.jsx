@@ -7,9 +7,10 @@ const ThemeToggle = () => {
   return (
     <button
       onClick={toggleTheme}
-      className="relative inline-flex items-center w-12 h-6 transition-colors duration-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+      className="relative inline-flex items-center w-12 h-6 transition-colors duration-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-green-500 focus:ring-offset-2 dark:focus:ring-offset-black"
       style={{
-        backgroundColor: theme === 'dark' ? '#22c55e' : '#e5e7eb',
+        backgroundColor: theme === 'dark' ? '#000000' : '#e5e7eb',
+        border: theme === 'dark' ? '1px solid #22c55e' : 'none',
       }}
       title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
     >

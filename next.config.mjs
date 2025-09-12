@@ -14,9 +14,15 @@ const nextConfig = {
             },
         ],
     },
-    // Configure for Replit environment
-    experimental: {
-        allowedHosts: ['.replit.dev', '.repl.co', 'localhost'],
+    // Configure for Replit environment - use hostname allowlist in webpack config
+    webpack: (config, { dev }) => {
+        if (dev) {
+            config.devServer = {
+                ...config.devServer,
+                allowedHosts: 'all'
+            };
+        }
+        return config;
     },
     // Standalone output for production deployment
     output: 'standalone',

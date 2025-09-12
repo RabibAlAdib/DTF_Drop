@@ -8,7 +8,6 @@ import { toast } from 'react-hot-toast';
 
 const AddProduct = () => {
   const { getToken } = useAppContext();
-  const [files, setFiles] = useState([]);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('Drop Shoulder');
@@ -18,8 +17,14 @@ const AddProduct = () => {
   // NEW: State for additional fields
   const [gender, setGender] = useState('both');
   const [designType, setDesignType] = useState('customized');
-  const [selectedColors, setSelectedColors] = useState(['Black']);
-  const [selectedSizes, setSelectedSizes] = useState(['M']);
+  
+  // NEW: Dynamic image-color pairs (max 10)
+  const [imageSlots, setImageSlots] = useState([
+    { file: null, color: 'Black' } // Start with one slot
+  ]);
+  
+  // NEW: Custom sizes input
+  const [customSizes, setCustomSizes] = useState('M, L, XL');
 
   // Available options
   const AVAILABLE_COLORS = ['Black', 'White', 'Lite Pink', 'Coffee', 'Offwhite', 'NevyBlue'];
@@ -27,24 +32,39 @@ const AddProduct = () => {
   const DESIGN_TYPES = ['Anima', 'Typography', 'game', 'wwe', 'sports', 'motivational', 'jokes', 'Islamic', 'customized'];
   const GENDERS = ['male', 'female', 'both'];
 
-  const handleColorChange = (color) => {
-    if (selectedColors.includes(color)) {
-      setSelectedColors(selectedColors.filter(c => c !== color));
-    } else {
-      setSelectedColors([...selectedColors, color]);
+  const addImageSlot = () => {
+    if (imageSlots.length < 10) {
+      setImageSlots([...imageSlots, { file: null, color: 'Black' }]);
     }
   };
 
-  const handleSizeChange = (size) => {
-    if (selectedSizes.includes(size)) {
-      setSelectedSizes(selectedSizes.filter(s => s !== size));
-    } else {
-      setSelectedSizes([...selectedSizes, size]);
+  const removeImageSlot = (index) => {
+    if (imageSlots.length > 1) {
+      const newSlots = imageSlots.filter((_, i) => i !== index);
+      setImageSlots(newSlots);
     }
+  };
+
+  const updateImageSlot = (index, field, value) => {
+    const newSlots = [...imageSlots];
+    newSlots[index][field] = value;
+    setImageSlots(newSlots);
+  };
+
+  const parseSizes = (sizeString) => {
+    return sizeString.split(',').map(size => size.trim()).filter(size => size.length > 0);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Filter out empty image slots
+    const validImageSlots = imageSlots.filter(slot => slot.file !== null);
+    
+    if (validImageSlots.length === 0) {
+      toast.error('Please upload at least one image');
+      return;
+    }
     
     const formData = new FormData();
     formData.append('name', name);
@@ -57,15 +77,19 @@ const AddProduct = () => {
     formData.append('gender', gender);
     formData.append('designType', designType);
     
-    // Append colors and sizes as arrays
-    selectedColors.forEach(color => formData.append('colors', color));
-    selectedSizes.forEach(size => formData.append('sizes', size));
-
-    for (let i = 0; i < files.length; i++) {
-      if (files[i]) {
-        formData.append('images', files[i]);
-      }
-    }
+    // NEW: Append image-color pairs using the new API format
+    validImageSlots.forEach((slot, index) => {
+      formData.append(`image_${index}`, slot.file);
+      formData.append(`color_${index}`, slot.color);
+    });
+    
+    // Parse and append sizes
+    const sizes = parseSizes(customSizes);
+    sizes.forEach(size => formData.append('sizes', size));
+    
+    // Extract unique colors for the colors field
+    const uniqueColors = [...new Set(validImageSlots.map(slot => slot.color))];
+    uniqueColors.forEach(color => formData.append('colors', color));
 
     try {
       const token = await getToken();
@@ -86,9 +110,8 @@ const AddProduct = () => {
         setOfferPrice('');
         setGender('both');
         setDesignType('customized');
-        setSelectedColors(['Black']);
-        setSelectedSizes(['M']);
-        setFiles([]);
+        setImageSlots([{ file: null, color: 'Black' }]);
+        setCustomSizes('M, L, XL');
       } else {
         toast.error(response.data.message);
       }
@@ -102,43 +125,76 @@ const AddProduct = () => {
       <h1 className="text-2xl font-bold mb-6">Add New Product</h1>
       
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Product Images */}
+        {/* Dynamic Product Images with Color Selection */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Product Image (up to 4 images)
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Product Images (max 10 images)
           </label>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {[...Array(4)].map((_, index) => (
-              <div key={index} className="relative">
-                <label 
-                  htmlFor={`image${index}`}
-                  className="block w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-blue-500 transition-colors"
-                >
-                  {files[index] ? (
-                    <img 
-                      src={URL.createObjectURL(files[index])} 
-                      alt={`Preview ${index}`}
-                      className="w-full h-full object-cover rounded-lg"
-                    />
-                  ) : (
-                    <div className="flex items-center justify-center h-full text-gray-400">
-                      <span>Image {index + 1}</span>
-                    </div>
+          <div className="space-y-4">
+            {imageSlots.map((slot, index) => (
+              <div key={index} className="flex gap-4 p-4 border border-gray-200 dark:border-gray-600 rounded-lg">
+                <div className="flex-1">
+                  <label 
+                    htmlFor={`image${index}`}
+                    className="block w-full h-32 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:border-blue-500 transition-colors"
+                  >
+                    {slot.file ? (
+                      <img 
+                        src={URL.createObjectURL(slot.file)} 
+                        alt={`Preview ${index}`}
+                        className="w-full h-full object-cover rounded-lg"
+                      />
+                    ) : (
+                      <div className="flex items-center justify-center h-full text-gray-400">
+                        <span>Image {index + 1}</span>
+                      </div>
+                    )}
+                  </label>
+                  <input
+                    onChange={(e) => updateImageSlot(index, 'file', e.target.files[0])}
+                    type="file"
+                    id={`image${index}`}
+                    hidden
+                    accept="image/*"
+                  />
+                </div>
+                
+                <div className="w-48 space-y-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Color for this image
+                  </label>
+                  <select
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-black dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    value={slot.color}
+                    onChange={(e) => updateImageSlot(index, 'color', e.target.value)}
+                  >
+                    {AVAILABLE_COLORS.map(color => (
+                      <option key={color} value={color}>{color}</option>
+                    ))}
+                  </select>
+                  
+                  {imageSlots.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => removeImageSlot(index)}
+                      className="w-full px-3 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
+                    >
+                      Remove
+                    </button>
                   )}
-                </label>
-                <input
-                  onChange={(e) => {
-                    const updatedFiles = [...files];
-                    updatedFiles[index] = e.target.files[0];
-                    setFiles(updatedFiles);
-                  }}
-                  type="file"
-                  id={`image${index}`}
-                  hidden
-                  accept="image/*"
-                />
+                </div>
               </div>
             ))}
+            
+            {imageSlots.length < 10 && (
+              <button
+                type="button"
+                onClick={addImageSlot}
+                className="w-full px-4 py-3 border-2 border-dashed border-blue-300 text-blue-600 rounded-lg hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
+              >
+                + Add Image
+              </button>
+            )}
           </div>
         </div>
 
@@ -223,44 +279,22 @@ const AddProduct = () => {
           </select>
         </div>
 
-        {/* Colors */}
+        {/* Custom Sizes */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Available Colors
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Available Sizes (comma-separated)
           </label>
-          <div className="flex flex-wrap gap-2">
-            {AVAILABLE_COLORS.map((color) => (
-              <label key={color} className="flex items-center space-x-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={selectedColors.includes(color)}
-                  onChange={() => handleColorChange(color)}
-                  className="rounded text-blue-600 focus:ring-blue-500"
-                />
-                <span>{color}</span>
-              </label>
-            ))}
-          </div>
-        </div>
-
-        {/* Sizes */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Available Sizes
-          </label>
-          <div className="flex flex-wrap gap-2">
-            {AVAILABLE_SIZES.map((size) => (
-              <label key={size} className="flex items-center space-x-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={selectedSizes.includes(size)}
-                  onChange={() => handleSizeChange(size)}
-                  className="rounded text-blue-600 focus:ring-blue-500"
-                />
-                <span>{size}</span>
-              </label>
-            ))}
-          </div>
+          <input
+            type="text"
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-black dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="e.g., XS, S, M, L, XL, XXL"
+            value={customSizes}
+            onChange={(e) => setCustomSizes(e.target.value)}
+            required
+          />
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            Enter sizes separated by commas. Users can select from these options.
+          </p>
         </div>
 
         {/* Product Price */}

@@ -24,16 +24,27 @@ const productSchema = new mongoose.Schema({
   name: { type: String, required: true },
   description: { type: String, required: true },
   
-  // UPDATED: Category options
+  // UPDATED: Category options (relaxed for backward compatibility)
   category: { 
     type: String, 
     required: true,
-    enum: ['Drop Shoulder', 'T-Shirt']
+    // Note: enum restrictions removed temporarily for backward compatibility
   },
   
   price: { type: Number, required: true },
   offerPrice: { type: Number, required: false },
-  images: { type: Array, required: true },
+  images: { type: Array, required: true }, // Legacy field for backward compatibility
+  
+  // NEW: Color-aware images for dynamic color switching
+  colorImages: [{
+    color: { 
+      type: String, 
+      required: true,
+      enum: ['Black', 'White', 'Lite Pink', 'Coffee', 'Offwhite', 'NevyBlue']
+    },
+    url: { type: String, required: true }
+  }],
+  
   date: { type: Number, required: true, default: Date.now() },
   
   // UPDATED: Rating system with default values
@@ -68,8 +79,8 @@ const productSchema = new mongoose.Schema({
   sizes: { 
     type: [String], 
     required: true,
-    enum: ['M', 'L', 'XL',],
     default: ['M']
+    // Note: enum restriction removed to allow custom sizes from seller dashboard
   },
   
   // Inventory tracking for each variant

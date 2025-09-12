@@ -32,7 +32,26 @@ export async function POST(request) {
     const category = formData.get('category');
     const price = formData.get('price');
     const offerPrice = formData.get('offerPrice');
-    const files = formData.getAll('images');
+    
+    // NEW: Get color-aware images
+    const imageFiles = [];
+    const imageColors = [];
+    let imageIndex = 0;
+    
+    // Collect all image-color pairs
+    while (formData.get(`image_${imageIndex}`)) {
+      imageFiles.push(formData.get(`image_${imageIndex}`));
+      imageColors.push(formData.get(`color_${imageIndex}`));
+      imageIndex++;
+    }
+    
+    // Fallback for legacy format
+    if (imageFiles.length === 0) {
+      const files = formData.getAll('images');
+      const colors = formData.getAll('colors');
+      imageFiles.push(...files);
+      imageColors.push(...(colors.length > 0 ? colors : ['Black']));
+    }
     
     // NEW: Get additional fields
     const gender = formData.get('gender');
@@ -40,49 +59,56 @@ export async function POST(request) {
     const colors = formData.getAll('colors');
     const sizes = formData.getAll('sizes');
 
-    // Validate required fields
-    if (!name || !description || !category || !price || !gender || !designType) {
+    // Validate required fields (gender and designType optional for backward compatibility)
+    if (!name || !description || !category || !price) {
       return NextResponse.json({
         success: false,
         message: "Please fill all required fields."
       });
     }
 
-    if (!files || files.length === 0) {
+    if (!imageFiles || imageFiles.length === 0) {
       return NextResponse.json({
         success: false,
         message: "Please upload at least one image."
       });
     }
 
-    // NEW: Validate colors and sizes
-    if (!colors || colors.length === 0) {
+    if (imageFiles.length > 10) {
       return NextResponse.json({
         success: false,
-        message: "Please select at least one color."
+        message: "Maximum 10 images allowed per product."
       });
     }
 
-    if (!sizes || sizes.length === 0) {
-      return NextResponse.json({
-        success: false,
-        message: "Please select at least one size."
-      });
-    }
+    // Set defaults for backward compatibility
+    const finalGender = gender || 'both';
+    const finalDesignType = designType || 'customized';
+    const finalColors = (colors && colors.length > 0) ? colors : ['Black'];
+    const finalSizes = (sizes && sizes.length > 0) ? sizes : ['M'];
 
-    // Upload images to Cloudinary
-    const result = await Promise.all(
-      files.map(async (file) => {
+    // Upload images to Cloudinary in parallel
+    const uploadResults = await Promise.all(
+      imageFiles.map(async (file, index) => {
         const arrayBuffer = await file.arrayBuffer();
         const buffer = Buffer.from(arrayBuffer);
         return new Promise((resolve, reject) => {
           const stream = cloudinary.uploader.upload_stream(
-            { resource_type: 'auto' },
+            { 
+              resource_type: 'auto',
+              transformation: [
+                { width: 800, height: 800, crop: 'limit' },
+                { quality: 'auto', fetch_format: 'auto' }
+              ]
+            },
             (error, result) => {
               if (error) {
                 reject(error);
               } else {
-                resolve(result);
+                resolve({
+                  url: result.secure_url,
+                  color: imageColors[index] || 'Black'
+                });
               }
             }
           );
@@ -91,15 +117,17 @@ export async function POST(request) {
       })
     );
 
-    const images = result.map(result => result.secure_url);
+    // Create colorImages mapping and legacy images array
+    const colorImages = uploadResults;
+    const images = uploadResults.map(result => result.url);
 
     // Connect to database
     await connectDB();
 
     // Generate variants for each color-size combination
     const variants = [];
-    colors.forEach(color => {
-      sizes.forEach(size => {
+    finalColors.forEach(color => {
+      finalSizes.forEach(size => {
         variants.push({
           color,
           size,
@@ -123,7 +151,7 @@ export async function POST(request) {
     });
     */
 
-    // Updated product creation with all new fields
+    // Updated product creation with all new fields including colorImages
     const newProduct = new Product({
       userId,
       name,
@@ -131,11 +159,12 @@ export async function POST(request) {
       category,
       price: Number(price),
       offerPrice: offerPrice ? Number(offerPrice) : undefined,
-      images: images,
-      gender: gender,
-      designType: designType,
-      colors: colors,
-      sizes: sizes,
+      images: images, // Legacy field for backward compatibility
+      colorImages: colorImages, // NEW: Color-aware images
+      gender: finalGender,
+      designType: finalDesignType,
+      colors: finalColors,
+      sizes: finalSizes,
       variants: variants,
       ratings: 4.3, // Default rating
       numOfReviews: 2, // Default number of reviews

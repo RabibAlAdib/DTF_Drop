@@ -43,8 +43,8 @@ const HomeProducts = () => {
             }}
           >
             <div className="relative group">
-              {/* Moving shadow effect */}
-              <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-lg blur opacity-0 group-hover:opacity-75 transition duration-1000 group-hover:animate-pulse-glow"></div>
+              {/* Border shadow effect - transparent fill */}
+              <div className="absolute -inset-1 border-2 border-blue-500 group-hover:border-purple-500 rounded-lg opacity-0 group-hover:opacity-80 transition-all duration-1000 group-hover:shadow-lg group-hover:shadow-purple-500/50"></div>
               <div className="relative">
                 <ProductCard product={product} />
               </div>
