@@ -34,6 +34,34 @@ const Product = () => {
   const [selectedColor, setSelectedColor] = useState('');
   const [selectedSize, setSelectedSize] = useState('');
   const [quantity, setQuantity] = useState(1);
+  
+  // Helper function to get images for selected color
+  const getImagesForColor = (color) => {
+    if (!productData) return [];
+    
+    // Use new colorImages if available
+    if (productData.colorImages && productData.colorImages.length > 0) {
+      return productData.colorImages
+        .filter(img => img.color === color)
+        .map(img => img.url);
+    }
+    
+    // Fallback to legacy images
+    return productData.images || [];
+  };
+  
+  // Helper function to get all available images
+  const getAllImages = () => {
+    if (!productData) return [];
+    
+    // Use new colorImages if available
+    if (productData.colorImages && productData.colorImages.length > 0) {
+      return productData.colorImages.map(img => img.url);
+    }
+    
+    // Fallback to legacy images
+    return productData.images || [];
+  };
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -45,9 +73,21 @@ const Product = () => {
         
         if (localProduct) {
           setProductData(localProduct);
-          setMainImage(localProduct.images?.[0] || '');
-          setSelectedColor(localProduct.colors?.[0] || '');
-          setSelectedSize(localProduct.sizes?.[0] || '');
+          
+          // Set initial color and size
+          const initialColor = localProduct.colors?.[0] || '';
+          const initialSize = localProduct.sizes?.[0] || '';
+          setSelectedColor(initialColor);
+          setSelectedSize(initialSize);
+          
+          // Set main image based on color or fallback to first image
+          if (localProduct.colorImages && localProduct.colorImages.length > 0) {
+            const colorImage = localProduct.colorImages.find(img => img.color === initialColor);
+            setMainImage(colorImage?.url || localProduct.colorImages[0]?.url || '');
+          } else {
+            setMainImage(localProduct.images?.[0] || '');
+          }
+          
           setLoading(false);
         } else {
           // If not found locally, fetch from API
@@ -56,9 +96,20 @@ const Product = () => {
           
           if (data.success) {
             setProductData(data.product);
-            setMainImage(data.product.images?.[0] || '');
-            setSelectedColor(data.product.colors?.[0] || '');
-            setSelectedSize(data.product.sizes?.[0] || '');
+            
+            // Set initial color and size
+            const initialColor = data.product.colors?.[0] || '';
+            const initialSize = data.product.sizes?.[0] || '';
+            setSelectedColor(initialColor);
+            setSelectedSize(initialSize);
+            
+            // Set main image based on color or fallback to first image
+            if (data.product.colorImages && data.product.colorImages.length > 0) {
+              const colorImage = data.product.colorImages.find(img => img.color === initialColor);
+              setMainImage(colorImage?.url || data.product.colorImages[0]?.url || '');
+            } else {
+              setMainImage(data.product.images?.[0] || '');
+            }
           } else {
             toast.error(data.message || 'Product not found');
           }
@@ -149,6 +200,12 @@ const Product = () => {
   const handleColorSelect = (color) => {
     console.log('Color selected:', color);
     setSelectedColor(color);
+    
+    // Update main image to show the selected color's image
+    const colorImages = getImagesForColor(color);
+    if (colorImages.length > 0) {
+      setMainImage(colorImages[0]);
+    }
   };
 
   return (
@@ -173,34 +230,40 @@ const Product = () => {
                 />
             </div>
             
-            {/* Thumbnail Images */}
+            {/* Thumbnail Images - Show images for selected color */}
             <div className="grid grid-cols-4 gap-2">
-                {productData.images && productData.images.length > 0 ? (
-                productData.images.map((image, index) => (
-                    <div 
-                    key={index}
-                    className="rounded-lg overflow-hidden bg-gray-500/10 cursor-pointer border-2 border-transparent hover:border-blue-500 transition-colors"
-                    onClick={() => setMainImage(image)}
-                    >
-                    <Image
-                        src={image || '/placeholder-image.jpg'}
-                        alt={`${productData.name} ${index + 1}`}
-                        className="w-full h-20 object-cover"
-                        width={100}
-                        height={80}
-                        sizes="80px"
-                        loading="lazy"
-                        onError={(e) => {
-                        e.target.src = '/placeholder-image.jpg';
-                        }}
-                    />
+                {(() => {
+                  const currentImages = selectedColor ? getImagesForColor(selectedColor) : getAllImages();
+                  
+                  return currentImages.length > 0 ? (
+                    currentImages.map((image, index) => (
+                      <div 
+                        key={index}
+                        className={`rounded-lg overflow-hidden bg-gray-500/10 cursor-pointer border-2 transition-colors ${
+                          mainImage === image ? 'border-blue-500' : 'border-transparent hover:border-blue-500'
+                        }`}
+                        onClick={() => setMainImage(image)}
+                      >
+                        <Image
+                          src={image || '/placeholder-image.jpg'}
+                          alt={`${productData.name} ${selectedColor || ''} ${index + 1}`}
+                          className="w-full h-20 object-cover"
+                          width={100}
+                          height={80}
+                          sizes="80px"
+                          loading="lazy"
+                          onError={(e) => {
+                            e.target.src = '/placeholder-image.jpg';
+                          }}
+                        />
+                      </div>
+                    ))
+                  ) : (
+                    <div className="col-span-4 text-center py-8 text-gray-500">
+                      No images available
                     </div>
-                ))
-                ) : (
-                <div className="col-span-4 text-center py-8 text-gray-500">
-                    No images available
-                </div>
-                )}
+                  );
+                })()} 
             </div>
             </div>
             
@@ -261,7 +324,7 @@ const Product = () => {
             
             {/* Color Selection */}
             <div className="space-y-3">
-                <h3 className="text-lg font-semibold">Color: {selectedColor}</h3>
+                <h3 className="text-lg font-semibold dark:text-gray-200">Color: {selectedColor}</h3>
                 <div className="flex flex-wrap gap-2">
                 {productData.colors?.map((color) => (
                     <button
@@ -278,10 +341,9 @@ const Product = () => {
             
             {/* Size Selection */}
             <div className="space-y-3">
-                <h3 className="text-lg font-semibold">Size: {selectedSize}</h3>
+                <h3 className="text-lg font-semibold dark:text-gray-200">Size: {selectedSize}</h3>
                 <div className="flex flex-wrap gap-2">
-                {AVAILABLE_SIZES.map((size) => {
-                    const isSizeAvailable = productData.sizes?.includes(size);
+                {(productData.sizes || []).map((size) => {
                     const isSelected = selectedSize === size;
                     
                     return (
@@ -290,12 +352,9 @@ const Product = () => {
                         className={`px-4 py-2 border rounded-lg transition-all ${
                         isSelected
                             ? 'bg-blue-500 text-white border-blue-500'
-                            : isSizeAvailable
-                            ? 'bg-white text-gray-700 border-gray-300 hover:border-blue-500 hover:bg-blue-50'
-                            : 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
+                            : 'bg-white text-gray-700 border-gray-300 hover:border-blue-500 hover:bg-blue-50 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600 dark:hover:border-blue-500'
                         }`}
-                        onClick={() => isSizeAvailable && handleSizeSelect(size)}
-                        disabled={!isSizeAvailable}
+                        onClick={() => handleSizeSelect(size)}
                     >
                         {size}
                     </button>
@@ -306,7 +365,7 @@ const Product = () => {
             
             {/* Quantity Selection */}
             <div className="space-y-3">
-                <h3 className="text-lg font-semibold">Quantity</h3>
+                <h3 className="text-lg font-semibold dark:text-gray-200">Quantity</h3>
                 <div className="flex items-center gap-3">
                 <button
                     className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center hover:bg-gray-300 transition-colors disabled:opacity-50"
