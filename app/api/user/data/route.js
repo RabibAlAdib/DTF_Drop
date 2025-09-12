@@ -19,6 +19,7 @@ export async function GET(request) {
         return NextResponse.json({success:true, user})
 
     } catch (error) {
-        return NextResponse.json({success:false, message: "User not found"})
+        console.error('User data fetch error:', error);
+        return NextResponse.json({success:false, message: "Unable to fetch user data"})
     }
 }

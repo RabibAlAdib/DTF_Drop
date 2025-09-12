@@ -1,6 +1,7 @@
 modules = ["nodejs-20", "web"]
 [agent]
 expertMode = true
+integrations = ["replitmail:1.0.0"]
 
 [nix]
 channel = "stable-25_05"
@@ -34,7 +35,7 @@ localPort = 5000
 externalPort = 80
 
 [[ports]]
-localPort = 39091
+localPort = 37691
 externalPort = 3000
 
 [deployment]
