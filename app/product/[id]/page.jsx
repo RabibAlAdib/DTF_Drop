@@ -40,18 +40,28 @@ const Product = () => {
       try {
         setLoading(true);
         
-        // Find product in local products array
-        const product = products.find(p => p._id === params.id);
+        // First try to find product in local products array for faster loading
+        const localProduct = products.find(p => p._id === params.id);
         
-        if (product) {
-          setProductData(product);
-          setMainImage(product.images?.[0] || '');
-          // Set default selected color and size
-          setSelectedColor(product.colors?.[0] || '');
-          setSelectedSize(product.sizes?.[0] || '');
+        if (localProduct) {
+          setProductData(localProduct);
+          setMainImage(localProduct.images?.[0] || '');
+          setSelectedColor(localProduct.colors?.[0] || '');
+          setSelectedSize(localProduct.sizes?.[0] || '');
+          setLoading(false);
         } else {
-          // Product not found in local array
-          toast.error('Product not found');
+          // If not found locally, fetch from API
+          const response = await fetch(`/api/product/${params.id}`);
+          const data = await response.json();
+          
+          if (data.success) {
+            setProductData(data.product);
+            setMainImage(data.product.images?.[0] || '');
+            setSelectedColor(data.product.colors?.[0] || '');
+            setSelectedSize(data.product.sizes?.[0] || '');
+          } else {
+            toast.error(data.message || 'Product not found');
+          }
         }
       } catch (error) {
         console.error('Error fetching product:', error);
@@ -61,7 +71,7 @@ const Product = () => {
       }
     };
     
-    if (params.id && products.length > 0) {
+    if (params.id) {
       fetchProduct();
     }
   }, [params.id, products]);

@@ -1,6 +1,7 @@
 import React from 'react'
 import { assets } from '@/assets/assets'
 import Image from 'next/image';
+import Link from 'next/link';
 import { useAppContext } from '@/context/AppContext';
 
 const ProductCard = ({ product }) => {
@@ -8,8 +9,9 @@ const ProductCard = ({ product }) => {
     const { currency, router } = useAppContext()
 
     return (
-        <div
-            onClick={() => { router.push('/product/' + product._id); scrollTo(0, 0) }}
+        <Link 
+            href={`/product/${product._id}`}
+            prefetch={true}
             className="flex flex-col items-start gap-0.5 max-w-[200px] w-full cursor-pointer"
         >
             <div className="cursor-pointer group relative bg-gray-500/10 rounded-lg w-full h-52 flex items-center justify-center">
@@ -55,7 +57,7 @@ const ProductCard = ({ product }) => {
                     Buy now
                 </button>
             </div>
-        </div>
+        </Link>
     )
 }
 
