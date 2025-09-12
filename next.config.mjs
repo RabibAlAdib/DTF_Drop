@@ -16,8 +16,10 @@ const nextConfig = {
     },
     // Configure for Replit environment
     experimental: {
-        allowedHosts: true,
+        allowedHosts: ['.replit.dev', '.repl.co', 'localhost'],
     },
+    // Standalone output for production deployment
+    output: 'standalone',
     // Allow iframe embedding for Replit preview
     async headers() {
         return [
@@ -25,8 +27,8 @@ const nextConfig = {
                 source: '/(.*)',
                 headers: [
                     {
-                        key: 'X-Frame-Options',
-                        value: 'SAMEORIGIN',
+                        key: 'Content-Security-Policy',
+                        value: "frame-ancestors 'self' https://*.replit.com https://*.replit.dev",
                     },
                 ],
             },
