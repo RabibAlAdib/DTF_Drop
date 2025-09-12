@@ -18,7 +18,7 @@ export default function RootLayout({ children }) {
     <ClerkProvider>
       <AppContextProvider>
         <html lang="en">
-          <body className={outfit.className}>
+          <body className={outfit.className} suppressHydrationWarning={true}>
             {/* <Navbar /> */}
             <Toaster />
             <main className="min-h-screen">
