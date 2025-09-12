@@ -5,8 +5,10 @@ import { useAppContext } from '@/context/AppContext';
 import { assets } from '@/assets/assets';
 import Image from 'next/image';
 import Loading from '@/components/Loading';
-import toast from 'react-hot-toast';
-import ProductRecommendations from '@/components/ProductRecommendations'
+import { toast } from 'react-hot-toast';
+import ProductRecommendations from '@/components/ProductRecommendations';
+import Navbar from '@/components/Navbar';
+import FeaturedProduct from '@/components/FeaturedProduct';
 
 // Available colors and sizes
 const AVAILABLE_COLORS = ['Black', 'White', 'Lite Pink', 'Coffee', 'Offwhite', 'NevyBlue'];
@@ -22,7 +24,7 @@ const COLOR_MAP = {
 };
 
 const Product = () => {
-  const { products, addToCart } = useAppContext();
+  const { products, addToCart, addToFavorites, removeFromFavorites, isFavorite } = useAppContext();
   const params = useParams();
   const [productData, setProductData] = useState(null);
   const [mainImage, setMainImage] = useState('');
@@ -87,9 +89,16 @@ const Product = () => {
   
   // Check if selected variant is available
   const isVariantAvailable = () => {
+    // If no variants exist, allow purchase
+    if (!productData.variants || productData.variants.length === 0) {
+      return true;
+    }
+    
+    // If variants exist but no color or size is selected, return false
     if (!selectedColor || !selectedSize) return false;
     
-    const variant = productData.variants?.find(
+    // Check if the selected variant is in stock
+    const variant = productData.variants.find(
       v => v.color === selectedColor && v.size === selectedSize
     );
     
@@ -98,23 +107,26 @@ const Product = () => {
   
   // Handle add to cart with variants
   const handleAddToCart = () => {
-    if (!selectedColor || !selectedSize) {
-      toast.error('Please select color and size');
-      return;
+    // If variants exist, require color and size selection
+    if (productData.variants && productData.variants.length > 0) {
+      if (!selectedColor || !selectedSize) {
+        toast.error('Please select color and size');
+        return;
+      }
+      
+      if (!isVariantAvailable()) {
+        toast.error('Selected variant is not available');
+        return;
+      }
+      
+      addToCart(productData._id, {
+        color: selectedColor,
+        size: selectedSize
+      }, quantity);
+    } else {
+      // No variants, add to cart directly
+      addToCart(productData._id, {}, quantity);
     }
-    
-    if (!isVariantAvailable()) {
-      toast.error('Selected variant is not available');
-      return;
-    }
-    
-    addToCart(productData._id, {
-      color: selectedColor,
-      size: selectedSize,
-      quantity: quantity
-    });
-    
-    toast.success('Added to cart!');
   };
   
   // Handle size selection properly
@@ -130,7 +142,9 @@ const Product = () => {
   };
 
   return (
-    <div className="px-4 md:px-8 lg:px-16 py-6">
+    <>
+      <Navbar />
+      <div className="px-4 md:px-8 lg:px-16 py-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Product Images */}
             <div className="space-y-4">
@@ -333,21 +347,48 @@ const Product = () => {
                 </div>
             </div>
             
-            {/* Add to Cart Button */}
-            <div className="pt-6">
-                <button
-                className={`w-full py-3 px-6 rounded-lg font-semibold transition-colors ${
-                    isVariantAvailable()
-                    ? 'bg-blue-600 text-white hover:bg-blue-700'
-                    : 'bg-gray-400 text-gray-200 cursor-not-allowed'
-                }`}
-                onClick={handleAddToCart}
-                disabled={!isVariantAvailable()}
-                >
-                Add to Cart
-                </button>
+            {/* Add to Cart and Favorite Buttons */}
+            <div className="pt-6 space-y-4">
+                <div className="flex gap-3">
+                    <button
+                    className={`flex-1 py-3 px-6 rounded-lg font-semibold transition-colors ${
+                        isVariantAvailable()
+                        ? 'bg-blue-600 text-white hover:bg-blue-700'
+                        : 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                    }`}
+                    onClick={handleAddToCart}
+                    disabled={!isVariantAvailable()}
+                    >
+                    Add to Cart
+                    </button>
+                    <button
+                    className={`p-3 rounded-lg border-2 transition-colors ${
+                        isFavorite(productData._id)
+                        ? 'bg-red-50 border-red-500 text-red-500 hover:bg-red-100'
+                        : 'bg-white border-gray-300 text-gray-500 hover:border-red-500 hover:text-red-500 hover:bg-red-50'
+                    }`}
+                    onClick={() => {
+                        if (isFavorite(productData._id)) {
+                        removeFromFavorites(productData._id);
+                        } else {
+                        addToFavorites(productData._id);
+                        }
+                    }}
+                    title={isFavorite(productData._id) ? 'Remove from favorites' : 'Add to favorites'}
+                    >
+                    <svg className="w-6 h-6" fill={isFavorite(productData._id) ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    </svg>
+                    </button>
+                </div>
             </div>
             </div>
+        </div>
+        
+        {/* Featured Products */}
+        <div className="mt-12">
+        <h2 className="text-2xl font-bold mb-6">Featured Products</h2>
+        <FeaturedProduct />
         </div>
         
         {/* Product Recommendations */}
@@ -358,7 +399,8 @@ const Product = () => {
             category={productData.category} 
         />
         </div>
-    </div>
+      </div>
+    </>
   );
 };
 

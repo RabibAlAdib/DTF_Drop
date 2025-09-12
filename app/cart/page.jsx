@@ -40,53 +40,75 @@ const Cart = () => {
                 </tr>
               </thead>
               <tbody>
-                {Object.keys(cartItems).map((itemId) => {
-                  const product = products.find(product => product._id === itemId);
+                {Object.keys(cartItems).map((itemKey) => {
+                  // Skip the _variants key
+                  if (itemKey === '_variants' || cartItems[itemKey] <= 0) return null;
+                  
+                  // Extract base product ID from variant key (format: productId_color_size or productId)
+                  const baseProductId = itemKey.split('_')[0];
+                  const product = products.find(product => product._id === baseProductId);
+                  
+                  // Get variant info if available
+                  const variantInfo = cartItems._variants?.[itemKey] || {};
 
-                  if (!product || cartItems[itemId] <= 0) return null;
+                  if (!product) return null;
 
                   return (
-                    <tr key={itemId}>
+                    <tr key={itemKey}>
                       <td className="flex items-center gap-4 py-4 md:px-4 px-1">
                         <div>
                           <div className="rounded-lg overflow-hidden bg-gray-500/10 p-2">
                             <Image
-                              src={product.image[0]}
+                              src={product.images?.[0] || '/placeholder-image.jpg'}
                               alt={product.name}
                               className="w-16 h-auto object-cover mix-blend-multiply"
                               width={1280}
                               height={720}
+                              onError={(e) => {
+                                e.target.src = '/placeholder-image.jpg';
+                              }}
                             />
                           </div>
                           <button
                             className="md:hidden text-xs text-orange-600 mt-1"
-                            onClick={() => updateCartQuantity(product._id, 0)}
+                            onClick={() => updateCartQuantity(baseProductId, 0, variantInfo)}
                           >
                             Remove
                           </button>
                         </div>
                         <div className="text-sm hidden md:block">
                           <p className="text-gray-800">{product.name}</p>
+                          {variantInfo.color && (
+                            <p className="text-xs text-gray-500">Color: {variantInfo.color}</p>
+                          )}
+                          {variantInfo.size && (
+                            <p className="text-xs text-gray-500">Size: {variantInfo.size}</p>
+                          )}
                           <button
                             className="text-xs text-orange-600 mt-1"
-                            onClick={() => updateCartQuantity(product._id, 0)}
+                            onClick={() => updateCartQuantity(baseProductId, 0, variantInfo)}
                           >
                             Remove
                           </button>
                         </div>
                       </td>
-                      <td className="py-4 md:px-4 px-1 text-gray-600">${product.offerPrice}</td>
+                      <td className="py-4 md:px-4 px-1 text-gray-600">${product.offerPrice || product.price}</td>
                       <td className="py-4 md:px-4 px-1">
                         <div className="flex items-center md:gap-2 gap-1">
-                          <button onClick={() => updateCartQuantity(product._id, cartItems[itemId] - 1)}>
+                          <button onClick={() => updateCartQuantity(baseProductId, cartItems[itemKey] - 1, variantInfo)}>
                             <Image
                               src={assets.decrease_arrow}
                               alt="decrease_arrow"
                               className="w-4 h-4"
                             />
                           </button>
-                          <input onChange={e => updateCartQuantity(product._id, Number(e.target.value))} type="number" value={cartItems[itemId]} className="w-8 border text-center appearance-none"></input>
-                          <button onClick={() => addToCart(product._id)}>
+                          <input 
+                            onChange={e => updateCartQuantity(baseProductId, Number(e.target.value), variantInfo)} 
+                            type="number" 
+                            value={cartItems[itemKey]} 
+                            className="w-8 border text-center appearance-none"
+                          />
+                          <button onClick={() => addToCart(baseProductId, variantInfo)}>
                             <Image
                               src={assets.increase_arrow}
                               alt="increase_arrow"
@@ -95,7 +117,7 @@ const Cart = () => {
                           </button>
                         </div>
                       </td>
-                      <td className="py-4 md:px-4 px-1 text-gray-600">${(product.offerPrice * cartItems[itemId]).toFixed(2)}</td>
+                      <td className="py-4 md:px-4 px-1 text-gray-600">${((product.offerPrice || product.price) * cartItems[itemKey]).toFixed(2)}</td>
                     </tr>
                   );
                 })}

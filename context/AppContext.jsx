@@ -20,6 +20,7 @@ export const AppContextProvider = (props) => {
   const [userData, setUserData] = useState(false)
   const [isSeller, setIsSeller] = useState(false)
   const [cartItems, setCartItems] = useState({})
+  const [favorites, setFavorites] = useState([])
 
   const fetchProductData = async () => {
     // setProducts(productsDummyData)
@@ -67,7 +68,7 @@ export const AppContextProvider = (props) => {
   */
 
   // Updated addToCart function with variant support
-  const addToCart = async (itemId, variant = {}) => {
+  const addToCart = async (itemId, variant = {}, quantity = 1) => {
     let cartData = structuredClone(cartItems);
     
     // Create unique key for product variant
@@ -76,9 +77,9 @@ export const AppContextProvider = (props) => {
       : itemId;
     
     if (cartData[variantKey]) {
-      cartData[variantKey] += 1;
+      cartData[variantKey] += quantity;
     } else {
-      cartData[variantKey] = 1;
+      cartData[variantKey] = quantity;
     }
     
     // Store variant info with the cart item
@@ -88,7 +89,6 @@ export const AppContextProvider = (props) => {
     cartData._variants[variantKey] = variant;
     
     setCartItems(cartData);
-    toast.success('Added to cart!');
   }
 
   // Previous updateCartQuantity function (commented for reference)
@@ -166,6 +166,25 @@ export const AppContextProvider = (props) => {
     return Math.floor(totalAmount * 100) / 100;
   }
 
+  // Add to favorites
+  const addToFavorites = (productId) => {
+    if (!favorites.includes(productId)) {
+      setFavorites([...favorites, productId]);
+      toast.success('Added to favorites!');
+    }
+  }
+
+  // Remove from favorites
+  const removeFromFavorites = (productId) => {
+    setFavorites(favorites.filter(id => id !== productId));
+    toast.success('Removed from favorites!');
+  }
+
+  // Check if product is in favorites
+  const isFavorite = (productId) => {
+    return favorites.includes(productId);
+  }
+
   useEffect(() => {
     fetchProductData()
   }, [])
@@ -185,7 +204,8 @@ export const AppContextProvider = (props) => {
     products, fetchProductData,
     cartItems, setCartItems,
     addToCart, updateCartQuantity,
-    getCartCount, getCartAmount
+    getCartCount, getCartAmount,
+    favorites, addToFavorites, removeFromFavorites, isFavorite
   }
 
   return (

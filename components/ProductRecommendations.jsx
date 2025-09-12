@@ -11,7 +11,7 @@ const ProductRecommendations = ({ currentProductId, category }) => {
   useEffect(() => {
     const fetchRecommendations = async () => {
       try {
-        const response = await axios.get(`/api/products/recommendations?category=${category}&exclude=${currentProductId}`)
+        const response = await axios.get(`/api/product/recommendations?category=${category}&exclude=${currentProductId}`)
         setProducts(response.data)
       } catch (error) {
         console.error('Error fetching recommendations:', error)
