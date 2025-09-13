@@ -1,6 +1,5 @@
 'use client';
 import React, { useState } from 'react';
-import Footer from '@/components/Footer';
 import { useAppContext } from '@/context/AppContext';
 import { toast } from 'react-hot-toast';
 import { useClerk } from '@clerk/nextjs';
@@ -216,7 +215,6 @@ const Contact = () => {
           </div>
         </div>
       </div>
-      <Footer />
     </>
   );
 };

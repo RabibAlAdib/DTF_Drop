@@ -17,10 +17,10 @@ const Navbar = () => {
   const { isSeller, router, user } = useAppContext();
   const { openSignIn } = useClerk();
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 px-6 md:px-16 lg:px-32 py-3 border-b border-gray-300 dark:border-gray-700 text-gray-700 dark:text-white bg-white/95 dark:bg-black/95 backdrop-blur-sm transition-all duration-300 flex md:grid md:grid-cols-[auto_1fr_auto] items-center justify-between md:gap-4">
+    <nav className="fixed top-0 left-0 right-0 z-50 px-6 md:px-16 lg:px-32 py-1.5 border-b border-gray-300 dark:border-gray-700 text-gray-700 dark:text-white bg-white/95 dark:bg-black/95 backdrop-blur-sm transition-all duration-300 flex md:grid md:grid-cols-[auto_1fr_auto] items-center justify-between md:gap-4">
       {/* Logo */}
       <Image
-        className="cursor-pointer w-20 md:w-24"
+        className="cursor-pointer w-16 md:w-20"
         onClick={() => router.push("/")}
         src={assets.logo}
         alt="logo"
