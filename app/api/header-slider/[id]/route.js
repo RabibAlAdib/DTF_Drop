@@ -3,6 +3,7 @@ import { getAuth } from '@clerk/nextjs/server';
 import connectDB from '@/config/db';
 import HeaderSlider from '@/models/HeaderSlider';
 import authSeller from '@/lib/authSeller';
+import { isValidUrl } from '../utils.js';
 
 // PUT - Update header slide visibility (seller only)
 export async function PUT(request, { params }) {
@@ -22,7 +23,22 @@ export async function PUT(request, { params }) {
     }
 
     const body = await request.json();
-    const { isVisible, title, shortText, buyButtonText, learnMoreButtonText, learnMoreLink } = body;
+    const { isVisible, title, shortText, buyButtonText, learnMoreButtonText, learnMoreLink, buyButtonLink, buyButtonAction } = body;
+
+    // Validate URLs if provided
+    if (learnMoreLink && !isValidUrl(learnMoreLink)) {
+      return NextResponse.json({
+        success: false,
+        message: "Valid Learn More URL is required (http/https only)."
+      }, { status: 400 });
+    }
+    
+    if (buyButtonAction === 'redirect' && buyButtonLink && !isValidUrl(buyButtonLink)) {
+      return NextResponse.json({
+        success: false,
+        message: "Valid redirect URL is required (http/https only)."
+      }, { status: 400 });
+    }
 
     // Find the slide and check ownership
     const slide = await HeaderSlider.findById(id);
@@ -48,6 +64,8 @@ export async function PUT(request, { params }) {
     if (buyButtonText) updateData.buyButtonText = buyButtonText;
     if (learnMoreButtonText) updateData.learnMoreButtonText = learnMoreButtonText;
     if (learnMoreLink) updateData.learnMoreLink = learnMoreLink;
+    if (buyButtonAction) updateData.buyButtonAction = buyButtonAction;
+    if (buyButtonLink) updateData.buyButtonLink = buyButtonLink;
 
     const updatedSlide = await HeaderSlider.findByIdAndUpdate(id, updateData, { new: true });
 

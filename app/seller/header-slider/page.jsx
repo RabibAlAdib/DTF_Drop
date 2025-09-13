@@ -27,7 +27,10 @@ const HeaderSliderManagement = () => {
 
   const fetchSlides = async () => {
     try {
-      const response = await axios.get('/api/header-slider');
+      const token = await getToken();
+      const response = await axios.get('/api/header-slider?mineOnly=true', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       if (response.data.success) {
         setSlides(response.data.slides);
       }

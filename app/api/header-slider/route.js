@@ -3,7 +3,8 @@ import { getAuth } from '@clerk/nextjs/server';
 import connectDB from '@/config/db';
 import HeaderSlider from '@/models/HeaderSlider';
 import authSeller from '@/lib/authSeller';
-import cloudinary from 'cloudinary';
+import { v2 as cloudinary } from 'cloudinary';
+import { isValidUrl } from './utils.js';
 
 // Configure Cloudinary
 cloudinary.config({
@@ -13,20 +14,54 @@ cloudinary.config({
   secure: true
 });
 
-// GET - Fetch all header slides (for front-end display)
+// GET - Fetch header slides (public for front-end display, seller-only for management)
 export async function GET(request) {
   try {
     await connectDB();
     
     const { searchParams } = new URL(request.url);
     const visibleOnly = searchParams.get('visibleOnly') === 'true';
+    const mineOnly = searchParams.get('mineOnly') === 'true';
     
     let query = {};
-    if (visibleOnly) {
+    let selectFields = 'title shortText productImage buyButtonText buyButtonAction buyButtonLink learnMoreButtonText learnMoreLink isVisible order createdAt';
+    
+    // For seller management view - show only current seller's slides
+    if (mineOnly) {
+      const { userId } = getAuth(request);
+      if (!userId) {
+        return NextResponse.json({
+          success: false,
+          message: "Authentication required"
+        }, { status: 401 });
+      }
+      
+      const isSeller = await authSeller(userId);
+      if (!isSeller) {
+        return NextResponse.json({
+          success: false,
+          message: "Unauthorized Access. Only Sellers can access this endpoint."
+        }, { status: 403 });
+      }
+      
+      query.userId = userId;
+      selectFields += ' userId'; // Include userId for seller management
+    } 
+    // For public display - only visible slides, exclude sensitive data
+    else if (visibleOnly) {
       query.isVisible = true;
+      // Don't include userId for public display
+    }
+    // If neither flag is set, return error for security
+    else {
+      return NextResponse.json({
+        success: false,
+        message: "Invalid request. Please specify visibleOnly=true for public display or mineOnly=true for management."
+      }, { status: 400 });
     }
 
     const slides = await HeaderSlider.find(query)
+      .select(selectFields)
       .sort({ order: -1, createdAt: -1 }) // Newest first
       .lean();
 
@@ -86,12 +121,35 @@ export async function POST(request) {
         message: "Product ID is required for 'Add to Cart' action."
       }, { status: 400 });
     }
+    
+    if (buyButtonAction === 'redirect' && (!buyButtonLink || !isValidUrl(buyButtonLink))) {
+      return NextResponse.json({
+        success: false,
+        message: "Valid URL is required for redirect action."
+      }, { status: 400 });
+    }
+    
+    // Validate learn more link
+    if (!isValidUrl(learnMoreLink)) {
+      return NextResponse.json({
+        success: false,
+        message: "Valid Learn More URL is required."
+      }, { status: 400 });
+    }
+    
+    // Check Cloudinary configuration
+    if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
+      return NextResponse.json({
+        success: false,
+        message: "Cloudinary configuration is missing. Please check your environment variables."
+      }, { status: 500 });
+    }
 
     // Upload image to Cloudinary
     const buffer = Buffer.from(await productImageFile.arrayBuffer());
     
     const uploadPromise = new Promise((resolve, reject) => {
-      const uploadStream = cloudinary.v2.uploader.upload_stream(
+      const uploadStream = cloudinary.uploader.upload_stream(
         {
           folder: 'header-slides',
           resource_type: 'image',
