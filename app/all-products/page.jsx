@@ -19,7 +19,7 @@ const AllProducts = () => {
                     {products.map((product, index) => (
                         <div
                             key={index}
-                            className="animate-float-delay-1 hover:scale-105 transition-transform duration-300"
+                            className="border-2 border-transparent rounded-lg hover:animate-border-rotation transition-all duration-300"
                         >
                             <ProductCard product={product} />
                         </div>

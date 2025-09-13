@@ -53,6 +53,24 @@
   }
 }
 
+@keyframes border-rotation {
+  0% {
+    border-color: transparent;
+  }
+  25% {
+    border-color: #3b82f6; /* blue-500 */
+  }
+  50% {
+    border-color: #8b5cf6; /* purple-500 */
+  }
+  75% {
+    border-color: #ef4444; /* red-500 */
+  }
+  100% {
+    border-color: #10b981; /* green-500 */
+  }
+}
+
 .animate-float {
   animation: float 6s ease-in-out infinite;
 }
@@ -72,6 +90,10 @@
 .animate-gradient {
   background-size: 200% 200%;
   animation: gradient-move 3s ease infinite;
+}
+
+.animate-border-rotation {
+  animation: border-rotation 3s ease-in-out infinite;
 }
 
 /* Dark mode enhancements */
