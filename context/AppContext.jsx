@@ -47,7 +47,6 @@ export const AppContextProvider = (props) => {
       if (data.success) {
         setUserData(data.user)
         setCartItems(data.user.cartItems)
-        setFavorites(data.user.favorites || [])
       } else {
         toast.error(data.message || "Failed to fetch user data")
       }
@@ -168,53 +167,26 @@ export const AppContextProvider = (props) => {
     return Math.floor(totalAmount * 100) / 100;
   }
 
-  // Add to favorites (updated to sync with server)
-  const addToFavorites = async (productId) => {
+  // Add to favorites
+  const addToFavorites = (productId) => {
     if (!user) {
       toast.error('Please log in to add items to favorites');
       return;
     }
     if (!favorites.includes(productId)) {
       setFavorites([...favorites, productId]);
-      
-      try {
-        const token = await getToken();
-        await axios.post('/api/user/favorites', {
-          productId,
-          action: 'add'
-        }, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-      } catch (error) {
-        // Revert optimistic update on error
-        setFavorites(prev => prev.filter(id => id !== productId));
-        toast.error('Failed to add to favorites');
-      }
+      toast.success('Added to favorites!');
     }
   }
 
-  // Remove from favorites (updated to sync with server)
-  const removeFromFavorites = async (productId) => {
+  // Remove from favorites
+  const removeFromFavorites = (productId) => {
     if (!user) {
       toast.error('Please log in to manage favorites');
       return;
     }
-    const previousFavorites = [...favorites];
     setFavorites(favorites.filter(id => id !== productId));
-    
-    try {
-      const token = await getToken();
-      await axios.post('/api/user/favorites', {
-        productId,
-        action: 'remove'
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-    } catch (error) {
-      // Revert optimistic update on error
-      setFavorites(previousFavorites);
-      toast.error('Failed to remove from favorites');
-    }
+    toast.success('Removed from favorites!');
   }
 
   // Check if product is in favorites
@@ -231,6 +203,7 @@ export const AppContextProvider = (props) => {
     if (user) {
       fetchUserData()
     }
+    fetchUserData()
   }, [user])
 
   const value = {
