@@ -255,7 +255,7 @@ const Product = () => {
             </div>
             
             {/* Thumbnail Images - Show images for selected color */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+            <div className="flex gap-2 overflow-x-auto pb-2 md:grid md:grid-cols-4 md:overflow-visible">
                 {(() => {
                   const currentImages = selectedColor ? getImagesForColor(selectedColor) : getAllImages();
                   
@@ -263,7 +263,7 @@ const Product = () => {
                     currentImages.map((image, index) => (
                       <div 
                         key={index}
-                        className={`rounded-lg overflow-hidden bg-gray-500/10 cursor-pointer border-2 transition-colors ${
+                        className={`flex-shrink-0 w-16 h-16 md:w-auto md:h-20 rounded-lg overflow-hidden bg-gray-500/10 cursor-pointer border-2 transition-colors ${
                           mainImage === image ? 'border-blue-500' : 'border-transparent hover:border-blue-500'
                         }`}
                         onClick={() => setMainImage(image)}
@@ -271,10 +271,10 @@ const Product = () => {
                         <Image
                           src={image || '/placeholder-image.jpg'}
                           alt={`${productData.name} ${selectedColor || ''} ${index + 1}`}
-                          className="w-full h-20 object-cover"
+                          className="w-full h-full object-cover"
                           width={100}
                           height={80}
-                          sizes="80px"
+                          sizes="(max-width: 768px) 64px, 80px"
                           loading="lazy"
                           onError={(e) => {
                             e.target.src = '/placeholder-image.jpg';
@@ -283,7 +283,7 @@ const Product = () => {
                       </div>
                     ))
                   ) : (
-                    <div className="col-span-4 text-center py-8 text-gray-500">
+                    <div className="flex-shrink-0 w-full text-center py-8 text-gray-500 md:col-span-4">
                       No images available
                     </div>
                   );
