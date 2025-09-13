@@ -8,6 +8,7 @@ import Image from "next/image";
 import { useClerk } from "@clerk/nextjs";
 import { UserButton } from "@clerk/nextjs";
 import ThemeToggle from "./ThemeToggle";
+import SearchDropdown from "./SearchDropdown";
 
 const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -69,9 +70,9 @@ const Navbar = () => {
 
       <ul className="hidden md:flex items-center gap-4">
         <ThemeToggle />
-        <button className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-          <Image className="w-4 h-4" src={assets.search_icon} alt="search icon" />
-        </button>
+        <div className="w-72">
+          <SearchDropdown />
+        </div>
         {user ? (
           <div className="flex items-center gap-2">
             <button
@@ -306,6 +307,11 @@ const Navbar = () => {
                   Customization
                 </span>
               </Link>
+
+              {/* Search in Mobile Menu */}
+              <div className="px-4 py-3">
+                <SearchDropdown onMobileSelect={() => setMobileMenuOpen(false)} />
+              </div>
 
               {/* Seller Dashboard in Mobile Menu */}
               {isSeller && (
