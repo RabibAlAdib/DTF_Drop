@@ -7,7 +7,7 @@ import Image from 'next/image';
 import Loading from '@/components/Loading';
 import { toast } from 'react-hot-toast';
 import ProductRecommendations from '@/components/ProductRecommendations';
-import Navbar from '@/components/Navbar';
+// Navbar is provided by layout - removed to prevent duplication
 import FeaturedProduct from '@/components/FeaturedProduct';
 
 // Available colors and sizes
@@ -209,9 +209,7 @@ const Product = () => {
   };
 
   return (
-    <>
-      <Navbar />
-      <div className="px-4 md:px-8 lg:px-16 py-6">
+    <div className="px-4 md:px-8 lg:px-16 py-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
             {/* Product Images */}
             <div className="space-y-4">
@@ -277,7 +275,7 @@ const Product = () => {
                 {/* Display Gender and Design Type */}
                 <div className="flex flex-wrap gap-2 mb-4">
                 <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
-                    {productData.gender ? 
+                    {productData.gender && productData.gender !== '' ? 
                         String(productData.gender).charAt(0).toUpperCase() + String(productData.gender).slice(1) 
                         : 'Unspecified'}
                 </span>
@@ -469,7 +467,6 @@ const Product = () => {
         />
         </div>
       </div>
-    </>
   );
 };
 
