@@ -215,7 +215,7 @@ const Navbar = () => {
           />
 
           {/* Mobile Menu */}
-          <div className="md:hidden fixed top-0 right-0 h-full w-80 max-w-[85vw] bg-white/95 dark:bg-black/95 backdrop-blur-xl border-l border-gray-200 dark:border-gray-700 shadow-2xl z-50 transform transition-all duration-300">
+          <div className="md:hidden fixed top-0 right-0 h-full w-80 max-w-[85vw] bg-white dark:bg-black border-l border-gray-200 dark:border-gray-700 shadow-2xl z-50 transform transition-all duration-300">
             {/* Menu Header */}
             <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
               <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
