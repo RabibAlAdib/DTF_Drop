@@ -1,43 +1,41 @@
 'use client';
 import React from 'react';
-import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 
 const About = () => {
   return (
     <>
-      <Navbar />
       <div className="px-6 md:px-16 lg:px-32 py-16">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">
+            <h1 className="text-4xl md:text-5xl font-bold text-gray-800 dark:text-white mb-6 animate-pulse-glow">
               About DTF Drop
             </h1>
-            <p className="text-lg text-gray-600 leading-relaxed">
+            <p className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed">
               Your premier destination for premium drop shoulder clothing
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 gap-12 items-center mb-16">
             <div>
-              <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+              <h2 className="text-2xl font-semibold text-gray-800 dark:text-white mb-4">
                 Our Story
               </h2>
-              <p className="text-gray-600 leading-relaxed mb-6">
+              <p className="text-gray-600 dark:text-gray-300 leading-relaxed mb-6">
                 DTF Drop was founded with a simple mission: to provide high-quality, 
                 comfortable drop shoulder clothing that combines style with functionality. 
                 We believe that everyone deserves to feel confident and comfortable in their clothing.
               </p>
-              <p className="text-gray-600 leading-relaxed">
+              <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
                 Our carefully curated collection features the latest trends in drop shoulder 
                 fashion, made from premium materials and designed for the modern lifestyle.
               </p>
             </div>
-            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-8 rounded-lg">
-              <h3 className="text-xl font-semibold text-gray-800 mb-4">
+            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-700 p-8 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
+              <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">
                 Why Choose Us?
               </h3>
-              <ul className="space-y-3 text-gray-600">
+              <ul className="space-y-3 text-gray-600 dark:text-gray-300">
                 <li className="flex items-center">
                   <span className="w-2 h-2 bg-blue-500 rounded-full mr-3"></span>
                   Premium quality materials
