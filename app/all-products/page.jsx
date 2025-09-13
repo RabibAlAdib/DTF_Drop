@@ -19,7 +19,8 @@ const AllProducts = () => {
                     {products.map((product, index) => (
                         <div
                             key={index}
-                            className="border-2 border-transparent rounded-lg hover:animate-border-rotation transition-all duration-300"
+                            className="border-2 border-transparent rounded-lg hover:animate-border-glow transition-all duration-300 animate-fade-in-up"
+                            style={{ animationDelay: `${index * 100}ms` }}
                         >
                             <ProductCard product={product} />
                         </div>

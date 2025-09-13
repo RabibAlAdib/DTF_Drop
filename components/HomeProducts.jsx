@@ -12,11 +12,11 @@ const HomeProducts = () => {
 
   return (
     <div className="flex flex-col items-center pt-14 relative">
-      {/* Floating background elements */}
+      {/* Gentle background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-10 w-32 h-32 bg-blue-500/10 rounded-full blur-xl animate-float"></div>
-        <div className="absolute top-40 right-20 w-24 h-24 bg-purple-500/10 rounded-full blur-xl animate-float-delay-1"></div>
-        <div className="absolute bottom-20 left-1/3 w-40 h-40 bg-pink-500/10 rounded-full blur-xl animate-float-delay-2"></div>
+        <div className="absolute top-20 left-10 w-32 h-32 bg-blue-500/10 rounded-full blur-xl animate-gentle-bounce"></div>
+        <div className="absolute top-40 right-20 w-24 h-24 bg-purple-500/10 rounded-full blur-xl animate-soft-pulse"></div>
+        <div className="absolute bottom-20 left-1/3 w-40 h-40 bg-pink-500/10 rounded-full blur-xl animate-gentle-bounce"></div>
       </div>
 
       <div 
@@ -34,7 +34,7 @@ const HomeProducts = () => {
         {products.map((product, index) => (
           <div 
             key={index}
-            className={`transform transition-all duration-700 hover:scale-105 ${
+            className={`transform transition-all duration-700 hover:scale-102 ${
               inView ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
             }`}
             style={{ 
@@ -55,7 +55,7 @@ const HomeProducts = () => {
       
       <button 
         onClick={() => { router.push('/all-products') }} 
-        className={`px-12 py-2.5 border rounded text-gray-500/70 hover:bg-slate-50/90 dark:hover:bg-gray-700/90 transition-all duration-300 transform hover:scale-105 hover:shadow-lg ${
+        className={`px-12 py-2.5 border rounded text-gray-500/70 hover:bg-slate-50/90 dark:hover:bg-gray-700/90 transition-all duration-300 transform hover:scale-102 hover:shadow-lg ${
           inView ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
         }`}
         style={{ transitionDelay: '800ms' }}
