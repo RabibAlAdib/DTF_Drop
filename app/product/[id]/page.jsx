@@ -499,8 +499,23 @@ const Product = () => {
 
             <div className="flex items-center gap-2">
               <span className="font-semibold">Sold:</span>
-              <span>{productData.numberofSales || 0} units</span>
+              <span className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 px-3 py-1 rounded-full text-sm">
+                {productData.numberofSales || 0} units sold
+              </span>
             </div>
+            
+            {productData.date && (
+              <div className="flex items-center gap-2">
+                <span className="font-semibold">Published:</span>
+                <span className="text-gray-600 dark:text-gray-400 text-sm">
+                  {new Date(productData.date).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                  })}
+                </span>
+              </div>
+            )}
           </div>
 
           {/* Add to Cart and Favorite Buttons */}

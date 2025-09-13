@@ -8,6 +8,7 @@ import { useAppContext } from "@/context/AppContext";
 const AllProducts = () => {
     const { products } = useAppContext();
     const [activeCategory, setActiveCategory] = useState('ALL');
+    const [activeDesignType, setActiveDesignType] = useState('ALL');
 
     // Get unique categories from products
     const categories = useMemo(() => {
@@ -16,26 +17,36 @@ const AllProducts = () => {
             if (product.category) {
                 uniqueCategories.add(product.category);
             }
-            // Also add design types as they might be more relevant for filtering
-            if (product.designType && product.designType !== 'customized') {
-                uniqueCategories.add(product.designType);
-            }
         });
         return ['ALL', ...Array.from(uniqueCategories).sort()];
     }, [products]);
 
-    // Filter products based on selected category
+    // Get design types from product model
+    const designTypes = useMemo(() => {
+        const uniqueDesignTypes = new Set();
+        products.forEach(product => {
+            if (product.designType) {
+                uniqueDesignTypes.add(product.designType);
+            }
+        });
+        return ['ALL', ...Array.from(uniqueDesignTypes).sort()];
+    }, [products]);
+
+    // Filter products based on selected category and design type
     const filteredProducts = useMemo(() => {
-        if (activeCategory === 'ALL') {
-            return products;
-        }
-        return products.filter(product => 
-            product.category === activeCategory || product.designType === activeCategory
-        );
-    }, [products, activeCategory]);
+        return products.filter(product => {
+            const categoryMatch = activeCategory === 'ALL' || product.category === activeCategory;
+            const designTypeMatch = activeDesignType === 'ALL' || product.designType === activeDesignType;
+            return categoryMatch && designTypeMatch;
+        });
+    }, [products, activeCategory, activeDesignType]);
 
     const handleCategoryChange = (category) => {
         setActiveCategory(category);
+    };
+
+    const handleDesignTypeChange = (designType) => {
+        setActiveDesignType(designType);
     };
 
     return (
@@ -49,19 +60,38 @@ const AllProducts = () => {
                 </div>
                 
                 {/* Category Filter */}
-                <div className="w-full mt-8">
-                    <CategoryFilter 
-                        categories={categories}
-                        activeCategory={activeCategory}
-                        onCategoryChange={handleCategoryChange}
-                    />
+                <div className="w-full mt-8 space-y-4">
+                    <div>
+                        <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-3 text-center">
+                            Filter by Category
+                        </h3>
+                        <CategoryFilter 
+                            categories={categories}
+                            activeCategory={activeCategory}
+                            onCategoryChange={handleCategoryChange}
+                            title="Categories"
+                        />
+                    </div>
+                    
+                    <div>
+                        <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-3 text-center">
+                            Filter by Design Type
+                        </h3>
+                        <CategoryFilter 
+                            categories={designTypes}
+                            activeCategory={activeDesignType}
+                            onCategoryChange={handleDesignTypeChange}
+                            title="Design Types"
+                        />
+                    </div>
                 </div>
 
                 {/* Product Count */}
                 <div className="w-full text-center mb-4">
                     <p className="text-sm text-gray-600 dark:text-gray-400">
                         Showing {filteredProducts.length} {filteredProducts.length === 1 ? 'product' : 'products'}
-                        {activeCategory !== 'ALL' && ` in ${activeCategory}`}
+                        {activeCategory !== 'ALL' && ` in category "${activeCategory}"`}
+                        {activeDesignType !== 'ALL' && ` with design type "${activeDesignType}"`}
                     </p>
                 </div>
 
@@ -86,7 +116,11 @@ const AllProducts = () => {
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-5.5a2.5 2.5 0 00-2.5 2.5v0a2.5 2.5 0 01-2.5 2.5H12" />
                             </svg>
                             <h3 className="text-lg font-medium mb-2">No products found</h3>
-                            <p className="text-sm">No products available in the {activeCategory} category.</p>
+                            <p className="text-sm">
+                                No products found matching your filters.
+                                {activeCategory !== 'ALL' && ` Category: ${activeCategory}`}
+                                {activeDesignType !== 'ALL' && ` Design Type: ${activeDesignType}`}
+                            </p>
                         </div>
                     </div>
                 )}
