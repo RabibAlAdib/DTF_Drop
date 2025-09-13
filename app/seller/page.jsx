@@ -23,12 +23,8 @@ const AddProduct = () => {
     { file: null, color: 'Black' } // Start with one slot
   ]);
   
-  // NEW: Size management with default and optional XXL
-  const [includeXXL, setIncludeXXL] = useState(false);
-  const getDefaultSizes = () => {
-    const baseSizes = ['M', 'L', 'XL'];
-    return includeXXL ? [...baseSizes, 'XXL'] : baseSizes;
-  };
+  // NEW: Custom sizes input
+  const [customSizes, setCustomSizes] = useState('M, L, XL');
 
   // Available options
   const AVAILABLE_COLORS = ['Black', 'White', 'Lite Pink', 'Coffee', 'Offwhite', 'NevyBlue'];
@@ -55,7 +51,9 @@ const AddProduct = () => {
     setImageSlots(newSlots);
   };
 
-  // Remove parseSizes function as it's no longer needed
+  const parseSizes = (sizeString) => {
+    return sizeString.split(',').map(size => size.trim()).filter(size => size.length > 0);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -85,8 +83,8 @@ const AddProduct = () => {
       formData.append(`color_${index}`, slot.color);
     });
     
-    // Use default sizes with optional XXL
-    const sizes = getDefaultSizes();
+    // Parse and append sizes
+    const sizes = parseSizes(customSizes);
     sizes.forEach(size => formData.append('sizes', size));
     
     // Extract unique colors for the colors field
@@ -113,7 +111,7 @@ const AddProduct = () => {
         setGender('both');
         setDesignType('customized');
         setImageSlots([{ file: null, color: 'Black' }]);
-        setIncludeXXL(false);
+        setCustomSizes('M, L, XL');
       } else {
         toast.error(response.data.message);
       }
@@ -286,47 +284,22 @@ const AddProduct = () => {
           </select>
         </div>
 
-        {/* Available Sizes */}
+        {/* Custom Sizes */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-            Available Sizes
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Available Sizes (comma-separated)
           </label>
-          <div className="space-y-3">
-            {/* Default Sizes Display */}
-            <div className="flex items-center gap-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Default sizes:</span>
-              <div className="flex gap-2">
-                {['M', 'L', 'XL'].map(size => (
-                  <span key={size} className="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs font-medium rounded">
-                    {size}
-                  </span>
-                ))}
-              </div>
-            </div>
-            
-            {/* XXL Option */}
-            <div className="flex items-center gap-3">
-              <input
-                type="checkbox"
-                id="includeXXL"
-                checked={includeXXL}
-                onChange={(e) => setIncludeXXL(e.target.checked)}
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded"
-              />
-              <label htmlFor="includeXXL" className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                Include XXL size
-              </label>
-              {includeXXL && (
-                <span className="px-2 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 text-xs font-medium rounded">
-                  XXL
-                </span>
-              )}
-            </div>
-            
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              All products include M, L, XL sizes by default. Check the box above to also include XXL.
-            </p>
-          </div>
+          <input
+            type="text"
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-black dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="e.g., XS, S, M, L, XL, XXL"
+            value={customSizes}
+            onChange={(e) => setCustomSizes(e.target.value)}
+            required
+          />
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            Enter sizes separated by commas. Users can select from these options.
+          </p>
         </div>
 
         {/* Product Price */}

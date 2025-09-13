@@ -3,64 +3,31 @@ import { assets } from '@/assets/assets'
 import Image from 'next/image';
 import Link from 'next/link';
 import { useAppContext } from '@/context/AppContext';
-import { toast } from 'react-hot-toast';
 
 const ProductCard = ({ product }) => {
 
-    const { currency, router, user, favorites, isFavorite, addToFavorites, removeFromFavorites } = useAppContext()
-
-    const handleFavoriteToggle = async (e, productId) => {
-        e.preventDefault(); // Prevent navigation to product page
-        e.stopPropagation();
-        
-        if (!user) {
-            toast.error('Please log in to add items to favorites');
-            return;
-        }
-
-        // Use AppContext functions that handle both API calls and state updates
-        if (isFavorite(productId)) {
-            await removeFromFavorites(productId);
-        } else {
-            await addToFavorites(productId);
-        }
-    };
+    const { currency, router } = useAppContext()
 
     return (
         <Link 
             href={`/product/${product._id}`}
             prefetch={true}
-            className="flex flex-col items-start gap-0.5 w-full cursor-pointer px-2 max-w-[280px]"
+            className="flex flex-col items-start gap-0.5 max-w-[200px] w-full cursor-pointer px-[5px]"
         >
-            <div className="cursor-pointer group relative bg-gray-500/10 rounded-lg w-full h-64 md:h-72 flex items-center justify-center overflow-hidden">
+            <div className="cursor-pointer group relative bg-gray-500/10 rounded-lg w-full h-52 flex items-center justify-center">
                 <Image
                     src={product.images[0]}
                     alt={product.name}
-                    className="group-hover:scale-105 transition object-cover w-full h-full rounded-lg"
+                    className="group-hover:scale-105 transition object-cover w-4/5 h-4/5 md:w-full md:h-full"
                     width={800}
                     height={800}
                 />
-                <button 
-                    onClick={(e) => handleFavoriteToggle(e, product._id)}
-                    className={`absolute top-2 right-2 p-2 rounded-full shadow-md transition-all duration-300 hover:scale-110 ${
-                        isFavorite(product._id) 
-                            ? 'bg-red-500 text-white hover:bg-red-600' 
-                            : 'bg-white text-gray-600 hover:bg-red-50'
-                    }`}
-                >
-                    <svg 
-                        className="h-3 w-3" 
-                        fill={isFavorite(product._id) ? 'currentColor' : 'none'} 
-                        stroke="currentColor" 
-                        viewBox="0 0 24 24"
-                    >
-                        <path 
-                            strokeLinecap="round" 
-                            strokeLinejoin="round" 
-                            strokeWidth={2} 
-                            d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" 
-                        />
-                    </svg>
+                <button className="absolute top-2 right-2 bg-white p-2 rounded-full shadow-md">
+                    <Image
+                        className="h-3 w-3"
+                        src={assets.heart_icon}
+                        alt="heart_icon"
+                    />
                 </button>
             </div>
 
