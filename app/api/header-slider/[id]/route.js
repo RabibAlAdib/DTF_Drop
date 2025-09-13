@@ -1,14 +1,14 @@
 import { NextResponse } from 'next/server';
 import { getAuth } from '@clerk/nextjs/server';
-import { connectDB } from '@/config/db';
+import connectDB from '@/config/db';
 import HeaderSlider from '@/models/HeaderSlider';
-import { authSeller } from '@/lib/authSeller';
-
-await connectDB();
+import authSeller from '@/lib/authSeller';
 
 // PUT - Update header slide visibility (seller only)
 export async function PUT(request, { params }) {
   try {
+    await connectDB();
+    
     const { userId } = getAuth(request);
     const { id } = params;
     
@@ -69,6 +69,8 @@ export async function PUT(request, { params }) {
 // DELETE - Delete header slide (seller only)
 export async function DELETE(request, { params }) {
   try {
+    await connectDB();
+    
     const { userId } = getAuth(request);
     const { id } = params;
     

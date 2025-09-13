@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
 import { getAuth } from '@clerk/nextjs/server';
-import { connectDB } from '@/config/db';
+import connectDB from '@/config/db';
 import HeaderSlider from '@/models/HeaderSlider';
-import { authSeller } from '@/lib/authSeller';
+import authSeller from '@/lib/authSeller';
 import cloudinary from 'cloudinary';
 
 // Configure Cloudinary
@@ -13,11 +13,11 @@ cloudinary.config({
   secure: true
 });
 
-await connectDB();
-
 // GET - Fetch all header slides (for front-end display)
 export async function GET(request) {
   try {
+    await connectDB();
+    
     const { searchParams } = new URL(request.url);
     const visibleOnly = searchParams.get('visibleOnly') === 'true';
     
@@ -47,6 +47,8 @@ export async function GET(request) {
 // POST - Create new header slide (seller only)
 export async function POST(request) {
   try {
+    await connectDB();
+    
     const { userId } = getAuth(request);
     
     // Check if user is a seller
