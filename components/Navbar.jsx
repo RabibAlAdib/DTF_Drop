@@ -24,7 +24,7 @@ const Navbar = () => {
         width={96}
         height={40}
       />
-      <div className="max-md:hidden bg-gray-50 dark:bg-gray-800/30 rounded-full px-2 py-1">
+      <div className="max-md:hidden bg-gray-300 dark:bg-gray-800/30 rounded-full px-2 py-1">
         <div className="flex items-center gap-1">
           <Link
             href="/"
@@ -89,12 +89,16 @@ const Navbar = () => {
             >
               <HeartIcon />
             </button>
-            <UserButton appearance={{
-              elements: {
-                userButtonAvatarBox: "w-8 h-8 rounded-full border-2 border-gray-200 dark:border-gray-700 hover:border-blue-400 dark:hover:border-blue-500 transition-colors",
-                userButtonPopoverCard: "rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm",
-              }
-            }}>
+            <UserButton
+              appearance={{
+                elements: {
+                  userButtonAvatarBox:
+                    "w-8 h-8 rounded-full border-2 border-gray-200 dark:border-gray-700 hover:border-blue-400 dark:hover:border-blue-500 transition-colors",
+                  userButtonPopoverCard:
+                    "rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm",
+                },
+              }}
+            >
               <UserButton.MenuItems>
                 <UserButton.Action
                   label="My Orders"
@@ -109,7 +113,11 @@ const Navbar = () => {
             onClick={openSignIn}
             className="flex items-center gap-2 px-4 py-2 rounded-full bg-blue-600 hover:bg-blue-700 text-white transition-colors font-medium"
           >
-            <Image src={assets.user_icon} alt="user icon" className="w-4 h-4 filter brightness-0 invert" />
+            <Image
+              src={assets.user_icon}
+              alt="user icon"
+              className="w-4 h-4 filter brightness-0 invert"
+            />
             Sign In
           </button>
         )}
@@ -118,11 +126,14 @@ const Navbar = () => {
       <div className="flex items-center md:hidden gap-3">
         {/* User Button for Mobile */}
         {user ? (
-          <UserButton appearance={{
-            elements: {
-              userButtonAvatarBox: "w-8 h-8 rounded-full border-2 border-gray-200 dark:border-gray-700"
-            }
-          }}>
+          <UserButton
+            appearance={{
+              elements: {
+                userButtonAvatarBox:
+                  "w-8 h-8 rounded-full border-2 border-gray-200 dark:border-gray-700",
+              },
+            }}
+          >
             <UserButton.MenuItems>
               <UserButton.Action
                 label="Cart"
@@ -150,7 +161,11 @@ const Navbar = () => {
             onClick={openSignIn}
             className="flex items-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-full transition-colors text-sm"
           >
-            <Image src={assets.user_icon} alt="user icon" className="w-4 h-4 filter brightness-0 invert" />
+            <Image
+              src={assets.user_icon}
+              alt="user icon"
+              className="w-4 h-4 filter brightness-0 invert"
+            />
             Sign In
           </button>
         )}
@@ -219,7 +234,7 @@ const Navbar = () => {
               {/* Navigation Links */}
               <Link
                 href="/"
-                className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200 group text-white"
+                className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200 group"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 <HomeIcon />
@@ -230,7 +245,7 @@ const Navbar = () => {
 
               <Link
                 href="/all-products"
-                className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200 group text-white"
+                className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200 group"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 <BoxIcon />
@@ -310,7 +325,9 @@ const Navbar = () => {
 
               {/* Search in Mobile Menu */}
               <div className="px-4 py-3">
-                <SearchDropdown onMobileSelect={() => setMobileMenuOpen(false)} />
+                <SearchDropdown
+                  onMobileSelect={() => setMobileMenuOpen(false)}
+                />
               </div>
 
               {/* Seller Dashboard in Mobile Menu */}
