@@ -16,7 +16,7 @@ const AddProduct = () => {
   
   // NEW: State for additional fields
   const [gender, setGender] = useState('both');
-  const [designType, setDesignType] = useState('customized');
+  const [designType, setDesignType] = useState('Customized');
   
   // Progress bar state
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -37,7 +37,7 @@ const AddProduct = () => {
   // Available options
   const AVAILABLE_COLORS = ['Black', 'White', 'Lite Pink', 'Coffee', 'Offwhite', 'NevyBlue'];
   const AVAILABLE_SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
-  const DESIGN_TYPES = ['Anima', 'Typography', 'game', 'wwe', 'sports', 'motivational', 'jokes', 'Islamic', 'customized'];
+  const DESIGN_TYPES = ['Anime', 'Typography', 'Game', 'WWE', 'Sports', 'Motivational', 'Jokes', 'Islamic', 'Customized', 'Cartoon', 'Movie/TV', 'Music/Band', 'Minimalist', 'Abstract', 'Nature', 'Festival/Seasonal', 'Couple/Friendship', 'Quotes', 'Retro/Vintage', 'Geek/Tech', 'Streetwear', 'Hip-Hop/Rap', 'Graffiti/Urban', 'Fantasy/Mythology', 'Sci-Fi', 'Superheroes/Comics', 'Animals/Pets', 'Cars/Bikes', 'Food/Drinks', 'Travel/Adventure', 'National/Patriotic', 'Memes', 'Spiritual/Inspirational', 'Kids/Family', 'Occupations (Doctor, Engineer, etc.)', 'College/University Life', 'Fitness/Gym', 'Luxury/High Fashion', 'Gaming Esports Teams'];
   const GENDERS = ['male', 'female', 'both'];
 
   const addImageSlot = () => {
@@ -124,7 +124,7 @@ const AddProduct = () => {
         setPrice('');
         setOfferPrice('');
         setGender('both');
-        setDesignType('customized');
+        setDesignType('Customized');
         setImageSlots([{ file: null, color: 'Black' }]);
         setIncludeXXL(false);
       } else {
@@ -257,9 +257,9 @@ const AddProduct = () => {
             <option value="Drop Shoulder">Drop Shoulder</option>
             <option value="Panjabi">Panjabi</option>
             <option value="Pant">Pant</option>
-            <option value="shirt">Shirt</option>
+            <option value="Shirt">Shirt</option>
             <option value="Half Sleeve T-shirt">Half Sleeve T-shirt</option>
-            <option value="full Sleeve T-shirt">Full Sleeve T-shirt</option>
+            <option value="Full Sleeve T-shirt">Full Sleeve T-shirt</option>
             <option value="Polo T-shirt">Polo T-shirt</option>
           </select>
         </div>

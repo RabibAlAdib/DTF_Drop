@@ -65,8 +65,13 @@ const productSchema = new mongoose.Schema({
   designType: { 
     type: String, 
     required: true,
-    enum: ['Anima', 'Typography', 'game', 'wwe', 'sports', 'motivational', 'jokes', 'Islamic', 'customized'],
-    default: 'customized'
+    enum: [
+      // Canonical values (current)
+      'Anime', 'Typography', 'Game', 'WWE', 'Sports', 'Motivational', 'Jokes', 'Islamic', 'Customized', 'Cartoon', 'Movie/TV', 'Music/Band', 'Minimalist', 'Abstract', 'Nature', 'Festival/Seasonal', 'Couple/Friendship', 'Quotes', 'Retro/Vintage', 'Geek/Tech', 'Streetwear', 'Hip-Hop/Rap', 'Graffiti/Urban', 'Fantasy/Mythology', 'Sci-Fi', 'Superheroes/Comics', 'Animals/Pets', 'Cars/Bikes', 'Food/Drinks', 'Travel/Adventure', 'National/Patriotic', 'Memes', 'Spiritual/Inspirational', 'Kids/Family', 'Occupations (Doctor, Engineer, etc.)', 'College/University Life', 'Fitness/Gym', 'Luxury/High Fashion', 'Gaming Esports Teams',
+      // Legacy values for backward compatibility
+      'anime', 'typography', 'game', 'wwe', 'sports', 'motivational', 'jokes', 'islamic', 'customized', 'cartoon', 'movie/tv', 'music/band', 'minimalist', 'abstract', 'nature', 'festival/seasonal', 'couple/friendship', 'quotes', 'retro/vintage', 'geek/tech', 'streetwear', 'hip-hop/rap', 'graffiti/urban', 'fantasy/mythology', 'sci-fi', 'superheroes/comics', 'animals/pets', 'cars/bikes', 'food/drinks', 'travel/adventure', 'national/patriotic', 'memes', 'spiritual/inspirational', 'kids/family', 'occupations', 'college/university', 'fitness/gym', 'luxury/fashion', 'gaming', 'esports'
+    ],
+    default: 'Customized'
   },
   
   // Color and size variants (existing)
