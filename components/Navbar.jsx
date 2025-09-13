@@ -9,9 +9,11 @@ import { useClerk } from "@clerk/nextjs";
 import { UserButton } from "@clerk/nextjs";
 import ThemeToggle from "./ThemeToggle";
 import SearchDropdown from "./SearchDropdown";
+import SearchModal from "./SearchModal";
 
 const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [searchModalOpen, setSearchModalOpen] = useState(false);
   const { isSeller, router, user } = useAppContext();
   const { openSignIn } = useClerk();
   return (
@@ -24,71 +26,61 @@ const Navbar = () => {
         width={96}
         height={40}
       />
-      <div className="max-md:hidden bg-gray-300 dark:bg-gray-800/30 rounded-full px-2 py-1">
-        <div className="flex items-center gap-1">
-          <Link
-            href="/"
-            className="px-3 py-2 rounded-full hover:bg-white dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-200 transition-all duration-200 text-sm"
-          >
-            Home
-          </Link>
-          <Link
-            href="/all-products"
-            className="px-3 py-2 rounded-full hover:bg-white dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-200 transition-all duration-200 text-sm"
-          >
-            Shop
-          </Link>
-          <Link
-            href="/about"
-            className="px-3 py-2 rounded-full hover:bg-white dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-200 transition-all duration-200 text-sm"
-          >
-            About Us
-          </Link>
-          <Link
-            href="/contact"
-            className="px-3 py-2 rounded-full hover:bg-white dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-200 transition-all duration-200 text-sm"
-          >
-            Contact
-          </Link>
-          <Link
-            href="/customization"
-            className="px-3 py-2 rounded-full hover:bg-white dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-200 transition-all duration-200 text-sm"
-          >
-            Customization
-          </Link>
+      {/* Desktop Navigation - Layout: Logo (menu items) (Trigger) ProfileMenu search_icon */}
+      <div className="hidden md:flex items-center flex-1 justify-between">
+        {/* Menu Items */}
+        <div className="bg-gray-300 dark:bg-gray-800/30 rounded-full px-2 py-1 ml-8">
+          <div className="flex items-center gap-1">
+            <Link
+              href="/"
+              className="px-3 py-2 rounded-full hover:bg-white dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-200 transition-all duration-200 text-sm"
+            >
+              Home
+            </Link>
+            <Link
+              href="/all-products"
+              className="px-3 py-2 rounded-full hover:bg-white dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-200 transition-all duration-200 text-sm"
+            >
+              Shop
+            </Link>
+            <Link
+              href="/about"
+              className="px-3 py-2 rounded-full hover:bg-white dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-200 transition-all duration-200 text-sm"
+            >
+              About Us
+            </Link>
+            <Link
+              href="/contact"
+              className="px-3 py-2 rounded-full hover:bg-white dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-200 transition-all duration-200 text-sm"
+            >
+              Contact
+            </Link>
+            <Link
+              href="/customization"
+              className="px-3 py-2 rounded-full hover:bg-white dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-200 transition-all duration-200 text-sm"
+            >
+              Customization
+            </Link>
+          </div>
+        </div>
 
+        {/* Right Side: Trigger, ProfileMenu, Search Icon */}
+        <div className="flex items-center gap-4">
+          {/* Trigger (Theme Toggle) */}
+          <ThemeToggle />
+
+          {/* Seller Dashboard Trigger */}
           {isSeller && (
             <button
               onClick={() => router.push("/seller")}
-              className="text-xs bg-blue-100 dark:bg-blue-900/40 hover:bg-blue-200 dark:hover:bg-blue-900/60 px-3 py-2 rounded-full transition-colors font-medium text-blue-700 dark:text-blue-300 ml-1"
+              className="text-xs bg-blue-100 dark:bg-blue-900/40 hover:bg-blue-200 dark:hover:bg-blue-900/60 px-3 py-2 rounded-full transition-colors font-medium text-blue-700 dark:text-blue-300"
             >
               Seller Dashboard
             </button>
           )}
-        </div>
-      </div>
 
-      <ul className="hidden md:flex items-center gap-4">
-        <ThemeToggle />
-        <div className="w-72">
-          <SearchDropdown />
-        </div>
-        {user ? (
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => router.push("/cart")}
-              className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors relative"
-              title="Cart"
-            >
-              <CartIcon />
-            </button>
-            <button
-              onClick={() => router.push("/favorites")}
-              className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-              title="Favorites"
-            >
-              <HeartIcon />
-            </button>
+          {/* Profile Menu */}
+          {user ? (
             <UserButton
               appearance={{
                 elements: {
@@ -101,27 +93,48 @@ const Navbar = () => {
             >
               <UserButton.MenuItems>
                 <UserButton.Action
+                  label="Cart"
+                  labelIcon={<CartIcon />}
+                  onClick={() => router.push("/cart")}
+                />
+                <UserButton.Action
                   label="My Orders"
                   labelIcon={<BagIcon />}
                   onClick={() => router.push("/my-orders")}
                 />
+                <UserButton.Action
+                  label="Favorites"
+                  labelIcon={<HeartIcon />}
+                  onClick={() => router.push("/favorites")}
+                />
               </UserButton.MenuItems>
             </UserButton>
-          </div>
-        ) : (
+          ) : (
+            <button
+              onClick={openSignIn}
+              className="flex items-center gap-2 px-4 py-2 rounded-full bg-blue-600 hover:bg-blue-700 text-white transition-colors font-medium"
+            >
+              <Image
+                src={assets.user_icon}
+                alt="user icon"
+                className="w-4 h-4 filter brightness-0 invert"
+              />
+              Sign In
+            </button>
+          )}
+
+          {/* Search Icon */}
           <button
-            onClick={openSignIn}
-            className="flex items-center gap-2 px-4 py-2 rounded-full bg-blue-600 hover:bg-blue-700 text-white transition-colors font-medium"
+            onClick={() => setSearchModalOpen(true)}
+            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            title="Search"
           >
-            <Image
-              src={assets.user_icon}
-              alt="user icon"
-              className="w-4 h-4 filter brightness-0 invert"
-            />
-            Sign In
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
           </button>
-        )}
-      </ul>
+        </div>
+      </div>
 
       <div className="flex items-center md:hidden gap-3">
         {/* User Button for Mobile */}
@@ -379,6 +392,12 @@ const Navbar = () => {
           </div>
         </>
       )}
+
+      {/* Search Modal */}
+      <SearchModal 
+        isOpen={searchModalOpen} 
+        onClose={() => setSearchModalOpen(false)} 
+      />
     </nav>
   );
 };
