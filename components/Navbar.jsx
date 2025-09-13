@@ -64,78 +64,78 @@ const Navbar = () => {
             </Link>
           </div>
         </div>
+      </div>
 
-        {/* Right Side: Trigger, ProfileMenu, Search Icon */}
-        <div className="flex items-center gap-4">
-          {/* Trigger (Theme Toggle) */}
-          <ThemeToggle />
+      {/* Right Side: Theme Toggle, Profile Menu, Search Icon */}
+      <div className="hidden md:flex items-center gap-4">
+        {/* Theme Toggle */}
+        <ThemeToggle />
 
-          {/* Profile Menu */}
-          {user ? (
-            <UserButton
-              appearance={{
-                elements: {
-                  userButtonAvatarBox:
-                    "w-8 h-8 rounded-full border-2 border-gray-200 dark:border-gray-700 hover:border-blue-400 dark:hover:border-blue-500 transition-colors",
-                  userButtonPopoverCard:
-                    "rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm",
-                },
-              }}
-            >
-              <UserButton.MenuItems>
-                <UserButton.Action
-                  label="Cart"
-                  labelIcon={<CartIcon />}
-                  onClick={() => router.push("/cart")}
-                />
-                <UserButton.Action
-                  label="My Orders"
-                  labelIcon={<BagIcon />}
-                  onClick={() => router.push("/my-orders")}
-                />
-                <UserButton.Action
-                  label="Favorites"
-                  labelIcon={<HeartIcon />}
-                  onClick={() => router.push("/favorites")}
-                />
-                {isSeller && (
-                  <UserButton.Action
-                    label="Seller Dashboard"
-                    labelIcon={
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                      </svg>
-                    }
-                    onClick={() => router.push("/seller")}
-                  />
-                )}
-              </UserButton.MenuItems>
-            </UserButton>
-          ) : (
-            <button
-              onClick={openSignIn}
-              className="flex items-center gap-2 px-4 py-2 rounded-full bg-blue-600 hover:bg-blue-700 text-white transition-colors font-medium"
-            >
-              <Image
-                src={assets.user_icon}
-                alt="user icon"
-                className="w-4 h-4 filter brightness-0 invert"
-              />
-              Sign In
-            </button>
-          )}
-
-          {/* Search Icon */}
-          <button
-            onClick={() => setSearchModalOpen(true)}
-            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-            title="Search"
+        {/* Profile Menu */}
+        {user ? (
+          <UserButton
+            appearance={{
+              elements: {
+                userButtonAvatarBox:
+                  "w-8 h-8 rounded-full border-2 border-gray-200 dark:border-gray-700 hover:border-blue-400 dark:hover:border-blue-500 transition-colors",
+                userButtonPopoverCard:
+                  "rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm",
+              },
+            }}
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
+            <UserButton.MenuItems>
+              <UserButton.Action
+                label="Cart"
+                labelIcon={<CartIcon />}
+                onClick={() => router.push("/cart")}
+              />
+              <UserButton.Action
+                label="My Orders"
+                labelIcon={<BagIcon />}
+                onClick={() => router.push("/my-orders")}
+              />
+              <UserButton.Action
+                label="Favorites"
+                labelIcon={<HeartIcon />}
+                onClick={() => router.push("/favorites")}
+              />
+              {isSeller && (
+                <UserButton.Action
+                  label="Seller Dashboard"
+                  labelIcon={
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    </svg>
+                  }
+                  onClick={() => router.push("/seller")}
+                />
+              )}
+            </UserButton.MenuItems>
+          </UserButton>
+        ) : (
+          <button
+            onClick={openSignIn}
+            className="flex items-center gap-2 px-4 py-2 rounded-full bg-blue-600 hover:bg-blue-700 text-white transition-colors font-medium"
+          >
+            <Image
+              src={assets.user_icon}
+              alt="user icon"
+              className="w-4 h-4 filter brightness-0 invert"
+            />
+            Sign In
           </button>
-        </div>
+        )}
+
+        {/* Search Icon */}
+        <button
+          onClick={() => setSearchModalOpen(true)}
+          className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+          title="Search"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </button>
       </div>
 
       <div className="flex items-center md:hidden gap-3">
