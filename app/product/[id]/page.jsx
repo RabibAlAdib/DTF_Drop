@@ -268,21 +268,21 @@ const Product = () => {
             {/* Product Details */}
             <div className="space-y-6">
             <div>
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
                 {productData.name || 'Product Name'}
                 </h1>
                 
                 {/* Display Gender and Design Type */}
                 <div className="flex flex-wrap gap-2 mb-4">
-                <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
+                <span className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 px-3 py-1 rounded-full text-sm">
                     {productData.gender && productData.gender !== '' ? 
                         String(productData.gender).charAt(0).toUpperCase() + String(productData.gender).slice(1) 
                         : 'Unspecified'}
                 </span>
-                <span className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm">
+                <span className="bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200 px-3 py-1 rounded-full text-sm">
                     {productData.designType}
                 </span>
-                <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">
+                <span className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 px-3 py-1 rounded-full text-sm">
                     {productData.category}
                 </span>
                 </div>
@@ -292,7 +292,7 @@ const Product = () => {
                     {'★'.repeat(Math.floor(productData.ratings || 0))}
                     {'☆'.repeat(5 - Math.floor(productData.ratings || 0))}
                 </div>
-                <span className="text-gray-600">
+                <span className="text-gray-600 dark:text-gray-400">
                     ({productData.numOfReviews || 0} reviews)
                 </span>
                 </div>
@@ -305,15 +305,15 @@ const Product = () => {
                     <span className="text-3xl font-bold text-green-600">
                         ${productData.offerPrice}
                     </span>
-                    <span className="text-xl text-gray-500 line-through">
+                    <span className="text-xl text-gray-500 dark:text-gray-400 line-through">
                         ${productData.price}
                     </span>
-                    <span className="bg-red-100 text-red-800 px-2 py-1 rounded text-sm">
+                    <span className="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 px-2 py-1 rounded text-sm">
                         Save ${productData.price - productData.offerPrice}
                     </span>
                     </>
                 ) : (
-                    <span className="text-3xl font-bold text-gray-900">
+                    <span className="text-3xl font-bold text-gray-900 dark:text-white">
                     ${productData.price || '0.00'}
                     </span>
                 )}
