@@ -147,8 +147,14 @@ const ProductList = () => {
                         </div>
                         <div className="flex space-x-2">
                           <button
-                            onClick={() => router.push(`/product/${product._id}`)}
+                            onClick={() => router.push(`/seller/edit-product/${product._id}`)}
                             className="text-blue-600 hover:text-blue-900 bg-blue-50 px-2 py-1 rounded text-xs hover:bg-blue-100 transition-colors"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => router.push(`/product/${product._id}`)}
+                            className="text-green-600 hover:text-green-900 bg-green-50 px-2 py-1 rounded text-xs hover:bg-green-100 transition-colors"
                           >
                             View
                           </button>
@@ -266,8 +272,14 @@ const ProductList = () => {
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <div className="flex space-x-2">
                           <button
-                            onClick={() => router.push(`/product/${product._id}`)}
+                            onClick={() => router.push(`/seller/edit-product/${product._id}`)}
                             className="text-blue-600 hover:text-blue-900 bg-blue-50 px-3 py-1 rounded-md hover:bg-blue-100 transition-colors"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => router.push(`/product/${product._id}`)}
+                            className="text-green-600 hover:text-green-900 bg-green-50 px-3 py-1 rounded-md hover:bg-green-100 transition-colors"
                           >
                             View
                           </button>
