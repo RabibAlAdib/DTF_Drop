@@ -1,31 +1,95 @@
 "use client";
+import { useState, useMemo } from "react";
 import ProductCard from "@/components/ProductCard";
 import Footer from "@/components/Footer";
+import CategoryFilter from "@/components/CategoryFilter";
 import { useAppContext } from "@/context/AppContext";
 
 const AllProducts = () => {
     const { products } = useAppContext();
+    const [activeCategory, setActiveCategory] = useState('ALL');
+
+    // Get unique categories from products
+    const categories = useMemo(() => {
+        const uniqueCategories = new Set();
+        products.forEach(product => {
+            if (product.category) {
+                uniqueCategories.add(product.category);
+            }
+            // Also add design types as they might be more relevant for filtering
+            if (product.designType && product.designType !== 'customized') {
+                uniqueCategories.add(product.designType);
+            }
+        });
+        return ['ALL', ...Array.from(uniqueCategories).sort()];
+    }, [products]);
+
+    // Filter products based on selected category
+    const filteredProducts = useMemo(() => {
+        if (activeCategory === 'ALL') {
+            return products;
+        }
+        return products.filter(product => 
+            product.category === activeCategory || product.designType === activeCategory
+        );
+    }, [products, activeCategory]);
+
+    const handleCategoryChange = (category) => {
+        setActiveCategory(category);
+    };
 
     return (
         <>
             <div className="flex flex-col items-start px-6 md:px-16 lg:px-32 bg-gradient-to-br from-white via-gray-50 to-white dark:from-black dark:via-gray-900 dark:to-black min-h-screen">
-                <div className="flex flex-col items-end pt-12">
+                <div className="flex flex-col items-end pt-12 w-full">
                     <p className="text-2xl font-medium text-gray-800 dark:text-white animate-pulse-glow">
                         All products
                     </p>
                     <div className="w-16 h-0.5 bg-gradient-to-r from-orange-600 to-red-600 rounded-full animate-gradient"></div>
                 </div>
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 flex-col items-center gap-6 mt-12 pb-14 w-full">
-                    {products.map((product, index) => (
+                
+                {/* Category Filter */}
+                <div className="w-full mt-8">
+                    <CategoryFilter 
+                        categories={categories}
+                        activeCategory={activeCategory}
+                        onCategoryChange={handleCategoryChange}
+                    />
+                </div>
+
+                {/* Product Count */}
+                <div className="w-full text-center mb-4">
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                        Showing {filteredProducts.length} {filteredProducts.length === 1 ? 'product' : 'products'}
+                        {activeCategory !== 'ALL' && ` in ${activeCategory}`}
+                    </p>
+                </div>
+
+                {/* Products Grid */}
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 flex-col items-center gap-6 mt-4 pb-14 w-full">
+                    {filteredProducts.map((product, index) => (
                         <div
-                            key={index}
+                            key={product._id || index}
                             className="border-2 border-transparent rounded-lg hover:animate-border-glow transition-all duration-300 animate-fade-in-up"
-                            style={{ animationDelay: `${index * 100}ms` }}
+                            style={{ animationDelay: `${index * 50}ms` }}
                         >
                             <ProductCard product={product} />
                         </div>
                     ))}
                 </div>
+
+                {/* No Products Message */}
+                {filteredProducts.length === 0 && (
+                    <div className="flex flex-col items-center justify-center w-full py-16">
+                        <div className="text-gray-500 dark:text-gray-400 text-center">
+                            <svg className="w-16 h-16 mx-auto mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-5.5a2.5 2.5 0 00-2.5 2.5v0a2.5 2.5 0 01-2.5 2.5H12" />
+                            </svg>
+                            <h3 className="text-lg font-medium mb-2">No products found</h3>
+                            <p className="text-sm">No products available in the {activeCategory} category.</p>
+                        </div>
+                    </div>
+                )}
             </div>
             <Footer />
         </>
