@@ -35,6 +35,10 @@ const Product = () => {
   const [selectedSize, setSelectedSize] = useState('');
   const [quantity, setQuantity] = useState(1);
   
+  // State for image zoom functionality
+  const [showZoom, setShowZoom] = useState(false);
+  const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 });
+  
   // Helper function to get images for selected color
   const getImagesForColor = (color) => {
     if (!productData) return [];
@@ -234,24 +238,77 @@ const Product = () => {
     window.open(whatsappUrl, '_blank');
   };
 
+  // Handle image zoom functionality
+  const handleMouseMove = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    setZoomPosition({ x, y });
+  };
+
+  const handleMouseEnter = () => {
+    setShowZoom(true);
+  };
+
+  const handleMouseLeave = () => {
+    setShowZoom(false);
+  };
+
   return (
     <div className="px-4 md:px-8 lg:px-16 py-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
             {/* Product Images */}
             <div className="space-y-4">
-            <div className="rounded-lg overflow-hidden bg-gray-500/10 mb-4">
-                <Image
-                src={mainImage || '/placeholder-image.jpg'}
-                alt={productData.name || 'Product image'}
-                className="w-full h-auto object-cover mix-blend-multiply"
-                width={1280}
-                height={720}
-                priority
-                sizes="(max-width: 768px) 100vw, 50vw"
-                onError={(e) => {
-                    e.target.src = '/placeholder-image.jpg';
-                }}
-                />
+            <div className="relative rounded-lg overflow-hidden bg-gray-500/10 mb-4 group">
+                <div 
+                  className="relative cursor-crosshair"
+                  onMouseMove={handleMouseMove}
+                  onMouseEnter={handleMouseEnter}
+                  onMouseLeave={handleMouseLeave}
+                >
+                  <Image
+                    src={mainImage || '/placeholder-image.jpg'}
+                    alt={productData.name || 'Product image'}
+                    className="w-full h-auto object-cover mix-blend-multiply transition-transform duration-200"
+                    width={1280}
+                    height={720}
+                    priority
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    onError={(e) => {
+                        e.target.src = '/placeholder-image.jpg';
+                    }}
+                  />
+                  
+                  {/* Zoom Overlay - Desktop Only */}
+                  {showZoom && (
+                    <div className="hidden md:block absolute top-0 right-0 w-64 h-64 border-4 border-white shadow-2xl rounded-lg overflow-hidden bg-white z-10 transform translate-x-full -translate-y-4 ml-4">
+                      <div 
+                        className="w-full h-full bg-no-repeat"
+                        style={{
+                          backgroundImage: `url(${mainImage || '/placeholder-image.jpg'})`,
+                          backgroundSize: '400% 400%',
+                          backgroundPosition: `${zoomPosition.x}% ${zoomPosition.y}%`,
+                        }}
+                      />
+                    </div>
+                  )}
+                  
+                  {/* Magnifying Glass Indicator - Mobile */}
+                  {showZoom && (
+                    <div 
+                      className="md:hidden absolute pointer-events-none border-2 border-white rounded-full shadow-lg"
+                      style={{
+                        width: '80px',
+                        height: '80px',
+                        left: `calc(${zoomPosition.x}% - 40px)`,
+                        top: `calc(${zoomPosition.y}% - 40px)`,
+                        background: `url(${mainImage || '/placeholder-image.jpg'}) no-repeat`,
+                        backgroundSize: '300% 300%',
+                        backgroundPosition: `${zoomPosition.x}% ${zoomPosition.y}%`,
+                      }}
+                    />
+                  )}
+                </div>
             </div>
             
             {/* Thumbnail Images - Show images for selected color */}
