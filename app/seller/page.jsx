@@ -18,6 +18,10 @@ const AddProduct = () => {
   const [gender, setGender] = useState('both');
   const [designType, setDesignType] = useState('customized');
   
+  // Progress bar state
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [isUploading, setIsUploading] = useState(false);
+  
   // NEW: Dynamic image-color pairs (max 10)
   const [imageSlots, setImageSlots] = useState([
     { file: null, color: 'Black' } // Start with one slot
@@ -94,11 +98,20 @@ const AddProduct = () => {
     uniqueColors.forEach(color => formData.append('colors', color));
 
     try {
+      setIsUploading(true);
+      setUploadProgress(0);
+      
       const token = await getToken();
       const response = await axios.post('/api/product/add', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${token}`
+        },
+        onUploadProgress: (progressEvent) => {
+          const percentCompleted = Math.round(
+            (progressEvent.loaded * 100) / progressEvent.total
+          );
+          setUploadProgress(percentCompleted);
         }
       });
 
@@ -119,6 +132,9 @@ const AddProduct = () => {
       }
     } catch (error) {
       toast.error(error.response?.data?.message || error.message);
+    } finally {
+      setIsUploading(false);
+      setUploadProgress(0);
     }
   };
 
@@ -356,12 +372,38 @@ const AddProduct = () => {
           />
         </div>
 
+        {/* Progress Bar */}
+        {isUploading && (
+          <div className="space-y-3">
+            <div className="flex items-center justify-between text-sm font-medium text-gray-700 dark:text-gray-300">
+              <span>Uploading product...</span>
+              <span>{uploadProgress}%</span>
+            </div>
+            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
+              <div 
+                className="bg-blue-600 h-3 rounded-full transition-all duration-300 ease-out"
+                style={{ width: `${uploadProgress}%` }}
+              ></div>
+            </div>
+            {uploadProgress > 0 && uploadProgress < 100 && (
+              <p className="text-sm text-gray-500 dark:text-gray-400 text-center">
+                Please don't close this page while uploading...
+              </p>
+            )}
+          </div>
+        )}
+
         {/* Submit Button */}
         <button
           type="submit"
-          className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+          disabled={isUploading}
+          className={`w-full py-3 px-6 rounded-lg font-semibold transition-colors ${
+            isUploading 
+              ? 'bg-gray-400 dark:bg-gray-600 text-gray-200 cursor-not-allowed' 
+              : 'bg-blue-600 text-white hover:bg-blue-700'
+          }`}
         >
-          ADD PRODUCT
+          {isUploading ? 'UPLOADING...' : 'ADD PRODUCT'}
         </button>
       </form>
     </div>
