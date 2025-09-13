@@ -237,7 +237,12 @@ const AddProduct = () => {
             required
           >
             <option value="Drop Shoulder">Drop Shoulder</option>
-            <option value="T-Shirt">T-Shirt</option>
+            <option value="Panjabi">Panjabi</option>
+            <option value="Pant">Pant</option>
+            <option value="shirt">Shirt</option>
+            <option value="Half Sleeve T-shirt">Half Sleeve T-shirt</option>
+            <option value="full Sleeve T-shirt">Full Sleeve T-shirt</option>
+            <option value="Polo T-shirt">Polo T-shirt</option>
           </select>
         </div>
 
