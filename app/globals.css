@@ -2,6 +2,47 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Smooth Scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Account for sticky navbar height */
+body {
+  padding-top: 80px; /* Adjust based on navbar height */
+}
+
+/* Smooth scroll for anchor links and better scrolling performance */
+* {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar styles */
+.scrollbar-thin::-webkit-scrollbar {
+  height: 6px;
+}
+
+.scrollbar-thumb-gray-300::-webkit-scrollbar-thumb {
+  background-color: #d1d5db;
+  border-radius: 3px;
+}
+
+.dark .scrollbar-thumb-gray-600::-webkit-scrollbar-thumb {
+  background-color: #4b5563;
+}
+
+.scrollbar-track-transparent::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background-color: #9ca3af;
+}
+
+.dark .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background-color: #6b7280;
+}
+
 /* Custom Animations */
 @keyframes gentle-bounce {
   0%, 100% {

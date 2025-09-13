@@ -1,14 +1,22 @@
-import React from "react";
+import React, { useState } from "react";
 import ProductCard from "./ProductCard";
 import { useAppContext } from "@/context/AppContext";
 import { useInView } from "react-intersection-observer";
 
 const HomeProducts = () => {
   const { products, router } = useAppContext();
+  const [visibleCount, setVisibleCount] = useState(6);
   const { ref, inView } = useInView({
     threshold: 0.1,
     triggerOnce: true
   });
+
+  const handleSeeMore = () => {
+    setVisibleCount(prev => Math.min(prev + 6, products.length));
+  };
+
+  const displayedProducts = products.slice(0, visibleCount);
+  const hasMoreProducts = visibleCount < products.length;
 
   return (
     <div className="flex flex-col items-center pt-14 relative">
@@ -30,38 +38,65 @@ const HomeProducts = () => {
         </p>
       </div>
       
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 flex-col items-center gap-6 mt-6 pb-14 w-full relative">
-        {products.map((product, index) => (
-          <div 
-            key={index}
-            className={`transform transition-all duration-700 hover:scale-102 ${
-              inView ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
-            }`}
-            style={{ 
-              transitionDelay: `${index * 100}ms`,
-              animationDelay: `${index * 100}ms` 
-            }}
-          >
-            <div className="relative group">
-              {/* Border shadow effect - transparent fill */}
-              <div className="absolute -inset-1 border-2 border-blue-500 group-hover:border-purple-500 rounded-lg opacity-0 group-hover:opacity-80 transition-all duration-1000 group-hover:shadow-lg group-hover:shadow-purple-500/50"></div>
-              <div className="relative">
-                <ProductCard product={product} />
+      {/* Horizontal scrolling container */}
+      <div className="w-full overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent mt-6 pb-4">
+        <div 
+          className="flex gap-6 transition-all duration-500 ease-in-out"
+          style={{ width: `${displayedProducts.length * 280 + (displayedProducts.length - 1) * 24}px` }}
+        >
+          {displayedProducts.map((product, index) => (
+            <div 
+              key={index}
+              className={`flex-shrink-0 w-64 transform transition-all duration-700 hover:scale-102 ${
+                inView ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
+              }`}
+              style={{ 
+                transitionDelay: `${index * 100}ms`,
+                animationDelay: `${index * 100}ms` 
+              }}
+            >
+              <div className="relative group">
+                {/* Border shadow effect - transparent fill */}
+                <div className="absolute -inset-1 border-2 border-blue-500 group-hover:border-purple-500 rounded-lg opacity-0 group-hover:opacity-80 transition-all duration-1000 group-hover:shadow-lg group-hover:shadow-purple-500/50"></div>
+                <div className="relative">
+                  <ProductCard product={product} />
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
       
-      <button 
-        onClick={() => { router.push('/all-products') }} 
-        className={`px-12 py-2.5 border rounded text-gray-500/70 hover:bg-slate-50/90 dark:hover:bg-gray-700/90 transition-all duration-300 transform hover:scale-102 hover:shadow-lg ${
-          inView ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
-        }`}
-        style={{ transitionDelay: '800ms' }}
-      >
-        See more
-      </button>
+      {/* See More Button */}
+      <div className="flex items-center justify-center gap-4 mt-6 pb-14">
+        {hasMoreProducts && (
+          <button 
+            onClick={handleSeeMore}
+            className={`px-8 py-2.5 border rounded-lg text-gray-600 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-300 dark:hover:border-blue-600 transition-all duration-300 transform hover:scale-102 hover:shadow-lg flex items-center gap-2 ${
+              inView ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
+            }`}
+            style={{ transitionDelay: '800ms' }}
+          >
+            <span>Load More ({Math.min(6, products.length - visibleCount)} items)</span>
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+        )}
+        
+        <button 
+          onClick={() => { router.push('/all-products') }} 
+          className={`px-8 py-2.5 border rounded-lg text-gray-500/70 hover:bg-slate-50/90 dark:hover:bg-gray-700/90 hover:border-gray-400 transition-all duration-300 transform hover:scale-102 hover:shadow-lg flex items-center gap-2 ${
+            inView ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
+          }`}
+          style={{ transitionDelay: '900ms' }}
+        >
+          <span>View All Products</span>
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+          </svg>
+        </button>
+      </div>
     </div>
   );
 };

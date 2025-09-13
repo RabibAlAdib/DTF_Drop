@@ -17,7 +17,7 @@ const Navbar = () => {
   const { isSeller, router, user } = useAppContext();
   const { openSignIn } = useClerk();
   return (
-    <nav className="flex items-center justify-between px-6 md:px-16 lg:px-32 py-3 border-b border-gray-300 dark:border-gray-700 text-gray-700 dark:text-white bg-white dark:bg-black transition-colors duration-300">
+    <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 md:px-16 lg:px-32 py-3 border-b border-gray-300 dark:border-gray-700 text-gray-700 dark:text-white bg-white/95 dark:bg-black/95 backdrop-blur-sm transition-all duration-300">
       <Image
         className="cursor-pointer w-20 md:w-24"
         onClick={() => router.push("/")}
