@@ -7,19 +7,16 @@ const ThemeToggle = () => {
   return (
     <button
       onClick={toggleTheme}
-      className="relative inline-flex items-center w-12 h-6 transition-colors duration-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-green-500 focus:ring-offset-2 dark:focus:ring-offset-black"
-      style={{
-        backgroundColor: theme === 'dark' ? '#000000' : '#e5e7eb',
-        border: theme === 'dark' ? '1px solid #22c55e' : 'none',
-      }}
+      className={`relative inline-flex items-center w-12 h-6 transition-colors duration-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-green-500 focus:ring-offset-2 dark:focus:ring-offset-black
+        ${theme === 'dark' 
+          ? 'bg-gray-800 border border-green-500 md:bg-blue-600 md:border-none' 
+          : 'bg-gray-300 md:bg-gray-400'
+        }`}
       title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
     >
       <span
-        className={`inline-block w-5 h-5 transition-all duration-300 transform bg-white rounded-full shadow-lg ${
-          theme === 'dark' 
-            ? 'translate-x-6 shadow-green-400/50' 
-            : 'translate-x-0.5'
-        }`}
+        className={`inline-block w-5 h-5 transition-all duration-300 transform bg-white rounded-full shadow-md md:shadow-sm
+          ${theme === 'dark' ? 'translate-x-6' : 'translate-x-0.5'}`}
         style={{
           boxShadow: theme === 'dark' 
             ? '0 0 10px rgba(34, 197, 94, 0.5), 0 0 20px rgba(34, 197, 94, 0.3)' 
@@ -27,18 +24,16 @@ const ThemeToggle = () => {
         }}
       />
       
-      {/* Icons */}
+      {/* Mobile icons only - keep the fancy glow effect for mobile */}
       <span
-        className={`absolute left-1 top-1 w-4 h-4 flex items-center justify-center transition-opacity duration-300 ${
-          theme === 'light' ? 'opacity-100' : 'opacity-0'
-        }`}
+        className={`md:hidden absolute left-1 top-1 w-4 h-4 flex items-center justify-center transition-opacity duration-300
+          ${theme === 'light' ? 'opacity-100' : 'opacity-0'}`}
       >
         ☀️
       </span>
       <span
-        className={`absolute right-1 top-1 w-4 h-4 flex items-center justify-center transition-opacity duration-300 ${
-          theme === 'dark' ? 'opacity-100' : 'opacity-0'
-        }`}
+        className={`md:hidden absolute right-1 top-1 w-4 h-4 flex items-center justify-center transition-opacity duration-300
+          ${theme === 'dark' ? 'opacity-100' : 'opacity-0'}`}
       >
         🌙
       </span>

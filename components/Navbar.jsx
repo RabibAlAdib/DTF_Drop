@@ -219,7 +219,7 @@ const Navbar = () => {
               {/* Navigation Links */}
               <Link
                 href="/"
-                className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200 group"
+                className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200 group text-white"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 <HomeIcon />
@@ -230,7 +230,7 @@ const Navbar = () => {
 
               <Link
                 href="/all-products"
-                className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200 group"
+                className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200 group text-white"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 <BoxIcon />
