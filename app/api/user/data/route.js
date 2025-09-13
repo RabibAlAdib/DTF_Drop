@@ -1,4 +1,4 @@
-import { getAuth } from "@clerk/nextjs/server"
+import { getAuth, clerkClient } from "@clerk/nextjs/server"
 import connectDB from "@/config/db"
 import User from "@/models/User"
 import { NextResponse } from 'next/server';
@@ -8,12 +8,44 @@ export async function GET(request) {
         // console.log("Fetching user data...")
         // console.log(request)
         const {userId } = getAuth(request)
+        
+        // Check if user is authenticated
+        if (!userId) {
+            return NextResponse.json({
+                success: false, 
+                message: "User not authenticated"
+            }, { status: 401 });
+        }
+        
         await connectDB()
 
-        const user = await User.findById(userId)
+        let user = await User.findById(userId)
 
         if (!user) {
-            return NextResponse.json({success:false, message:"User not found"})
+            // Create user if doesn't exist (first visit)
+            try {
+                // Get user data from Clerk - fix API usage
+                const clerkUser = await clerkClient.users.getUser(userId)
+                
+                const userData = {
+                    _id: userId,
+                    name: `${clerkUser.firstName || ''} ${clerkUser.lastName || ''}`.trim() || 'User',
+                    email: clerkUser.emailAddresses[0]?.emailAddress || 'user@example.com',
+                    imageUrl: clerkUser.imageUrl || 'https://img.clerk.com/preview.png',
+                    cartItems: {},
+                    joinDate: Date.now()
+                }
+                
+                user = new User(userData)
+                await user.save()
+            } catch (userCreateError) {
+                console.error('Error creating user:', userCreateError);
+                // Return error response if user creation fails
+                return NextResponse.json({
+                    success: false, 
+                    message: "Unable to create user profile"
+                }, { status: 500 });
+            }
         }
 
         return NextResponse.json({success:true, user})
