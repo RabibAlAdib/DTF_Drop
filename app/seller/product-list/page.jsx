@@ -12,6 +12,7 @@ const ProductList = () => {
   const { router, getToken, user } = useAppContext()
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
+  const [deletingProduct, setDeletingProduct] = useState(null)
 
   const fetchSellerProduct = async () => {
     try {
@@ -28,6 +29,32 @@ const ProductList = () => {
       }
     } catch (error) {
       toast.error(error.message || "Failed to fetch products");
+    }
+  }
+
+  const handleDeleteProduct = async (productId) => {
+    if (!confirm('Are you sure you want to delete this product? This action cannot be undone.')) {
+      return;
+    }
+
+    setDeletingProduct(productId);
+    try {
+      const token = await getToken();
+      const { data } = await axios.delete(`/api/product/delete?id=${productId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      if (data.success) {
+        toast.success('Product deleted successfully!');
+        // Remove the deleted product from the state
+        setProducts(products.filter(product => product._id !== productId));
+      } else {
+        toast.error(data.message || "Failed to delete product");
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to delete product");
+    } finally {
+      setDeletingProduct(null);
     }
   }
 
@@ -70,7 +97,78 @@ const ProductList = () => {
               </p>
             </div>
             
-            <div className="overflow-x-auto">
+            {/* Mobile Card View (hidden on md and up) */}
+            <div className="md:hidden space-y-4 p-4">
+              {products.map((product, index) => (
+                <div key={product._id} className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+                  <div className="flex items-start space-x-4">
+                    <div className="flex-shrink-0">
+                      {product.images && product.images[0] ? (
+                        <Image
+                          className="h-16 w-16 rounded-lg object-cover"
+                          src={product.images[0]}
+                          alt={product.name}
+                          width={64}
+                          height={64}
+                        />
+                      ) : (
+                        <div className="h-16 w-16 rounded-lg bg-gray-300 flex items-center justify-center">
+                          <span className="text-xs text-gray-600">No img</span>
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-sm font-medium text-gray-900 truncate">{product.name}</h3>
+                      <div className="mt-1 flex flex-wrap gap-1">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                          {product.category}
+                        </span>
+                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">
+                          {product.gender}
+                        </span>
+                      </div>
+                      <div className="mt-2">
+                        {product.offerPrice ? (
+                          <div className="flex items-center space-x-2">
+                            <span className="text-sm font-semibold text-green-600">${product.offerPrice}</span>
+                            <span className="text-xs text-gray-500 line-through">${product.price}</span>
+                          </div>
+                        ) : (
+                          <span className="text-sm font-semibold text-gray-900">${product.price}</span>
+                        )}
+                      </div>
+                      <div className="mt-2 flex items-center justify-between">
+                        <div className="flex items-center space-x-1">
+                          <div className="flex text-yellow-400 text-xs">
+                            {'★'.repeat(Math.floor(product.ratings || 0))}
+                            {'☆'.repeat(5 - Math.floor(product.ratings || 0))}
+                          </div>
+                          <span className="text-xs text-gray-500">({product.numOfReviews || 0})</span>
+                        </div>
+                        <div className="flex space-x-2">
+                          <button
+                            onClick={() => router.push(`/product/${product._id}`)}
+                            className="text-blue-600 hover:text-blue-900 bg-blue-50 px-2 py-1 rounded text-xs hover:bg-blue-100 transition-colors"
+                          >
+                            View
+                          </button>
+                          <button
+                            onClick={() => handleDeleteProduct(product._id)}
+                            disabled={deletingProduct === product._id}
+                            className="text-red-600 hover:text-red-900 bg-red-50 px-2 py-1 rounded text-xs hover:bg-red-100 transition-colors disabled:opacity-50"
+                          >
+                            {deletingProduct === product._id ? 'Deleting...' : 'Delete'}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Desktop Table View (hidden on small screens) */}
+            <div className="hidden md:block overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
@@ -93,7 +191,7 @@ const ProductList = () => {
                       Rating
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Action
+                      Actions
                     </th>
                   </tr>
                 </thead>
@@ -166,12 +264,21 @@ const ProductList = () => {
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <button
-                          onClick={() => router.push(`/product/${product._id}`)}
-                          className="text-blue-600 hover:text-blue-900 bg-blue-50 px-3 py-1 rounded-md hover:bg-blue-100 transition-colors"
-                        >
-                          View
-                        </button>
+                        <div className="flex space-x-2">
+                          <button
+                            onClick={() => router.push(`/product/${product._id}`)}
+                            className="text-blue-600 hover:text-blue-900 bg-blue-50 px-3 py-1 rounded-md hover:bg-blue-100 transition-colors"
+                          >
+                            View
+                          </button>
+                          <button
+                            onClick={() => handleDeleteProduct(product._id)}
+                            disabled={deletingProduct === product._id}
+                            className="text-red-600 hover:text-red-900 bg-red-50 px-3 py-1 rounded-md hover:bg-red-100 transition-colors disabled:opacity-50"
+                          >
+                            {deletingProduct === product._id ? 'Deleting...' : 'Delete'}
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
