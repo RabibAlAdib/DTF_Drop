@@ -23,46 +23,48 @@ const Navbar = () => {
         width={96}
         height={40}
       />
-      <div className="flex items-center gap-2 lg:gap-4 max-md:hidden">
-        <Link
-          href="/"
-          className="px-4 py-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-200 transition-all duration-200"
-        >
-          Home
-        </Link>
-        <Link
-          href="/all-products"
-          className="px-4 py-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-200 transition-all duration-200"
-        >
-          Shop
-        </Link>
-        <Link
-          href="/about"
-          className="px-4 py-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-200 transition-all duration-200"
-        >
-          About Us
-        </Link>
-        <Link
-          href="/contact"
-          className="px-4 py-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-200 transition-all duration-200"
-        >
-          Contact
-        </Link>
-        <Link
-          href="/customization"
-          className="px-4 py-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-200 transition-all duration-200"
-        >
-          Customization
-        </Link>
-
-        {isSeller && (
-          <button
-            onClick={() => router.push("/seller")}
-            className="text-xs border border-gray-300 dark:border-gray-600 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/40 px-4 py-1.5 rounded-full transition-colors font-medium text-blue-700 dark:text-blue-300"
+      <div className="max-md:hidden bg-gray-50 dark:bg-gray-800/30 rounded-full px-2 py-1">
+        <div className="flex items-center gap-1">
+          <Link
+            href="/"
+            className="px-3 py-2 rounded-full hover:bg-white dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-200 transition-all duration-200 text-sm"
           >
-            Seller Dashboard
-          </button>
-        )}
+            Home
+          </Link>
+          <Link
+            href="/all-products"
+            className="px-3 py-2 rounded-full hover:bg-white dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-200 transition-all duration-200 text-sm"
+          >
+            Shop
+          </Link>
+          <Link
+            href="/about"
+            className="px-3 py-2 rounded-full hover:bg-white dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-200 transition-all duration-200 text-sm"
+          >
+            About Us
+          </Link>
+          <Link
+            href="/contact"
+            className="px-3 py-2 rounded-full hover:bg-white dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-200 transition-all duration-200 text-sm"
+          >
+            Contact
+          </Link>
+          <Link
+            href="/customization"
+            className="px-3 py-2 rounded-full hover:bg-white dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-200 transition-all duration-200 text-sm"
+          >
+            Customization
+          </Link>
+
+          {isSeller && (
+            <button
+              onClick={() => router.push("/seller")}
+              className="text-xs bg-blue-100 dark:bg-blue-900/40 hover:bg-blue-200 dark:hover:bg-blue-900/60 px-3 py-2 rounded-full transition-colors font-medium text-blue-700 dark:text-blue-300 ml-1"
+            >
+              Seller Dashboard
+            </button>
+          )}
+        </div>
       </div>
 
       <ul className="hidden md:flex items-center gap-4">
