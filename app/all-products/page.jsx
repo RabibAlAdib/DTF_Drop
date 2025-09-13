@@ -41,8 +41,8 @@ const AllProducts = () => {
     return (
         <>
             <div className="flex flex-col items-start px-6 md:px-16 lg:px-32 bg-gradient-to-br from-white via-gray-50 to-white dark:from-black dark:via-gray-900 dark:to-black min-h-screen">
-                <div className="flex flex-col items-end pt-12 w-full">
-                    <p className="text-2xl font-medium text-gray-800 dark:text-white animate-pulse-glow">
+                <div className="flex flex-col items-center pt-12 w-full">
+                    <p className="text-2xl font-medium text-gray-800 dark:text-white animate-pulse-glow text-center">
                         All products
                     </p>
                     <div className="w-16 h-0.5 bg-gradient-to-r from-orange-600 to-red-600 rounded-full animate-gradient"></div>
