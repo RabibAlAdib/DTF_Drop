@@ -60,46 +60,50 @@ const Footer = () => {
                   href="https://facebook.com/dtfdrop" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="text-blue-600 hover:text-blue-700 transition-colors text-xl"
+                  className="hover:opacity-80 transition-opacity"
                   title="Facebook"
                 >
-                  📘
+                  <Image src={assets.facebook_icon} alt="Facebook" className="w-6 h-6" />
                 </a>
                 <a 
                   href="https://www.facebook.com/groups/dtfdrop" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="text-blue-600 hover:text-blue-700 transition-colors text-xl"
+                  className="hover:opacity-80 transition-opacity"
                   title="Facebook Group"
                 >
-                  🏠
+                  <Image src={assets.facebook_icon} alt="Facebook Group" className="w-6 h-6" />
                 </a>
                 <a 
                   href="https://www.instagram.com/dtfdrop/" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="text-pink-600 hover:text-pink-700 transition-colors text-xl"
+                  className="hover:opacity-80 transition-opacity"
                   title="Instagram"
                 >
-                  📷
+                  <Image src={assets.instagram_icon} alt="Instagram" className="w-6 h-6" />
                 </a>
                 <a 
                   href="https://www.tiktok.com/@dtf.drop" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="text-gray-800 dark:text-white hover:text-gray-600 transition-colors text-xl"
+                  className="hover:opacity-80 transition-opacity"
                   title="TikTok"
                 >
-                  🎵
+                  <div className="w-6 h-6 bg-black dark:bg-white rounded-sm flex items-center justify-center">
+                    <span className="text-white dark:text-black text-xs font-bold">T</span>
+                  </div>
                 </a>
                 <a 
                   href="https://wa.me/+8801344823831" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="text-green-600 hover:text-green-700 transition-colors text-xl"
+                  className="hover:opacity-80 transition-opacity"
                   title="WhatsApp"
                 >
-                  💬
+                  <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                    <span className="text-white text-xs font-bold">W</span>
+                  </div>
                 </a>
               </div>
             </div>
