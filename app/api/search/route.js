@@ -11,12 +11,12 @@ export async function GET(request) {
     const limit = Math.min(requestedLimit, 20); // Max 20 results for performance
     
     if (!query || query.trim().length < 2) {
-      return Response.json({ products: [] });
+      return Response.json({ success: true, products: [] });
     }
     
     // Prevent overly long queries that could cause performance issues
     if (query.trim().length > 50) {
-      return Response.json({ products: [] });
+      return Response.json({ success: true, products: [] });
     }
     
     // Escape special regex characters to prevent regex injection
@@ -50,10 +50,10 @@ export async function GET(request) {
       image: product.colorImages?.[0]?.url || product.images?.[0] || '/placeholder-image.jpg'
     }));
     
-    return Response.json({ products: transformedProducts });
+    return Response.json({ success: true, products: transformedProducts });
     
   } catch (error) {
     console.error('Search API Error:', error);
-    return Response.json({ error: 'Search failed', products: [] }, { status: 500 });
+    return Response.json({ success: false, error: 'Search failed', products: [] }, { status: 500 });
   }
 }
