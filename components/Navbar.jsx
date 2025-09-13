@@ -23,34 +23,34 @@ const Navbar = () => {
         width={96}
         height={40}
       />
-      <div className="flex items-center gap-4 lg:gap-8 max-md:hidden">
+      <div className="flex items-center gap-2 lg:gap-4 max-md:hidden">
         <Link
           href="/"
-          className="hover:text-gray-900 dark:hover:text-gray-200 transition"
+          className="px-4 py-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-200 transition-all duration-200"
         >
           Home
         </Link>
         <Link
           href="/all-products"
-          className="hover:text-gray-900 dark:hover:text-gray-200 transition"
+          className="px-4 py-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-200 transition-all duration-200"
         >
           Shop
         </Link>
         <Link
           href="/about"
-          className="hover:text-gray-900 dark:hover:text-gray-200 transition"
+          className="px-4 py-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-200 transition-all duration-200"
         >
           About Us
         </Link>
         <Link
           href="/contact"
-          className="hover:text-gray-900 dark:hover:text-gray-200 transition"
+          className="px-4 py-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-200 transition-all duration-200"
         >
           Contact
         </Link>
         <Link
           href="/customization"
-          className="hover:text-gray-900 dark:hover:text-gray-200 transition"
+          className="px-4 py-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-200 transition-all duration-200"
         >
           Customization
         </Link>
@@ -58,33 +58,40 @@ const Navbar = () => {
         {isSeller && (
           <button
             onClick={() => router.push("/seller")}
-            className="text-xs border border-gray-300 dark:border-gray-600 dark:bg-black dark:text-white hover:bg-gray-50 dark:hover:bg-gray-900 px-4 py-1.5 rounded-full transition-colors"
+            className="text-xs border border-gray-300 dark:border-gray-600 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/40 px-4 py-1.5 rounded-full transition-colors font-medium text-blue-700 dark:text-blue-300"
           >
             Seller Dashboard
           </button>
         )}
       </div>
 
-      <ul className="hidden md:flex items-center gap-4 ">
+      <ul className="hidden md:flex items-center gap-4">
         <ThemeToggle />
-        <Image className="w-4 h-4" src={assets.search_icon} alt="search icon" />
+        <button className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+          <Image className="w-4 h-4" src={assets.search_icon} alt="search icon" />
+        </button>
         {user ? (
-          <>
-            <UserButton>
-              <UserButton.MenuItems>
-                <UserButton.Action
-                  label="Cart"
-                  labelIcon={<CartIcon />}
-                  onClick={() => router.push("/cart")}
-                />
-              </UserButton.MenuItems>
-              <UserButton.MenuItems>
-                <UserButton.Action
-                  label="Favorites"
-                  labelIcon={<HeartIcon />}
-                  onClick={() => router.push("/favorites")}
-                />
-              </UserButton.MenuItems>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => router.push("/cart")}
+              className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors relative"
+              title="Cart"
+            >
+              <CartIcon />
+            </button>
+            <button
+              onClick={() => router.push("/favorites")}
+              className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              title="Favorites"
+            >
+              <HeartIcon />
+            </button>
+            <UserButton appearance={{
+              elements: {
+                userButtonAvatarBox: "w-8 h-8 rounded-full border-2 border-gray-200 dark:border-gray-700 hover:border-blue-400 dark:hover:border-blue-500 transition-colors",
+                userButtonPopoverCard: "rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm",
+              }
+            }}>
               <UserButton.MenuItems>
                 <UserButton.Action
                   label="My Orders"
@@ -93,45 +100,26 @@ const Navbar = () => {
                 />
               </UserButton.MenuItems>
             </UserButton>
-          </>
+          </div>
         ) : (
           <button
             onClick={openSignIn}
-            className="flex items-center gap-2 hover:text-gray-900 dark:hover:text-gray-200 transition"
+            className="flex items-center gap-2 px-4 py-2 rounded-full bg-blue-600 hover:bg-blue-700 text-white transition-colors font-medium"
           >
-            <Image src={assets.user_icon} alt="user icon" />
-            Account
+            <Image src={assets.user_icon} alt="user icon" className="w-4 h-4 filter brightness-0 invert" />
+            Sign In
           </button>
         )}
       </ul>
 
       <div className="flex items-center md:hidden gap-3">
-        {isSeller && (
-          <button
-            onClick={() => router.push("/seller")}
-            className="text-xs border border-gray-300 dark:border-gray-600 dark:bg-black dark:text-white hover:bg-gray-50 dark:hover:bg-gray-900 px-4 py-1.5 rounded-full transition-colors"
-          >
-            Seller Dashboard
-          </button>
-        )}
-
         {/* User Button for Mobile */}
         {user ? (
-          <UserButton>
-            <UserButton.MenuItems>
-              <UserButton.Action
-                label="Home"
-                labelIcon={<HomeIcon />}
-                onClick={() => router.push("/")}
-              />
-            </UserButton.MenuItems>
-            <UserButton.MenuItems>
-              <UserButton.Action
-                label="Products"
-                labelIcon={<BoxIcon />}
-                onClick={() => router.push("/all-products")}
-              />
-            </UserButton.MenuItems>
+          <UserButton appearance={{
+            elements: {
+              userButtonAvatarBox: "w-8 h-8 rounded-full border-2 border-gray-200 dark:border-gray-700"
+            }
+          }}>
             <UserButton.MenuItems>
               <UserButton.Action
                 label="Cart"
@@ -157,9 +145,10 @@ const Navbar = () => {
         ) : (
           <button
             onClick={openSignIn}
-            className="flex items-center gap-2 hover:text-gray-900 dark:hover:text-gray-200 transition"
+            className="flex items-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-full transition-colors text-sm"
           >
-            <Image src={assets.user_icon} alt="user icon" className="w-5 h-5" />
+            <Image src={assets.user_icon} alt="user icon" className="w-4 h-4 filter brightness-0 invert" />
+            Sign In
           </button>
         )}
 
@@ -315,6 +304,34 @@ const Navbar = () => {
                   Customization
                 </span>
               </Link>
+
+              {/* Seller Dashboard in Mobile Menu */}
+              {isSeller && (
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    router.push("/seller");
+                  }}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-all duration-200 group"
+                >
+                  <svg
+                    className="w-5 h-5 text-blue-600 dark:text-blue-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                    />
+                  </svg>
+                  <span className="font-medium text-blue-700 dark:text-blue-300">
+                    Seller Dashboard
+                  </span>
+                </button>
+              )}
 
               {/* User Actions if not logged in */}
               {!user && (
