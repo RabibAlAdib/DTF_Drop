@@ -1,6 +1,7 @@
 "use client"
 import React, { useState } from "react";
 import { BagIcon, BoxIcon, CartIcon, HomeIcon, assets} from "@/assets/assets";
+import HeartIcon from "@/assets/HeartIcon";
 import Link from "next/link"
 import { useAppContext } from "@/context/AppContext";
 import Image from "next/image";
@@ -50,6 +51,9 @@ const Navbar = () => {
               <UserButton.Action label="Cart" labelIcon={<CartIcon />} onClick={() => router.push('/cart')} />
             </UserButton.MenuItems>
             <UserButton.MenuItems>
+              <UserButton.Action label="Favorites" labelIcon={<HeartIcon />} onClick={() => router.push('/favorites')} />
+            </UserButton.MenuItems>
+            <UserButton.MenuItems>
               <UserButton.Action label="My Orders" labelIcon={<BagIcon />} onClick={() => router.push('/my-orders')} />
             </UserButton.MenuItems>
           </UserButton>
@@ -62,9 +66,10 @@ const Navbar = () => {
       </ul>
 
       <div className="flex items-center md:hidden gap-3">
-        <ThemeToggle />
         {isSeller && <button onClick={() => router.push('/seller')} className="text-xs border border-gray-300 dark:border-gray-600 dark:bg-black dark:text-white hover:bg-gray-50 dark:hover:bg-gray-900 px-4 py-1.5 rounded-full transition-colors">Seller Dashboard</button>}
-        {user ? <>
+        
+        {/* User Button for Mobile */}
+        {user ? (
           <UserButton>
             <UserButton.MenuItems>
               <UserButton.Action label="Home" labelIcon={<HomeIcon/>} onClick={() => router.push('/')} />
@@ -76,71 +81,129 @@ const Navbar = () => {
               <UserButton.Action label="Cart" labelIcon={<CartIcon />} onClick={() => router.push('/cart')} />
             </UserButton.MenuItems>
             <UserButton.MenuItems>
+              <UserButton.Action label="Favorites" labelIcon={<HeartIcon />} onClick={() => router.push('/favorites')} />
+            </UserButton.MenuItems>
+            <UserButton.MenuItems>
               <UserButton.Action label="My Orders" labelIcon={<BagIcon />} onClick={() => router.push('/my-orders')} />
             </UserButton.MenuItems>
           </UserButton>
-        </>
-        :
-        <button onClick={openSignIn} className="flex items-center gap-2 hover:text-gray-900 dark:hover:text-gray-200 transition">
-          <Image src={assets.user_icon} alt="user icon" />
-          Account
-        </button>}
+        ) : (
+          <button onClick={openSignIn} className="flex items-center gap-2 hover:text-gray-900 dark:hover:text-gray-200 transition">
+            <Image src={assets.user_icon} alt="user icon" className="w-5 h-5" />
+          </button>
+        )}
         
         {/* Hamburger Menu Button */}
         <button 
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+          className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-300 relative z-50"
           aria-label="Menu"
         >
-          <div className="space-y-1">
-            <div className={`w-6 h-0.5 bg-current transition-transform duration-300 ${mobileMenuOpen ? 'transform rotate-45 translate-y-2' : ''}`}></div>
-            <div className={`w-6 h-0.5 bg-current transition-opacity duration-300 ${mobileMenuOpen ? 'opacity-0' : ''}`}></div>
-            <div className={`w-6 h-0.5 bg-current transition-transform duration-300 ${mobileMenuOpen ? 'transform -rotate-45 -translate-y-2' : ''}`}></div>
+          <div className="space-y-1.5">
+            <div className={`w-6 h-0.5 bg-current transition-all duration-300 ${mobileMenuOpen ? 'transform rotate-45 translate-y-2' : ''}`}></div>
+            <div className={`w-6 h-0.5 bg-current transition-all duration-300 ${mobileMenuOpen ? 'opacity-0' : ''}`}></div>
+            <div className={`w-6 h-0.5 bg-current transition-all duration-300 ${mobileMenuOpen ? 'transform -rotate-45 -translate-y-2' : ''}`}></div>
           </div>
         </button>
       </div>
 
       {/* Mobile Menu Dropdown */}
       {mobileMenuOpen && (
-        <div className="md:hidden absolute top-full left-0 right-0 bg-white dark:bg-black border-b border-gray-300 dark:border-gray-700 shadow-lg z-50">
-          <div className="px-6 py-4 space-y-4">
-            <Link 
-              href="/" 
-              className="block hover:text-gray-900 dark:hover:text-gray-200 transition py-2"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Home
-            </Link>
-            <Link 
-              href="/all-products" 
-              className="block hover:text-gray-900 dark:hover:text-gray-200 transition py-2"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Shop
-            </Link>
-            <Link 
-              href="/about" 
-              className="block hover:text-gray-900 dark:hover:text-gray-200 transition py-2"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              About Us
-            </Link>
-            <Link 
-              href="/contact" 
-              className="block hover:text-gray-900 dark:hover:text-gray-200 transition py-2"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Contact
-            </Link>
-            <Link 
-              href="/customization" 
-              className="block hover:text-gray-900 dark:hover:text-gray-200 transition py-2"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Customization
-            </Link>
+        <>
+          {/* Backdrop */}
+          <div 
+            className="md:hidden fixed inset-0 bg-black/20 backdrop-blur-sm z-40"
+            onClick={() => setMobileMenuOpen(false)}
+          />
+          
+          {/* Mobile Menu */}
+          <div className="md:hidden fixed top-0 right-0 h-full w-80 max-w-[85vw] bg-white/95 dark:bg-black/95 backdrop-blur-xl border-l border-gray-200 dark:border-gray-700 shadow-2xl z-50 transform transition-all duration-300">
+            {/* Menu Header */}
+            <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+              <h3 className="text-lg font-semibold text-gray-800 dark:text-white">Menu</h3>
+              <div className="flex items-center gap-3">
+                <ThemeToggle />
+                <button 
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            
+            {/* Menu Content */}
+            <div className="p-6 space-y-2">
+              {/* Navigation Links */}
+              <Link 
+                href="/" 
+                className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200 group"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <HomeIcon />
+                <span className="font-medium group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">Home</span>
+              </Link>
+              
+              <Link 
+                href="/all-products" 
+                className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200 group"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <BoxIcon />
+                <span className="font-medium group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">Shop</span>
+              </Link>
+              
+              <Link 
+                href="/about" 
+                className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200 group"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span className="font-medium group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">About</span>
+              </Link>
+              
+              <Link 
+                href="/contact" 
+                className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200 group"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+                <span className="font-medium group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">Contact</span>
+              </Link>
+              
+              <Link 
+                href="/customization" 
+                className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200 group"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4" />
+                </svg>
+                <span className="font-medium group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">Customization</span>
+              </Link>
+              
+              {/* User Actions if not logged in */}
+              {!user && (
+                <button 
+                  onClick={() => { 
+                    setMobileMenuOpen(false); 
+                    openSignIn(); 
+                  }}
+                  className="w-full flex items-center gap-3 px-4 py-3 mt-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-all duration-200 font-medium"
+                >
+                  <Image src={assets.user_icon} alt="user icon" className="w-5 h-5 filter brightness-0 invert" />
+                  <span>Sign In / Register</span>
+                </button>
+              )}
+            </div>
           </div>
-        </div>
+        </>
       )}
     </nav>
   );

@@ -1,6 +1,5 @@
 'use client';
 import React, { useState } from 'react';
-import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { useAppContext } from '@/context/AppContext';
 import { toast } from 'react-hot-toast';
@@ -73,21 +72,20 @@ const Contact = () => {
 
   return (
     <>
-      <Navbar />
-      <div className="px-6 md:px-16 lg:px-32 py-16">
+      <div className="px-6 md:px-16 lg:px-32 py-16 bg-gradient-to-br from-white via-gray-50 to-white dark:from-black dark:via-gray-900 dark:to-black min-h-screen">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">
+            <h1 className="text-4xl md:text-5xl font-bold text-gray-800 dark:text-white mb-6 animate-pulse-glow">
               Contact Us
             </h1>
-            <p className="text-lg text-gray-600 leading-relaxed">
+            <p className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed">
               We'd love to hear from you. Send us a message and we'll respond as soon as possible.
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 gap-12">
             <div>
-              <h2 className="text-2xl font-semibold text-gray-800 mb-6">
+              <h2 className="text-2xl font-semibold text-gray-800 dark:text-white mb-6">
                 Get In Touch
               </h2>
               
@@ -100,8 +98,8 @@ const Contact = () => {
                     </svg>
                   </div>
                   <div>
-                    <h3 className="font-semibold text-gray-800">Email</h3>
-                    <p className="text-gray-600">dtfdrop25@gmail.com</p>
+                    <h3 className="font-semibold text-gray-800 dark:text-white">Email</h3>
+                    <p className="text-gray-600 dark:text-gray-300">dtfdrop25@gmail.com</p>
                   </div>
                 </div>
 
@@ -112,7 +110,7 @@ const Contact = () => {
                     </svg>
                   </div>
                   <div>
-                    <h3 className="font-semibold text-gray-800">Social Media</h3>
+                    <h3 className="font-semibold text-gray-800 dark:text-white">Social Media</h3>
                     <a 
                       href="https://facebook.com/dtfdrop" 
                       target="_blank" 
