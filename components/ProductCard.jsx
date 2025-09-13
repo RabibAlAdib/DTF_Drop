@@ -3,12 +3,11 @@ import { assets } from '@/assets/assets'
 import Image from 'next/image';
 import Link from 'next/link';
 import { useAppContext } from '@/context/AppContext';
-import axios from 'axios';
 import { toast } from 'react-hot-toast';
 
 const ProductCard = ({ product }) => {
 
-    const { currency, router, user, favorites, isFavorite, getToken } = useAppContext()
+    const { currency, router, user, favorites, isFavorite, addToFavorites, removeFromFavorites } = useAppContext()
 
     const handleFavoriteToggle = async (e, productId) => {
         e.preventDefault(); // Prevent navigation to product page
@@ -19,34 +18,11 @@ const ProductCard = ({ product }) => {
             return;
         }
 
-        try {
-            const token = await getToken();
-            const action = isFavorite(productId) ? 'remove' : 'add';
-            
-            const response = await axios.post('/api/user/favorites', {
-                productId,
-                action
-            }, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-
-            if (response.data.success) {
-                // Update local state through context
-                if (action === 'add') {
-                    // addToFavorites will be called via API success
-                    toast.success('Added to favorites!');
-                } else {
-                    // removeFromFavorites will be called via API success
-                    toast.success('Removed from favorites!');
-                }
-            } else {
-                toast.error(response.data.message);
-            }
-        } catch (error) {
-            console.error('Favorite toggle error:', error);
-            toast.error('Failed to update favorites');
+        // Use AppContext functions that handle both API calls and state updates
+        if (isFavorite(productId)) {
+            await removeFromFavorites(productId);
+        } else {
+            await addToFavorites(productId);
         }
     };
 

@@ -231,7 +231,6 @@ export const AppContextProvider = (props) => {
     if (user) {
       fetchUserData()
     }
-    fetchUserData()
   }, [user])
 
   const value = {
