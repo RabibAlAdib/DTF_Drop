@@ -6,6 +6,7 @@ import './globals.css'
 import { Toaster } from 'react-hot-toast'
 import Footer from '@/components/Footer'
 import Navbar from '@/components/Navbar'
+import FloatingCart from '@/components/FloatingCart'
 
 const outfit = Outfit({ subsets: ['latin'] })
 
@@ -26,6 +27,7 @@ export default function RootLayout({ children }) {
               <main className="min-h-screen bg-white dark:bg-black text-gray-900 dark:text-white transition-colors duration-300">
                 {children}
               </main>
+              <FloatingCart />
               <Footer />
             </ThemeProvider>
           </AppContextProvider>
