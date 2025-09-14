@@ -5,6 +5,10 @@ import connectDB from "@/config/db";
 import Product from "@/models/Product";
 import { NextResponse } from "next/server";
 
+// Runtime configuration for handling large uploads
+export const runtime = 'nodejs';
+export const maxDuration = 30; // 30 seconds for upload timeout
+
 // Configure Cloudinary
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -23,7 +27,7 @@ export async function PUT(request) {
       return NextResponse.json({
         success: false,
         message: "Unauthorized Access. Only Sellers are allowed to update products."
-      });
+      }, { status: 401 });
     }
 
     const formData = await request.formData();
@@ -45,7 +49,7 @@ export async function PUT(request) {
       return NextResponse.json({
         success: false,
         message: "Please fill all required fields."
-      });
+      }, { status: 400 });
     }
 
     // Connect to database
@@ -57,14 +61,14 @@ export async function PUT(request) {
       return NextResponse.json({
         success: false,
         message: "Product not found."
-      });
+      }, { status: 404 });
     }
 
     if (String(existingProduct.userId) !== String(userId)) {
       return NextResponse.json({
         success: false,
         message: "Unauthorized. You can only update your own products."
-      });
+      }, { status: 403 });
     }
 
     // Handle image updates
@@ -88,7 +92,39 @@ export async function PUT(request) {
         return NextResponse.json({
           success: false,
           message: "Maximum 10 images allowed per product."
-        });
+        }, { status: 400 });
+      }
+
+      // Validate individual file sizes (max 10MB per image)
+      const maxFileSize = 10 * 1024 * 1024; // 10MB in bytes
+      let totalSize = 0;
+      const oversizedFiles = [];
+      
+      for (let i = 0; i < imageFiles.length; i++) {
+        const file = imageFiles[i];
+        if (file.size > maxFileSize) {
+          oversizedFiles.push({
+            name: file.name || `Image ${i + 1}`,
+            size: (file.size / 1024 / 1024).toFixed(2) + 'MB'
+          });
+        }
+        totalSize += file.size;
+      }
+
+      if (oversizedFiles.length > 0) {
+        return NextResponse.json({
+          success: false,
+          message: `The following images are too large (max 10MB each): ${oversizedFiles.map(f => `${f.name} (${f.size})`).join(', ')}`
+        }, { status: 413 });
+      }
+
+      // Validate total payload size (max 45MB to stay under 50MB limit with overhead)
+      const maxTotalSize = 45 * 1024 * 1024; // 45MB in bytes
+      if (totalSize > maxTotalSize) {
+        return NextResponse.json({
+          success: false,
+          message: `Total images size (${(totalSize / 1024 / 1024).toFixed(2)}MB) exceeds maximum allowed (45MB). Please reduce image sizes or upload fewer images.`
+        }, { status: 413 });
       }
 
       const uploadResults = await Promise.all(
@@ -158,9 +194,13 @@ export async function PUT(request) {
 
   } catch (error) {
     console.error('Error updating product:', error);
+    
+    // Return appropriate status codes based on error type
+    const statusCode = error.message.includes('too large') || error.message.includes('exceeds maximum') ? 413 : 500;
+    
     return NextResponse.json({
       success: false,
-      message: "Failed to update product. Please try again."
-    });
+      message: error.message || "Failed to update product. Please try again."
+    }, { status: statusCode });
   }
 }

@@ -59,7 +59,71 @@ const AddProduct = () => {
     setImageSlots(newSlots);
   };
 
-  // Remove parseSizes function as it's no longer needed
+  // Validate file sizes before submission
+  const validateFileSizes = (imageSlots) => {
+    const validSlots = imageSlots.filter(slot => slot.file !== null);
+    
+    if (validSlots.length === 0) {
+      return { valid: false, message: 'Please upload at least one image' };
+    }
+
+    const maxFileSize = 10 * 1024 * 1024; // 10MB in bytes
+    const maxTotalSize = 45 * 1024 * 1024; // 45MB total
+    let totalSize = 0;
+    const oversizedFiles = [];
+
+    for (let i = 0; i < validSlots.length; i++) {
+      const file = validSlots[i].file;
+      const fileSize = file.size;
+      totalSize += fileSize;
+
+      if (fileSize > maxFileSize) {
+        oversizedFiles.push({
+          name: file.name || `Image ${i + 1}`,
+          size: (fileSize / 1024 / 1024).toFixed(2) + 'MB'
+        });
+      }
+    }
+
+    if (oversizedFiles.length > 0) {
+      return {
+        valid: false,
+        message: `The following images are too large (max 10MB each): ${oversizedFiles.map(f => `${f.name} (${f.size})`).join(', ')}`
+      };
+    }
+
+    if (totalSize > maxTotalSize) {
+      return {
+        valid: false,
+        message: `Total images size (${(totalSize / 1024 / 1024).toFixed(2)}MB) exceeds maximum allowed (45MB). Please reduce image sizes or upload fewer images.`
+      };
+    }
+
+    return { valid: true };
+  };
+
+  // Handle file selection with immediate validation
+  const handleFileChange = (index, file) => {
+    updateImageSlot(index, 'file', file);
+
+    // Immediate validation for this file
+    if (file) {
+      const maxFileSize = 10 * 1024 * 1024; // 10MB
+      if (file.size > maxFileSize) {
+        toast.error(`Image "${file.name}" is too large (${(file.size / 1024 / 1024).toFixed(2)}MB). Maximum size is 10MB.`);
+        return;
+      }
+      
+      // Check total size with all current files
+      const newSlots = [...imageSlots];
+      newSlots[index] = { ...newSlots[index], file };
+      const validation = validateFileSizes(newSlots);
+      
+      if (!validation.valid) {
+        toast.warning(validation.message);
+      }
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -67,8 +131,10 @@ const AddProduct = () => {
     // Filter out empty image slots
     const validImageSlots = imageSlots.filter(slot => slot.file !== null);
     
-    if (validImageSlots.length === 0) {
-      toast.error('Please upload at least one image');
+    // Validate file sizes before submission
+    const validation = validateFileSizes(imageSlots);
+    if (!validation.valid) {
+      toast.error(validation.message);
       return;
     }
     
@@ -169,7 +235,7 @@ const AddProduct = () => {
                     )}
                   </label>
                   <input
-                    onChange={(e) => updateImageSlot(index, 'file', e.target.files[0])}
+                    onChange={(e) => handleFileChange(index, e.target.files[0])}
                     type="file"
                     id={`image${index}`}
                     hidden
