@@ -295,6 +295,42 @@ const Product = () => {
     window.open(whatsappUrl, "_blank");
   };
 
+  // Handle direct order functionality
+  const handleOrderNow = () => {
+    // If variants exist, require color and size selection
+    if (productData.variants && productData.variants.length > 0) {
+      if (!selectedColor || !selectedSize) {
+        toast.error("Please select color and size before ordering");
+        return;
+      }
+
+      if (!isVariantAvailable()) {
+        toast.error("Selected variant is not available for order");
+        return;
+      }
+
+      // Add to cart first
+      addToCart(
+        productData._id,
+        {
+          color: selectedColor,
+          size: selectedSize,
+        },
+        quantity,
+      );
+    } else {
+      // No variants, add to cart directly
+      addToCart(productData._id, {}, quantity);
+    }
+
+    // Navigate to checkout page after adding to cart
+    setTimeout(() => {
+      window.location.href = '/checkout';
+    }, 500);
+
+    toast.success(`${productData.name} added to cart! Redirecting to checkout...`);
+  };
+
   // Handle image zoom functionality
   const handleImageHover = () => {
     setIsZoomed(true);
@@ -402,27 +438,40 @@ const Product = () => {
             <div className="flex flex-wrap gap-2 mb-3">
               <span className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 px-3 py-1 rounded-full text-sm">
                 {productData.gender && productData.gender !== ""
-                  ? String(productData.gender).charAt(0).toUpperCase() +
-                    String(productData.gender).slice(1)
+                  ? (productData.gender === "both" ? "Both" : String(productData.gender).charAt(0).toUpperCase() + String(productData.gender).slice(1))
                   : "Unspecified"}
               </span>
-              <span className="bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200 px-3 py-1 rounded-full text-sm">
-                {productData.designType}
-              </span>
+              {productData.designType && (
+                <span className="bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200 px-3 py-1 rounded-full text-sm">
+                  {productData.designType}
+                </span>
+              )}
               <span className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 px-3 py-1 rounded-full text-sm">
                 {productData.category}
               </span>
             </div>
 
-            <div className="flex items-center gap-2 mb-3">
-              <div className="flex text-yellow-400">
-                {"★".repeat(Math.floor(productData.ratings || 0))}
-                {"☆".repeat(5 - Math.floor(productData.ratings || 0))}
+            {/* Only show rating if reviews exist */}
+            {productData.numOfReviews && productData.numOfReviews > 0 ? (
+              <div className="flex items-center gap-2 mb-3">
+                <div className="flex text-yellow-400">
+                  {"★".repeat(Math.floor(productData.ratings || 0))}
+                  {"☆".repeat(5 - Math.floor(productData.ratings || 0))}
+                </div>
+                <span className="text-gray-600 dark:text-gray-400">
+                  ({productData.numOfReviews} reviews) • Rating: {productData.ratings?.toFixed(1) || '0.0'}/5
+                </span>
               </div>
-              <span className="text-gray-600 dark:text-gray-400">
-                ({productData.numOfReviews || 0} reviews)
-              </span>
-            </div>
+            ) : (
+              <div className="flex items-center gap-2 mb-3">
+                <div className="flex text-gray-400">
+                  {"☆".repeat(5)}
+                </div>
+                <span className="text-gray-500 dark:text-gray-400 text-sm">
+                  No reviews yet • Be the first to review this product!
+                </span>
+              </div>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -497,7 +546,20 @@ const Product = () => {
                 })
               ) : (
                 <div className="text-gray-500 dark:text-gray-400 text-sm py-2">
-                  No color options available
+                  {/* Default color option when no colors are specified */}
+                  <button
+                    className="relative flex flex-col items-center p-2 rounded-lg border-2 border-blue-500 bg-blue-50 dark:bg-blue-900/20 shadow-lg min-w-[80px]"
+                    onClick={() => {
+                      handleColorSelect('Default');
+                      setSelectedColor('Default');
+                    }}
+                    title="Default color"
+                  >
+                    <div className="w-6 h-6 rounded-full bg-gray-400 border-2 border-gray-300 shadow-sm mb-1" />
+                    <span className="text-xs font-medium text-center leading-tight text-blue-600 dark:text-blue-400">
+                      Default
+                    </span>
+                  </button>
                 </div>
               )}
             </div>
@@ -536,7 +598,16 @@ const Product = () => {
                 })
               ) : (
                 <div className="text-gray-500 dark:text-gray-400 text-sm py-2">
-                  No size options available
+                  {/* Default size option when no sizes are specified */}
+                  <button
+                    className="px-3 py-2 border bg-blue-500 text-white border-blue-500 shadow-lg rounded-lg min-h-[40px] min-w-[40px] font-medium"
+                    onClick={() => {
+                      handleSizeSelect('One Size');
+                      setSelectedSize('One Size');
+                    }}
+                  >
+                    One Size
+                  </button>
                 </div>
               )}
             </div>
@@ -627,6 +698,17 @@ const Product = () => {
                 disabled={!isVariantAvailable()}
               >
                 Add to Cart
+              </button>
+              <button
+                className={`flex-1 py-3 px-6 rounded-lg font-semibold transition-colors ${
+                  isVariantAvailable()
+                    ? "bg-orange-600 text-white hover:bg-orange-700"
+                    : "bg-gray-400 text-gray-200 cursor-not-allowed"
+                }`}
+                onClick={handleOrderNow}
+                disabled={!isVariantAvailable()}
+              >
+                Order Now
               </button>
               <button
                 className={`p-3 rounded-lg border-2 transition-colors ${

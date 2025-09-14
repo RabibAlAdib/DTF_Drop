@@ -2,11 +2,12 @@ import { NextResponse } from 'next/server'
 import connectDB from '@/config/db';
 import Product from "@/models/Product";
 
-export async function GET(request, { params }) {
+export async function GET(request, context) {
   try {
     await connectDB();
     
-    const { id } = params
+    const { params } = await context;
+    const { id } = params;
     
     // Find product by ID using MongoDB query
     const product = await Product.findById(id).lean();
