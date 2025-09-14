@@ -1,21 +1,12 @@
-import { v2 as cloudinary } from "cloudinary";
 import { getAuth } from '@clerk/nextjs/server';
 import authSeller from "@/lib/authSeller";
 import connectDB from "@/config/db";
 import Product from "@/models/Product";
 import { NextResponse } from "next/server";
 
-// Runtime configuration for handling large uploads
+// Runtime configuration - much faster now without file uploads
 export const runtime = 'nodejs';
-export const maxDuration = 30; // 30 seconds for upload timeout
-
-// Configure Cloudinary
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-  secure: true
-});
+export const maxDuration = 10; // Reduced to 10 seconds since no file processing
 
 export async function PUT(request) {
   try {
@@ -30,19 +21,22 @@ export async function PUT(request) {
       }, { status: 401 });
     }
 
-    const formData = await request.formData();
-    const productId = formData.get('productId');
-    const name = formData.get('name');
-    const description = formData.get('description');
-    const category = formData.get('category');
-    const price = formData.get('price');
-    const offerPrice = formData.get('offerPrice');
-    
-    // Get additional fields
-    const gender = formData.get('gender');
-    const designType = formData.get('designType');
-    const colors = formData.getAll('colors');
-    const sizes = formData.getAll('sizes');
+    // Parse JSON data instead of FormData
+    const requestData = await request.json();
+    const { 
+      productId,
+      name, 
+      description, 
+      category, 
+      price, 
+      offerPrice,
+      gender,
+      designType,
+      imageUrls, // New image URLs (if user wants to replace images)
+      imageColors, // Colors for new images
+      sizes,
+      colors
+    } = requestData;
 
     // Validate required fields
     if (!productId || !name || !description || !category || !price) {
@@ -72,100 +66,44 @@ export async function PUT(request) {
     }
 
     // Handle image updates
-    const imageFiles = [];
-    const imageColors = [];
-    let imageIndex = 0;
-    
-    // Collect new image-color pairs if provided
-    while (formData.get(`image_${imageIndex}`)) {
-      imageFiles.push(formData.get(`image_${imageIndex}`));
-      imageColors.push(formData.get(`color_${imageIndex}`));
-      imageIndex++;
-    }
-
     let finalColorImages = existingProduct.colorImages || [];
     let finalImages = existingProduct.images || [];
 
-    // Upload new images if provided
-    if (imageFiles.length > 0) {
-      if (imageFiles.length > 10) {
+    // If new image URLs are provided, validate and use them
+    if (imageUrls && imageUrls.length > 0) {
+      if (imageUrls.length > 10) {
         return NextResponse.json({
           success: false,
           message: "Maximum 10 images allowed per product."
         }, { status: 400 });
       }
 
-      // Validate individual file sizes (max 10MB per image)
-      const maxFileSize = 10 * 1024 * 1024; // 10MB in bytes
-      let totalSize = 0;
-      const oversizedFiles = [];
+      // Validate all image URLs are from our Cloudinary account (security check)
+      const cloudinaryCloudName = process.env.CLOUDINARY_CLOUD_NAME;
+      const validCloudinaryPattern = new RegExp(`^https://res\\.cloudinary\\.com/${cloudinaryCloudName}/`);
       
-      for (let i = 0; i < imageFiles.length; i++) {
-        const file = imageFiles[i];
-        if (file.size > maxFileSize) {
-          oversizedFiles.push({
-            name: file.name || `Image ${i + 1}`,
-            size: (file.size / 1024 / 1024).toFixed(2) + 'MB'
-          });
+      for (const url of imageUrls) {
+        if (!validCloudinaryPattern.test(url)) {
+          return NextResponse.json({
+            success: false,
+            message: "Invalid image URL detected. All images must be uploaded through our system."
+          }, { status: 400 });
         }
-        totalSize += file.size;
       }
 
-      if (oversizedFiles.length > 0) {
-        return NextResponse.json({
-          success: false,
-          message: `The following images are too large (max 10MB each): ${oversizedFiles.map(f => `${f.name} (${f.size})`).join(', ')}`
-        }, { status: 413 });
-      }
-
-      // Validate total payload size (max 45MB to stay under 50MB limit with overhead)
-      const maxTotalSize = 45 * 1024 * 1024; // 45MB in bytes
-      if (totalSize > maxTotalSize) {
-        return NextResponse.json({
-          success: false,
-          message: `Total images size (${(totalSize / 1024 / 1024).toFixed(2)}MB) exceeds maximum allowed (45MB). Please reduce image sizes or upload fewer images.`
-        }, { status: 413 });
-      }
-
-      const uploadResults = await Promise.all(
-        imageFiles.map(async (file, index) => {
-          const arrayBuffer = await file.arrayBuffer();
-          const buffer = Buffer.from(arrayBuffer);
-          return new Promise((resolve, reject) => {
-            const stream = cloudinary.uploader.upload_stream(
-              { 
-                resource_type: 'auto',
-                transformation: [
-                  { width: 800, height: 800, crop: 'limit' },
-                  { quality: 'auto', fetch_format: 'auto' }
-                ]
-              },
-              (error, result) => {
-                if (error) {
-                  reject(error);
-                } else {
-                  resolve({
-                    url: result.secure_url,
-                    color: imageColors[index] || 'Black'
-                  });
-                }
-              }
-            );
-            stream.end(buffer);
-          });
-        })
-      );
-
-      // Replace images if new ones are uploaded
-      finalColorImages = uploadResults;
-      finalImages = uploadResults.map(result => result.url);
+      // Replace images with new ones
+      finalColorImages = imageUrls.map((url, index) => ({
+        url: url,
+        color: imageColors?.[index] || 'Black'
+      }));
+      finalImages = imageUrls;
     }
 
     // Set defaults for backward compatibility
     const finalGender = gender || existingProduct.gender || 'both';
     const finalDesignType = designType || existingProduct.designType || 'customized';
     const finalColors = (colors && colors.length > 0) ? colors : (existingProduct.colors || ['Black']);
-    const finalSizes = (sizes && sizes.length > 0) ? sizes : (existingProduct.sizes || ['M']);
+    const finalSizes = (sizes && sizes.length > 0) ? sizes : (existingProduct.sizes || ['M', 'L', 'XL']);
 
     // Update the product
     const updatedProduct = await Product.findByIdAndUpdate(
@@ -195,12 +133,9 @@ export async function PUT(request) {
   } catch (error) {
     console.error('Error updating product:', error);
     
-    // Return appropriate status codes based on error type
-    const statusCode = error.message.includes('too large') || error.message.includes('exceeds maximum') ? 413 : 500;
-    
     return NextResponse.json({
       success: false,
       message: error.message || "Failed to update product. Please try again."
-    }, { status: statusCode });
+    }, { status: 500 });
   }
 }

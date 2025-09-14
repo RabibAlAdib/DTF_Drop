@@ -24,7 +24,7 @@ const AddProduct = () => {
   
   // NEW: Dynamic image-color pairs (max 10)
   const [imageSlots, setImageSlots] = useState([
-    { file: null, color: 'Black' } // Start with one slot
+    { file: null, color: 'Black', url: null, uploading: false } // Start with one slot
   ]);
   
   // NEW: Size management with default and optional XXL
@@ -40,9 +40,77 @@ const AddProduct = () => {
   const DESIGN_TYPES = ['Anime', 'Typography', 'Game', 'WWE', 'Sports', 'Motivational', 'Jokes', 'Islamic', 'Customized', 'Cartoon', 'Movie/TV', 'Music/Band', 'Minimalist', 'Abstract', 'Nature', 'Festival/Seasonal', 'Couple/Friendship', 'Quotes', 'Retro/Vintage', 'Geek/Tech', 'Streetwear', 'Hip-Hop/Rap', 'Graffiti/Urban', 'Fantasy/Mythology', 'Sci-Fi', 'Superheroes/Comics', 'Animals/Pets', 'Cars/Bikes', 'Food/Drinks', 'Travel/Adventure', 'National/Patriotic', 'Memes', 'Spiritual/Inspirational', 'Kids/Family', 'Occupations (Doctor, Engineer, etc.)', 'College/University Life', 'Fitness/Gym', 'Luxury/High Fashion', 'Gaming Esports Teams'];
   const GENDERS = ['male', 'female', 'both'];
 
+  // Function to get Cloudinary signature
+  const getCloudinarySignature = async () => {
+    try {
+      const token = await getToken();
+      const response = await axios.post('/api/cloudinary/signature', {}, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      return response.data;
+    } catch (error) {
+      throw new Error('Failed to get upload signature');
+    }
+  };
+
+  // Function to upload image directly to Cloudinary
+  const uploadToCloudinary = async (file, slotIndex) => {
+    try {
+      // Update slot to show uploading status
+      updateImageSlot(slotIndex, 'uploading', true);
+
+      // Get signature
+      const signatureData = await getCloudinarySignature();
+      
+      if (!signatureData.success) {
+        throw new Error('Failed to get upload signature');
+      }
+
+      // Prepare form data for Cloudinary
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('signature', signatureData.signature);
+      formData.append('timestamp', signatureData.timestamp);
+      formData.append('api_key', signatureData.api_key);
+      formData.append('folder', 'products');
+      formData.append('transformation', 'c_limit,w_800,h_800,q_auto,f_auto');
+
+      // Upload to Cloudinary
+      const uploadResponse = await axios.post(signatureData.upload_url, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        onUploadProgress: (progressEvent) => {
+          const percentCompleted = Math.round(
+            (progressEvent.loaded * 100) / progressEvent.total
+          );
+          console.log(`Upload progress for slot ${slotIndex}: ${percentCompleted}%`);
+        }
+      });
+
+      // Update slot with URL and stop uploading status
+      updateImageSlot(slotIndex, 'url', uploadResponse.data.secure_url);
+      updateImageSlot(slotIndex, 'uploading', false);
+      
+      toast.success(`Image ${slotIndex + 1} uploaded successfully!`);
+      return uploadResponse.data.secure_url;
+
+    } catch (error) {
+      updateImageSlot(slotIndex, 'uploading', false);
+      updateImageSlot(slotIndex, 'file', null);
+      updateImageSlot(slotIndex, 'url', null);
+      
+      console.error('Cloudinary upload error:', error);
+      toast.error(`Failed to upload image ${slotIndex + 1}: ${error.message}`);
+      throw error;
+    }
+  };
+
   const addImageSlot = () => {
     if (imageSlots.length < 10) {
-      setImageSlots([...imageSlots, { file: null, color: 'Black' }]);
+      setImageSlots([...imageSlots, { file: null, color: 'Black', url: null, uploading: false }]);
     }
   };
 
@@ -59,118 +127,75 @@ const AddProduct = () => {
     setImageSlots(newSlots);
   };
 
-  // Validate file sizes before submission
-  const validateFileSizes = (imageSlots) => {
-    const validSlots = imageSlots.filter(slot => slot.file !== null);
-    
-    if (validSlots.length === 0) {
-      return { valid: false, message: 'Please upload at least one image' };
-    }
 
-    const maxFileSize = 10 * 1024 * 1024; // 10MB in bytes
-    const maxTotalSize = 45 * 1024 * 1024; // 45MB total
-    let totalSize = 0;
-    const oversizedFiles = [];
-
-    for (let i = 0; i < validSlots.length; i++) {
-      const file = validSlots[i].file;
-      const fileSize = file.size;
-      totalSize += fileSize;
-
-      if (fileSize > maxFileSize) {
-        oversizedFiles.push({
-          name: file.name || `Image ${i + 1}`,
-          size: (fileSize / 1024 / 1024).toFixed(2) + 'MB'
-        });
-      }
-    }
-
-    if (oversizedFiles.length > 0) {
-      return {
-        valid: false,
-        message: `The following images are too large (max 10MB each): ${oversizedFiles.map(f => `${f.name} (${f.size})`).join(', ')}`
-      };
-    }
-
-    if (totalSize > maxTotalSize) {
-      return {
-        valid: false,
-        message: `Total images size (${(totalSize / 1024 / 1024).toFixed(2)}MB) exceeds maximum allowed (45MB). Please reduce image sizes or upload fewer images.`
-      };
-    }
-
-    return { valid: true };
-  };
-
-  // Handle file selection with immediate validation
-  const handleFileChange = (index, file) => {
-    updateImageSlot(index, 'file', file);
+  // Handle file selection with immediate validation and upload
+  const handleFileChange = async (index, file) => {
+    if (!file) return;
 
     // Immediate validation for this file
-    if (file) {
-      const maxFileSize = 10 * 1024 * 1024; // 10MB
-      if (file.size > maxFileSize) {
-        toast.error(`Image "${file.name}" is too large (${(file.size / 1024 / 1024).toFixed(2)}MB). Maximum size is 10MB.`);
-        return;
-      }
-      
-      // Check total size with all current files
-      const newSlots = [...imageSlots];
-      newSlots[index] = { ...newSlots[index], file };
-      const validation = validateFileSizes(newSlots);
-      
-      if (!validation.valid) {
-        toast.warning(validation.message);
-      }
+    const maxFileSize = 10 * 1024 * 1024; // 10MB
+    if (file.size > maxFileSize) {
+      toast.error(`Image "${file.name}" is too large (${(file.size / 1024 / 1024).toFixed(2)}MB). Maximum size is 10MB.`);
+      return;
+    }
+
+    // Update slot with file and start upload process
+    updateImageSlot(index, 'file', file);
+    
+    try {
+      // Upload to Cloudinary immediately
+      await uploadToCloudinary(file, index);
+    } catch (error) {
+      console.error('Upload failed:', error);
+      // Error handling is already done in uploadToCloudinary
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Filter out empty image slots
-    const validImageSlots = imageSlots.filter(slot => slot.file !== null);
+    // Filter out slots that have successfully uploaded images
+    const validImageSlots = imageSlots.filter(slot => slot.url !== null);
     
-    // Validate file sizes before submission
-    const validation = validateFileSizes(imageSlots);
-    if (!validation.valid) {
-      toast.error(validation.message);
+    // Check if there are any images still uploading
+    const uploadingSlots = imageSlots.filter(slot => slot.uploading);
+    if (uploadingSlots.length > 0) {
+      toast.warning(`Please wait for ${uploadingSlots.length} image(s) to finish uploading before submitting.`);
       return;
     }
     
-    const formData = new FormData();
-    formData.append('name', name);
-    formData.append('description', description);
-    formData.append('category', category);
-    formData.append('price', price);
-    formData.append('offerPrice', offerPrice);
+    // Validate that at least one image was uploaded
+    if (validImageSlots.length === 0) {
+      toast.error('Please upload at least one image');
+      return;
+    }
     
-    // NEW: Append additional fields
-    formData.append('gender', gender);
-    formData.append('designType', designType);
-    
-    // NEW: Append image-color pairs using the new API format
-    validImageSlots.forEach((slot, index) => {
-      formData.append(`image_${index}`, slot.file);
-      formData.append(`color_${index}`, slot.color);
-    });
-    
-    // Use default sizes with optional XXL
-    const sizes = getDefaultSizes();
-    sizes.forEach(size => formData.append('sizes', size));
-    
-    // Extract unique colors for the colors field
-    const uniqueColors = [...new Set(validImageSlots.map(slot => slot.color))];
-    uniqueColors.forEach(color => formData.append('colors', color));
+    // Prepare JSON data instead of FormData (no more files!)
+    const productData = {
+      name,
+      description,
+      category,
+      price: parseFloat(price),
+      offerPrice: offerPrice ? parseFloat(offerPrice) : undefined,
+      gender,
+      designType,
+      // Send image URLs and colors
+      imageUrls: validImageSlots.map(slot => slot.url),
+      imageColors: validImageSlots.map(slot => slot.color),
+      // Use default sizes with optional XXL
+      sizes: getDefaultSizes(),
+      // Extract unique colors for the colors field
+      colors: [...new Set(validImageSlots.map(slot => slot.color))]
+    };
 
     try {
       setIsUploading(true);
       setUploadProgress(0);
       
       const token = await getToken();
-      const response = await axios.post('/api/product/add', formData, {
+      const response = await axios.post('/api/product/add', productData, {
         headers: {
-          'Content-Type': 'multipart/form-data',
+          'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`
         },
         onUploadProgress: (progressEvent) => {
@@ -191,7 +216,7 @@ const AddProduct = () => {
         setOfferPrice('');
         setGender('both');
         setDesignType('Customized');
-        setImageSlots([{ file: null, color: 'Black' }]);
+        setImageSlots([{ file: null, color: 'Black', url: null, uploading: false }]);
         setIncludeXXL(false);
       } else {
         toast.error(response.data.message);
@@ -220,9 +245,33 @@ const AddProduct = () => {
                 <div className="flex-1">
                   <label 
                     htmlFor={`image${index}`}
-                    className="block w-full h-32 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:border-blue-500 transition-colors"
+                    className={`block w-full h-32 border-2 border-dashed rounded-lg transition-colors ${
+                      slot.uploading 
+                        ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 cursor-wait' 
+                        : slot.url 
+                        ? 'border-green-500 bg-green-50 dark:bg-green-900/20 cursor-pointer hover:border-green-600'
+                        : 'border-gray-300 dark:border-gray-600 cursor-pointer hover:border-blue-500'
+                    }`}
                   >
-                    {slot.file ? (
+                    {slot.uploading ? (
+                      <div className="flex flex-col items-center justify-center h-full text-blue-600">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-2"></div>
+                        <span className="text-sm">Uploading...</span>
+                      </div>
+                    ) : slot.url ? (
+                      <div className="relative w-full h-full">
+                        <img 
+                          src={slot.url} 
+                          alt={`Preview ${index}`}
+                          className="w-full h-full object-cover rounded-lg"
+                        />
+                        <div className="absolute top-1 right-1 bg-green-500 text-white rounded-full p-1">
+                          <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                          </svg>
+                        </div>
+                      </div>
+                    ) : slot.file ? (
                       <img 
                         src={URL.createObjectURL(slot.file)} 
                         alt={`Preview ${index}`}
