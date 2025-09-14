@@ -56,8 +56,9 @@ const HomeProducts = () => {
               }}
             >
               <div className="relative group">
-                {/* Border shadow effect - left and top only */}
-                <div className="absolute -inset-1 border-l-2 border-t-2 border-l-blue-500 border-t-blue-500 group-hover:border-l-purple-500 group-hover:border-t-purple-500 rounded-lg opacity-0 group-hover:opacity-80 transition-all duration-1000 group-hover:shadow-lg group-hover:shadow-purple-500/50"></div>
+                {/* Enhanced blurry border background effect */}
+                <div className="absolute -inset-2 bg-gradient-to-br from-blue-500/20 via-purple-500/20 to-pink-500/20 rounded-xl blur-sm opacity-0 group-hover:opacity-100 transition-all duration-500"></div>
+                <div className="absolute -inset-1 border-l-2 border-t-2 border-l-blue-500 border-t-blue-500 group-hover:border-l-purple-500 group-hover:border-t-purple-500 rounded-lg opacity-0 group-hover:opacity-90 transition-all duration-700 group-hover:shadow-2xl group-hover:shadow-purple-500/30"></div>
                 <div className="relative">
                   <ProductCard product={product} />
                 </div>

@@ -62,18 +62,18 @@ const OrderSummary = () => {
 
   return (
     <div className="w-full md:w-96 bg-gray-500/5 p-5">
-      <h2 className="text-xl md:text-2xl font-medium text-gray-700">
+      <h2 className="text-xl md:text-2xl font-medium text-gray-700 dark:text-gray-200">
         Order Summary
       </h2>
       <hr className="border-gray-500/30 my-5" />
       <div className="space-y-6">
         <div>
-          <label className="text-base font-medium uppercase text-gray-600 block mb-2">
+          <label className="text-base font-medium uppercase text-gray-600 dark:text-gray-300 block mb-2">
             Select Address
           </label>
           <div className="relative inline-block w-full text-sm border">
             <button
-              className="peer w-full text-left px-4 pr-2 py-2 bg-white text-gray-700 focus:outline-none"
+              className="peer w-full text-left px-4 pr-2 py-2 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 border dark:border-gray-600 focus:outline-none"
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
             >
               <span>
@@ -89,11 +89,11 @@ const OrderSummary = () => {
             </button>
 
             {isDropdownOpen && (
-              <ul className="absolute w-full bg-white border shadow-md mt-1 z-10 py-1.5">
+              <ul className="absolute w-full bg-white dark:bg-gray-800 border dark:border-gray-600 shadow-md mt-1 z-10 py-1.5">
                 {userAddresses.map((address, index) => (
                   <li
                     key={index}
-                    className="px-4 py-2 hover:bg-gray-500/10 cursor-pointer"
+                    className="px-4 py-2 hover:bg-gray-500/10 dark:hover:bg-gray-700 cursor-pointer text-gray-700 dark:text-gray-200"
                     onClick={() => handleAddressSelect(address)}
                   >
                     {address.fullName}, {address.area}, {address.city}, {address.state}
@@ -101,7 +101,7 @@ const OrderSummary = () => {
                 ))}
                 <li
                   onClick={() => router.push("/add-address")}
-                  className="px-4 py-2 hover:bg-gray-500/10 cursor-pointer text-center"
+                  className="px-4 py-2 hover:bg-gray-500/10 dark:hover:bg-gray-700 cursor-pointer text-center text-gray-700 dark:text-gray-200"
                 >
                   + Add New Address
                 </li>
@@ -111,14 +111,14 @@ const OrderSummary = () => {
         </div>
 
         <div>
-          <label className="text-base font-medium uppercase text-gray-600 block mb-2">
+          <label className="text-base font-medium uppercase text-gray-600 dark:text-gray-300 block mb-2">
             Promo Code
           </label>
           <div className="flex flex-col items-start gap-3">
             <input
               type="text"
               placeholder="Enter promo code"
-              className="flex-grow w-full outline-none p-2.5 text-gray-600 border"
+              className="flex-grow w-full outline-none p-2.5 text-gray-600 dark:text-gray-200 bg-white dark:bg-gray-800 border dark:border-gray-600 placeholder:text-gray-400 dark:placeholder:text-gray-500"
             />
             <button className="bg-orange-600 text-white px-9 py-2 hover:bg-orange-700">
               Apply
@@ -130,20 +130,20 @@ const OrderSummary = () => {
 
         <div className="space-y-4">
           <div className="flex justify-between text-base font-medium">
-            <p className="uppercase text-gray-600">Items {getCartCount()}</p>
-            <p className="text-gray-800">{currency}{getCartAmount()}</p>
+            <p className="uppercase text-gray-600 dark:text-gray-300">Items {getCartCount()}</p>
+            <p className="text-gray-800 dark:text-gray-200">{currency}{getCartAmount()}</p>
           </div>
           <div className="flex justify-between">
-            <p className="text-gray-600">Shipping Fee</p>
-            <p className="font-medium text-gray-800">Free</p>
+            <p className="text-gray-600 dark:text-gray-300">Shipping Fee</p>
+            <p className="font-medium text-gray-800 dark:text-gray-200">Free</p>
           </div>
           <div className="flex justify-between">
-            <p className="text-gray-600">Tax (2%)</p>
-            <p className="font-medium text-gray-800">{currency}{Math.floor(getCartAmount() * 0.02)}</p>
+            <p className="text-gray-600 dark:text-gray-300">Tax (2%)</p>
+            <p className="font-medium text-gray-800 dark:text-gray-200">{currency}{Math.floor(getCartAmount() * 0.02)}</p>
           </div>
           <div className="flex justify-between text-lg md:text-xl font-medium border-t pt-3">
-            <p>Total</p>
-            <p>{currency}{getCartAmount() + Math.floor(getCartAmount() * 0.02)}</p>
+            <p className="text-gray-800 dark:text-gray-200">Total</p>
+            <p className="text-gray-800 dark:text-gray-200">{currency}{getCartAmount() + Math.floor(getCartAmount() * 0.02)}</p>
           </div>
         </div>
       </div>
@@ -163,7 +163,7 @@ const OrderSummary = () => {
           </svg>
           Contact Support via WhatsApp
         </button>
-        <p className="text-xs text-gray-500 text-center mt-2">
+        <p className="text-xs text-gray-500 dark:text-gray-400 text-center mt-2">
           Get instant help with your cart items
         </p>
       </div>
