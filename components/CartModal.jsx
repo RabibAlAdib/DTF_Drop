@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import Image from 'next/image';
 import { useAppContext } from '@/context/AppContext';
 import { toast } from 'react-hot-toast';
@@ -10,6 +11,7 @@ const CartModal = ({ isOpen, onClose, product }) => {
   const [selectedColor, setSelectedColor] = useState('');
   const [quantity, setQuantity] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
 
   // Default product options if not available
   const defaultSizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
@@ -18,6 +20,11 @@ const CartModal = ({ isOpen, onClose, product }) => {
   // Use product-specific sizes/colors if available, otherwise use defaults
   const availableSizes = product?.sizes || defaultSizes;
   const availableColors = product?.colors || defaultColors;
+
+  // Handle client-side mounting
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Reset selections when modal opens with new product
   useEffect(() => {
@@ -84,18 +91,19 @@ const CartModal = ({ isOpen, onClose, product }) => {
     }
   };
 
-  if (!isOpen || !product) return null;
+  if (!isOpen || !product || !isMounted) return null;
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* Backdrop */}
+  const modalContent = (
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+      {/* Enhanced Backdrop */}
       <div 
-        className="absolute inset-0 bg-black bg-opacity-50 transition-opacity"
+        className="absolute inset-0 bg-black bg-opacity-60 backdrop-blur-sm transition-all duration-300"
         onClick={onClose}
+        aria-hidden="true"
       />
       
       {/* Modal Content */}
-      <div className="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-lg w-full mx-4 max-h-[90vh] overflow-y-auto">
+      <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-lg w-full max-h-[95vh] overflow-hidden animate-in fade-in zoom-in duration-300">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
@@ -111,9 +119,11 @@ const CartModal = ({ isOpen, onClose, product }) => {
           </button>
         </div>
 
-        {/* Product Info */}
-        <div className="p-6">
-          <div className="flex gap-4 mb-6">
+        {/* Scrollable Content */}
+        <div className="max-h-[calc(95vh-8rem)] overflow-y-auto">
+          {/* Product Info */}
+          <div className="p-6">
+            <div className="flex gap-4 mb-6">
             {/* Product Image */}
             <div className="w-24 h-24 bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden flex-shrink-0">
               <Image
@@ -218,10 +228,11 @@ const CartModal = ({ isOpen, onClose, product }) => {
               </span>
             </div>
           </div>
+          </div>
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700 flex gap-3">
+        <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700 flex gap-3 bg-gray-50 dark:bg-gray-700/50">
           <button
             onClick={onClose}
             className="flex-1 py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
@@ -243,6 +254,8 @@ const CartModal = ({ isOpen, onClose, product }) => {
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 };
 
 export default CartModal;
