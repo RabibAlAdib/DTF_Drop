@@ -26,6 +26,7 @@ const Navbar = () => {
         alt="logo"
         width={96}
         height={40}
+        priority
       />
       
       {/* Desktop Menu Items - Truly Centered */}

@@ -187,6 +187,7 @@ const HeaderSlider = () => {
                 alt={`Slide ${index + 1}`}
                 width={288}
                 height={288}
+                priority={index === 0}
               />
             </div>
             </div>
