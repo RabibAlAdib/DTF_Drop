@@ -210,14 +210,14 @@ const Navbar = () => {
         <>
           {/* Backdrop */}
           <div
-            className="md:hidden fixed inset-0 bg-black/20 backdrop-blur-sm z-40"
+            className="md:hidden fixed inset-0 bg-black/40 backdrop-blur-md z-40"
             onClick={() => setMobileMenuOpen(false)}
           />
 
           {/* Mobile Menu */}
-          <div className="md:hidden fixed top-0 right-0 h-full w-80 max-w-[85vw] bg-white dark:bg-black border-l border-gray-200 dark:border-gray-700 shadow-2xl z-50 transform transition-all duration-300">
+          <div className="md:hidden fixed top-0 right-0 h-full w-80 max-w-[85vw] bg-white/98 dark:bg-gray-900/98 backdrop-blur-xl border-l border-gray-200 dark:border-gray-700 shadow-2xl shadow-black/25 dark:shadow-black/50 z-50 transform transition-all duration-300">
             {/* Menu Header */}
-            <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+            <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700 bg-gray-50/80 dark:bg-gray-800/80 backdrop-blur-sm">
               <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
                 Menu
               </h3>
@@ -245,7 +245,7 @@ const Navbar = () => {
             </div>
 
             {/* Menu Content */}
-            <div className="p-6 space-y-2">
+            <div className="p-6 space-y-2 bg-gradient-to-b from-white/95 to-gray-50/95 dark:from-gray-900/95 dark:to-gray-800/95 backdrop-blur-sm h-full">
               {/* Navigation Links */}
               <Link
                 href="/"
