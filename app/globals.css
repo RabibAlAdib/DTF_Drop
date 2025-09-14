@@ -9,7 +9,8 @@ html {
 
 /* Account for sticky navbar height */
 body {
-  padding-top: 20px; /* Match actual navbar height */
+  padding-top: 80px;
+  /* Match actual navbar height */
 }
 
 /* Smooth scroll for anchor links and better scrolling performance */
@@ -45,9 +46,12 @@ body {
 
 /* Custom Animations */
 @keyframes gentle-bounce {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0px);
   }
+
   50% {
     transform: translateY(-10px);
   }
@@ -58,6 +62,7 @@ body {
     opacity: 0;
     transform: translateY(20px);
   }
+
   100% {
     opacity: 1;
     transform: translateY(0px);
@@ -65,10 +70,13 @@ body {
 }
 
 @keyframes soft-pulse {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 0.6;
     transform: scale(1);
   }
+
   50% {
     opacity: 0.9;
     transform: scale(1.02);
@@ -79,9 +87,11 @@ body {
   0% {
     background-position: 0% 50%;
   }
+
   50% {
     background-position: 100% 50%;
   }
+
   100% {
     background-position: 0% 50%;
   }
@@ -92,10 +102,12 @@ body {
     border-color: transparent;
     box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
   }
+
   50% {
     border-color: #3b82f6;
     box-shadow: 0 0 10px 2px rgba(59, 130, 246, 0.3);
   }
+
   100% {
     border-color: transparent;
     box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
@@ -150,12 +162,13 @@ body {
 }
 
 @layer base {
-    input[type="number"]::-webkit-inner-spin-button,
-    input[type="number"]::-webkit-outer-spin-button {
-      -webkit-appearance: none;
-      margin: 0;
-    }
+
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
   }
+}
 
 ::-webkit-scrollbar {
   display: none;
