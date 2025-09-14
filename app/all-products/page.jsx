@@ -73,18 +73,9 @@ const AllProducts = () => {
                 </div>
 
                 {/* Main Content Area */}
-                <div className="flex flex-col lg:flex-row gap-6 px-6 md:px-16 lg:px-32 mt-6">
-                    {/* Left Sidebar - DesignType Dropdown */}
-                    <div className="w-full lg:w-64 lg:flex-shrink-0">
-                        <DesignTypeDropdown 
-                            designTypes={designTypes}
-                            activeDesignType={activeDesignType}
-                            onDesignTypeChange={handleDesignTypeChange}
-                        />
-                    </div>
-
-                    {/* Right Content Area */}
-                    <div className="flex-1">
+                <div className="flex flex-col lg:flex-row px-6 md:px-16 lg:px-32 mt-6">
+                    {/* Left Content Area */}
+                    <div className="flex-1 lg:mr-2.5">
                         {/* Product Count */}
                         <div className="w-full text-center mb-6">
                             <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -123,6 +114,17 @@ const AllProducts = () => {
                                 </div>
                             </div>
                         )}
+                    </div>
+
+                    {/* Right Sidebar - DesignType Dropdown (Smaller) */}
+                    <div className="w-full lg:w-48 lg:flex-shrink-0">
+                        <div className="lg:sticky lg:top-4">
+                            <DesignTypeDropdown 
+                                designTypes={designTypes}
+                                activeDesignType={activeDesignType}
+                                onDesignTypeChange={handleDesignTypeChange}
+                            />
+                        </div>
                     </div>
                 </div>
             </div>
