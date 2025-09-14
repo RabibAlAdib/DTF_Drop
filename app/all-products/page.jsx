@@ -62,7 +62,7 @@ const AllProducts = () => {
                     <div className="w-16 h-0.5 bg-gradient-to-r from-orange-600 to-red-600 rounded-full animate-gradient"></div>
                 </div>
                 
-                {/* Category Filter - Top Center */}
+                {/* Row 1: Category Filter - Full Width */}
                 <div className="w-full mt-8 px-6">
                     <CategoryFilter 
                         categories={categories}
@@ -72,60 +72,58 @@ const AllProducts = () => {
                     />
                 </div>
 
-                {/* Main Content Area */}
-                <div className="flex flex-col lg:flex-row px-6 md:px-16 lg:px-32 mt-6">
-                    {/* Left Content Area */}
-                    <div className="flex-1 lg:mr-2.5">
-                        {/* Product Count */}
-                        <div className="w-full text-center mb-6">
-                            <p className="text-sm text-gray-600 dark:text-gray-400">
-                                Showing {filteredProducts.length} {filteredProducts.length === 1 ? 'product' : 'products'}
-                                {activeCategory !== 'ALL' && ` in category "${activeCategory}"`}
-                                {activeDesignType !== 'ALL' && ` with design type "${activeDesignType}"`}
-                            </p>
-                        </div>
+                {/* Row 2: Product Count (Left) + Design Type Filter (Right) */}
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center px-6 md:px-16 lg:px-32 mt-6 mb-6 gap-4">
+                    {/* Product Count - Left */}
+                    <div className="flex-1">
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                            Showing {filteredProducts.length} {filteredProducts.length === 1 ? 'product' : 'products'}
+                            {activeCategory !== 'ALL' && ` in category "${activeCategory}"`}
+                            {activeDesignType !== 'ALL' && ` with design type "${activeDesignType}"`}
+                        </p>
+                    </div>
+                    
+                    {/* Design Type Filter - Right */}
+                    <div className="w-full md:w-auto md:min-w-[220px]">
+                        <DesignTypeDropdown 
+                            designTypes={designTypes}
+                            activeDesignType={activeDesignType}
+                            onDesignTypeChange={handleDesignTypeChange}
+                        />
+                    </div>
+                </div>
 
-                        {/* Products Grid */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-6 pb-14">
-                            {filteredProducts.map((product, index) => (
-                                <div
-                                    key={product._id || index}
-                                    className="border-2 border-transparent rounded-lg hover:animate-border-glow transition-all duration-300 animate-fade-in-up"
-                                    style={{ animationDelay: `${index * 50}ms` }}
-                                >
-                                    <ProductCard product={product} />
-                                </div>
-                            ))}
-                        </div>
-
-                        {/* No Products Message */}
-                        {filteredProducts.length === 0 && (
-                            <div className="flex flex-col items-center justify-center w-full py-16">
-                                <div className="text-gray-500 dark:text-gray-400 text-center">
-                                    <svg className="w-16 h-16 mx-auto mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-5.5a2.5 2.5 0 00-2.5 2.5v0a2.5 2.5 0 01-2.5 2.5H12" />
-                                    </svg>
-                                    <h3 className="text-lg font-medium mb-2">No products found</h3>
-                                    <p className="text-sm">
-                                        No products found matching your filters.
-                                        {activeCategory !== 'ALL' && ` Category: ${activeCategory}`}
-                                        {activeDesignType !== 'ALL' && ` Design Type: ${activeDesignType}`}
-                                    </p>
-                                </div>
+                {/* Row 3: Products Grid - Full Width */}
+                <div className="px-6 md:px-16 lg:px-32">
+                    {/* Products Grid */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6 pb-14">
+                        {filteredProducts.map((product, index) => (
+                            <div
+                                key={product._id || index}
+                                className="border-2 border-transparent rounded-lg hover:animate-border-glow transition-all duration-300 animate-fade-in-up"
+                                style={{ animationDelay: `${index * 50}ms` }}
+                            >
+                                <ProductCard product={product} />
                             </div>
-                        )}
+                        ))}
                     </div>
 
-                    {/* Right Sidebar - DesignType Dropdown (Smaller) */}
-                    <div className="w-full lg:w-48 lg:flex-shrink-0">
-                        <div className="lg:sticky lg:top-4">
-                            <DesignTypeDropdown 
-                                designTypes={designTypes}
-                                activeDesignType={activeDesignType}
-                                onDesignTypeChange={handleDesignTypeChange}
-                            />
+                    {/* No Products Message */}
+                    {filteredProducts.length === 0 && (
+                        <div className="flex flex-col items-center justify-center w-full py-16">
+                            <div className="text-gray-500 dark:text-gray-400 text-center">
+                                <svg className="w-16 h-16 mx-auto mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-5.5a2.5 2.5 0 00-2.5 2.5v0a2.5 2.5 0 01-2.5 2.5H12" />
+                                </svg>
+                                <h3 className="text-lg font-medium mb-2">No products found</h3>
+                                <p className="text-sm">
+                                    No products found matching your filters.
+                                    {activeCategory !== 'ALL' && ` Category: ${activeCategory}`}
+                                    {activeDesignType !== 'ALL' && ` Design Type: ${activeDesignType}`}
+                                </p>
+                            </div>
                         </div>
-                    </div>
+                    )}
                 </div>
             </div>
             <Footer />

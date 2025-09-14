@@ -45,13 +45,13 @@ const ProductCard = ({ product }) => {
             <Link 
                 href={`/product/${product._id}`}
                 prefetch={true}
-                className="flex flex-col items-start gap-0.5 w-full cursor-pointer px-2 max-w-[280px]"
+                className="flex flex-col items-start gap-0.5 w-full cursor-pointer px-2"
             >
-                <div className="cursor-pointer group relative bg-gray-500/10 rounded-lg w-full h-48 md:h-56 overflow-hidden">
+                <div className="cursor-pointer group relative bg-white dark:bg-gray-900 rounded-lg w-full h-48 md:h-56 overflow-hidden shadow-sm border border-gray-100 dark:border-gray-700">
                     <Image
                         src={product.images[0]}
                         alt={product.name}
-                        className="group-hover:scale-102 transition-all duration-300 object-cover w-full h-full rounded-lg"
+                        className="group-hover:scale-102 transition-all duration-300 object-cover w-full h-full rounded-lg brightness-105 contrast-105"
                         width={800}
                         height={800}
                     />
