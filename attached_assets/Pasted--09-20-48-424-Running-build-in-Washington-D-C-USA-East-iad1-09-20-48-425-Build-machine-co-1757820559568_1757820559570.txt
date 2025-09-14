@@ -1,0 +1,64 @@
+[09:20:48.424] Running build in Washington, D.C., USA (East) – iad1
+[09:20:48.425] Build machine configuration: 2 cores, 8 GB
+[09:20:48.451] Cloning github.com/RabibAlAdib/QuickCart (Branch: main, Commit: cd1415d)
+[09:20:49.211] Cloning completed: 760.000ms
+[09:20:49.766] Restored build cache from previous deployment (CNB7d4XMWuUruBtUo2X69uSXhbKA)
+[09:20:50.303] Running "vercel build"
+[09:20:50.687] Vercel CLI 47.1.1
+[09:20:51.015] Warning: Due to "engines": { "node": "20.x" } in your `package.json` file, the Node.js Version defined in your Project Settings ("22.x") will not apply, Node.js Version "20.x" will be used instead. Learn More: http://vercel.link/node-version
+[09:20:51.028] Installing dependencies...
+[09:20:52.493] 
+[09:20:52.494] up to date in 1s
+[09:20:52.494] 
+[09:20:52.494] 153 packages are looking for funding
+[09:20:52.495]   run `npm fund` for details
+[09:20:52.506] Detected Next.js version: 15.5.2
+[09:20:52.510] Running "npm run build"
+[09:20:52.634] 
+[09:20:52.634] > ecommerce-inngest@0.1.0 build
+[09:20:52.635] > next build
+[09:20:52.635] 
+[09:20:53.365]    ▲ Next.js 15.5.2
+[09:20:53.366]    - Environments: .env.local, .env
+[09:20:53.366] 
+[09:20:53.452]    Creating an optimized production build ...
+[09:21:05.813]  ⚠ Compiled with warnings in 12.1s
+[09:21:05.814] 
+[09:21:05.815] ./app/api/orders/[orderId]/route.js
+[09:21:05.815] Attempted import error: 'connectDB' is not exported from '@/config/db' (imported as 'connectDB').
+[09:21:05.815] 
+[09:21:05.815] Import trace for requested module:
+[09:21:05.816] ./app/api/orders/[orderId]/route.js
+[09:21:05.816] 
+[09:21:05.816] ./app/api/orders/route.js
+[09:21:05.816] Attempted import error: 'connectDB' is not exported from '@/config/db' (imported as 'connectDB').
+[09:21:05.816] 
+[09:21:05.816] Import trace for requested module:
+[09:21:05.817] ./app/api/orders/route.js
+[09:21:05.817] 
+[09:21:05.817] ./app/api/product/delete/route.js
+[09:21:05.817] Attempted import error: 'authSeller' is not exported from '@/lib/authSeller' (imported as 'authSeller').
+[09:21:05.817] 
+[09:21:05.817] Import trace for requested module:
+[09:21:05.818] ./app/api/product/delete/route.js
+[09:21:05.818] 
+[09:21:05.820]    Linting and checking validity of types ...
+[09:21:07.420]  ⨯ ESLint: Cannot serialize key "parse" in "parser": Function values are not supported.
+[09:21:07.422]    Collecting page data ...
+[09:21:08.198] TypeError: (0 , g.connectDB) is not a function
+[09:21:08.199]     at <unknown> (.next/server/app/api/orders/[orderId]/route.js:3:9317)
+[09:21:08.199]     at c.a (.next/server/webpack-runtime.js:1:715)
+[09:21:08.200]     at 75407 (.next/server/app/api/orders/[orderId]/route.js:3:6486)
+[09:21:08.200]     at c (.next/server/webpack-runtime.js:1:143)
+[09:21:08.200]     at <unknown> (.next/server/app/api/orders/[orderId]/route.js:3:953)
+[09:21:08.200]     at c.a (.next/server/webpack-runtime.js:1:715)
+[09:21:08.201]     at 49750 (.next/server/app/api/orders/[orderId]/route.js:3:622)
+[09:21:08.201]     at c (.next/server/webpack-runtime.js:1:143)
+[09:21:08.201]     at <unknown> (.next/server/app/api/orders/[orderId]/route.js:5:315)
+[09:21:08.203]     at c.X (.next/server/webpack-runtime.js:1:2204)
+[09:21:08.203] 
+[09:21:08.203] > Build error occurred
+[09:21:08.211] [Error: Failed to collect page data for /api/orders/[orderId]] {
+[09:21:08.211]   type: 'Error'
+[09:21:08.211] }
+[09:21:08.257] Error: Command "npm run build" exited with 1
