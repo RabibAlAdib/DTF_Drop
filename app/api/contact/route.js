@@ -13,7 +13,7 @@ export async function POST(request) {
       );
     }
 
-    // Send email using SMTP
+    // Send email using Replit Mail integration
     const emailContent = `
 New contact form submission from DTF Drop website:
 

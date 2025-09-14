@@ -133,6 +133,7 @@ const OrderSchema = new mongoose.Schema({
 
 // Indexes for better query performance
 OrderSchema.index({ userId: 1, createdAt: -1 });
+OrderSchema.index({ orderNumber: 1 });
 OrderSchema.index({ status: 1 });
 OrderSchema.index({ 'payment.status': 1 });
 

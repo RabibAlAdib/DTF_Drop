@@ -14,7 +14,7 @@ const nextConfig = {
             },
         ],
     },
-    // Development server configuration - allows all hosts for development environments
+    // Configure for Replit environment - use hostname allowlist in webpack config
     webpack: (config, { dev }) => {
         if (dev) {
             config.devServer = {
@@ -23,6 +23,22 @@ const nextConfig = {
             };
         }
         return config;
+    },
+    // Standalone output for production deployment
+    output: 'standalone',
+    // Allow iframe embedding for Replit preview
+    async headers() {
+        return [
+            {
+                source: '/(.*)',
+                headers: [
+                    {
+                        key: 'Content-Security-Policy',
+                        value: "frame-ancestors 'self' https://*.replit.com https://*.replit.dev",
+                    },
+                ],
+            },
+        ];
     },
 };
 
