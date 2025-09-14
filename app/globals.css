@@ -9,7 +9,7 @@ html {
 
 /* Account for sticky navbar height */
 body {
-  padding-top: 60px; /* Reduced to match smaller navbar height */
+  padding-top: 20px; /* Match actual navbar height */
 }
 
 /* Smooth scroll for anchor links and better scrolling performance */
