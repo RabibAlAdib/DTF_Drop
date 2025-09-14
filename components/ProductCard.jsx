@@ -47,7 +47,7 @@ const ProductCard = ({ product }) => {
                 prefetch={true}
                 className="flex flex-col items-start gap-0.5 w-full cursor-pointer px-2"
             >
-                <div className="cursor-pointer group relative bg-white dark:bg-gray-900 rounded-lg w-full h-48 md:h-56 overflow-hidden shadow-sm border border-gray-100 dark:border-gray-700">
+                <div className="cursor-pointer group relative bg-white dark:bg-gray-900 rounded-lg w-full h-48 md:h-56 overflow-hidden shadow-sm border-l border-t border-l-gray-100 border-t-gray-100 dark:border-l-gray-700 dark:border-t-gray-700">
                     <Image
                         src={product.images[0]}
                         alt={product.name}
