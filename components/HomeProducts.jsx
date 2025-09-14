@@ -56,8 +56,8 @@ const HomeProducts = () => {
               }}
             >
               <div className="relative group">
-                {/* Border shadow effect - transparent fill */}
-                <div className="absolute -inset-1 border-2 border-blue-500 group-hover:border-purple-500 rounded-lg opacity-0 group-hover:opacity-80 transition-all duration-1000 group-hover:shadow-lg group-hover:shadow-purple-500/50"></div>
+                {/* Border shadow effect - left and top only */}
+                <div className="absolute -inset-1 border-l-2 border-t-2 border-l-blue-500 border-t-blue-500 group-hover:border-l-purple-500 group-hover:border-t-purple-500 rounded-lg opacity-0 group-hover:opacity-80 transition-all duration-1000 group-hover:shadow-lg group-hover:shadow-purple-500/50"></div>
                 <div className="relative">
                   <ProductCard product={product} />
                 </div>
