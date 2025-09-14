@@ -66,17 +66,32 @@ const Product = () => {
     return productData.images || [];
   };
 
-  // Helper function to get all available images
+  // Helper function to get all available images with color mapping
   const getAllImages = () => {
     if (!productData) return [];
 
     // Use new colorImages if available
     if (productData.colorImages && productData.colorImages.length > 0) {
-      return productData.colorImages.map((img) => img.url);
+      return productData.colorImages.map((img) => ({
+        url: img.url,
+        color: img.color
+      }));
     }
 
-    // Fallback to legacy images
-    return productData.images || [];
+    // Fallback to legacy images (no color association)
+    return (productData.images || []).map((url) => ({ url, color: null }));
+  };
+
+  // Helper function to get color from image URL
+  const getColorFromImage = (imageUrl) => {
+    if (!productData) return null;
+    
+    if (productData.colorImages && productData.colorImages.length > 0) {
+      const colorImage = productData.colorImages.find(img => img.url === imageUrl);
+      return colorImage ? colorImage.color : null;
+    }
+    
+    return null;
   };
 
   useEffect(() => {
@@ -231,7 +246,7 @@ const Product = () => {
     setSelectedSize(size);
   };
 
-  // Handle color selection properly
+  // Handle color selection properly with bidirectional sync
   const handleColorSelect = (color) => {
     console.log("Color selected:", color);
     setSelectedColor(color);
@@ -240,6 +255,17 @@ const Product = () => {
     const colorImages = getImagesForColor(color);
     if (colorImages.length > 0) {
       setMainImage(colorImages[0]);
+    }
+  };
+
+  // Handle image selection with bidirectional sync
+  const handleImageSelect = (imageUrl) => {
+    setMainImage(imageUrl);
+    
+    // Auto-select color if this image has a color association
+    const imageColor = getColorFromImage(imageUrl);
+    if (imageColor && productData.colors && productData.colors.includes(imageColor)) {
+      setSelectedColor(imageColor);
     }
   };
 
@@ -283,7 +309,7 @@ const Product = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
         {/* Product Images */}
         <div className="space-y-4">
-          <div className="rounded-lg overflow-hidden bg-gray-500/10 mb-4 cursor-zoom-in">
+          <div className="rounded-lg overflow-hidden bg-white shadow-md mb-4 cursor-zoom-in">
             <Image
               src={mainImage || "/placeholder-image.jpg"}
               alt={productData.name || "Product image"}
@@ -302,44 +328,66 @@ const Product = () => {
             />
           </div>
 
-          {/* Thumbnail Images - Show images for selected color */}
-          <div className="flex gap-2 overflow-x-auto pb-2 md:grid md:grid-cols-4 md:overflow-visible">
-            {(() => {
-              const currentImages = selectedColor
-                ? getImagesForColor(selectedColor)
-                : getAllImages();
+          {/* Complete Image Gallery - Show ALL available images */}
+          <div className="space-y-3">
+            <h3 className="text-lg font-semibold dark:text-gray-200">
+              Product Images {selectedColor && `(${selectedColor})`}
+            </h3>
+            <div className="flex gap-2 overflow-x-auto pb-2 md:grid md:grid-cols-5 md:overflow-visible">
+              {(() => {
+                const allImages = getAllImages();
+                
+                // Always show ALL images regardless of selected color
+                const displayImages = allImages;
 
-              return currentImages.length > 0 ? (
-                currentImages.map((image, index) => (
-                  <div
-                    key={index}
-                    className={`flex-shrink-0 w-16 h-16 md:w-auto md:h-20 rounded-lg overflow-hidden bg-gray-500/10 cursor-pointer border-2 transition-colors ${
-                      mainImage === image
-                        ? "border-blue-500"
-                        : "border-transparent hover:border-blue-500"
-                    }`}
-                    onClick={() => setMainImage(image)}
-                  >
-                    <Image
-                      src={image || "/placeholder-image.jpg"}
-                      alt={`${productData.name} ${selectedColor || ""} ${index + 1}`}
-                      className="w-full h-full object-cover"
-                      width={100}
-                      height={80}
-                      sizes="(max-width: 768px) 64px, 80px"
-                      loading="lazy"
-                      onError={(e) => {
-                        e.target.src = "/placeholder-image.jpg";
-                      }}
-                    />
+                return displayImages.length > 0 ? (
+                  displayImages.map((imageObj, index) => {
+                    const isSelected = mainImage === imageObj.url;
+                    const hasColorInfo = imageObj.color;
+                    
+                    return (
+                      <div
+                        key={`${imageObj.url}-${index}`}
+                        className={`relative flex-shrink-0 w-16 h-16 md:w-auto md:h-20 rounded-lg overflow-hidden bg-white cursor-pointer border-2 transition-all duration-300 hover:scale-105 ${
+                          isSelected
+                            ? "border-blue-500 ring-2 ring-blue-200 shadow-lg"
+                            : "border-gray-200 hover:border-blue-400 hover:shadow-md"
+                        }`}
+                        onClick={() => handleImageSelect(imageObj.url)}
+                        title={hasColorInfo ? `${productData.name} - ${imageObj.color}` : `${productData.name} - Image ${index + 1}`}
+                      >
+                        <Image
+                          src={imageObj.url || "/placeholder-image.jpg"}
+                          alt={`${productData.name} ${imageObj.color || ''} ${index + 1}`}
+                          className="w-full h-full object-cover mix-blend-multiply"
+                          width={100}
+                          height={80}
+                          sizes="(max-width: 768px) 64px, 80px"
+                          loading="lazy"
+                          onError={(e) => {
+                            e.target.src = "/placeholder-image.jpg";
+                          }}
+                        />
+                        {/* Color indicator dot if image has color association */}
+                        {hasColorInfo && (
+                          <div 
+                            className={`absolute top-1 right-1 w-3 h-3 rounded-full border border-white ${COLOR_MAP[imageObj.color]} shadow-sm`}
+                            title={imageObj.color}
+                          />
+                        )}
+                      </div>
+                    );
+                  })
+                ) : (
+                  <div className="flex-shrink-0 w-full text-center py-8 text-gray-500 dark:text-gray-400 md:col-span-5">
+                    <svg className="w-12 h-12 mx-auto mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    No images available
                   </div>
-                ))
-              ) : (
-                <div className="flex-shrink-0 w-full text-center py-8 text-gray-500 md:col-span-4">
-                  No images available
-                </div>
-              );
-            })()}
+                );
+              })()}
+            </div>
           </div>
         </div>
 
@@ -399,25 +447,65 @@ const Product = () => {
             </div>
           </div>
 
-          {/* Color Selection */}
+          {/* Enhanced Color Selection */}
           <div className="space-y-3 animate-fade-in">
             <h3 className="text-lg font-semibold dark:text-gray-200">
-              Color: {selectedColor}
+              Available Colors: {selectedColor && (
+                <span className="text-blue-600 dark:text-blue-400">{selectedColor}</span>
+              )}
             </h3>
-            <div className="flex flex-wrap gap-2">
-              {productData.colors?.map((color) => (
-                <button
-                  key={color}
-                  className={`w-10 h-10 md:w-8 md:h-8 rounded-full ${COLOR_MAP[color]} border-2 ${
-                    selectedColor === color
-                      ? "border-blue-500 ring-2 ring-blue-200 shadow-lg"
-                      : "border-transparent"
-                  } transition-all duration-300 cursor-pointer hover:scale-110 transform hover:shadow-md min-h-[44px] min-w-[44px]`}
-                  onClick={() => handleColorSelect(color)}
-                  title={color}
-                />
-              ))}
+            <div className="grid grid-cols-3 md:flex md:flex-wrap gap-3">
+              {productData.colors?.map((color) => {
+                const isSelected = selectedColor === color;
+                const hasImages = getImagesForColor(color).length > 0;
+                
+                return (
+                  <button
+                    key={color}
+                    className={`relative flex flex-col items-center p-2 rounded-lg border-2 transition-all duration-300 transform hover:scale-105 ${
+                      isSelected
+                        ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20 shadow-lg"
+                        : "border-gray-200 dark:border-gray-600 hover:border-blue-400 hover:bg-gray-50 dark:hover:bg-gray-800"
+                    }`}
+                    onClick={() => handleColorSelect(color)}
+                    title={`Select ${color} color${hasImages ? ' (has images)' : ''}`}
+                  >
+                    {/* Color Swatch */}
+                    <div 
+                      className={`w-8 h-8 rounded-full ${COLOR_MAP[color]} border-2 border-gray-300 shadow-sm mb-1`}
+                    />
+                    {/* Color Name */}
+                    <span className={`text-xs font-medium text-center leading-tight ${
+                      isSelected 
+                        ? "text-blue-600 dark:text-blue-400" 
+                        : "text-gray-600 dark:text-gray-400"
+                    }`}>
+                      {color}
+                    </span>
+                    {/* Image availability indicator */}
+                    {hasImages && (
+                      <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border border-white" 
+                           title="Has color-specific images" />
+                    )}
+                    {/* Selection indicator */}
+                    {isSelected && (
+                      <div className="absolute -top-1 -left-1 w-3 h-3 bg-blue-500 rounded-full border border-white">
+                        <svg className="w-2 h-2 text-white absolute top-0.5 left-0.5" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                    )}
+                  </button>
+                );
+              })}
             </div>
+            {/* Color selection help text */}
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              {selectedColor 
+                ? `Selected: ${selectedColor}. Click image thumbnails or colors to switch.`
+                : "Select a color to see specific images and variants."
+              }
+            </p>
           </div>
 
           {/* Size Selection */}
