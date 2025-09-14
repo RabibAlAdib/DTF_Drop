@@ -1,4 +1,5 @@
 import { z } from "zod";
+import nodemailer from 'nodemailer';
 
 // Zod schema matching the backend implementation
 export const zSmtpMessage = z.object({
@@ -29,20 +30,28 @@ export const zSmtpMessage = z.object({
 
 export type SmtpMessage = z.infer<typeof zSmtpMessage>
 
-function getAuthToken(): string {
-  const xReplitToken = process.env.REPL_IDENTITY
-    ? "repl " + process.env.REPL_IDENTITY
-    : process.env.WEB_REPL_RENEWAL
-      ? "depl " + process.env.WEB_REPL_RENEWAL
-      : null;
+function createTransporter() {
+  // Use Gmail SMTP by default, but allow configuration via env vars
+  const smtpHost = process.env.SMTP_HOST || 'smtp.gmail.com';
+  const smtpPort = parseInt(process.env.SMTP_PORT || '587');
+  const smtpUser = process.env.SMTP_USER;
+  const smtpPass = process.env.SMTP_PASS;
 
-  if (!xReplitToken) {
+  if (!smtpUser || !smtpPass) {
     throw new Error(
-      "No authentication token found. Please set REPL_IDENTITY or ensure you're running in Replit environment."
+      "Email configuration missing. Please set SMTP_USER and SMTP_PASS environment variables."
     );
   }
 
-  return xReplitToken;
+  return nodemailer.createTransport({
+    host: smtpHost,
+    port: smtpPort,
+    secure: smtpPort === 465, // true for 465, false for other ports
+    auth: {
+      user: smtpUser,
+      pass: smtpPass,
+    },
+  });
 }
 
 export async function sendEmail(message: SmtpMessage): Promise<{
@@ -52,31 +61,36 @@ export async function sendEmail(message: SmtpMessage): Promise<{
   messageId: string;
   response: string;
 }> {
-  const authToken = getAuthToken();
+  const transporter = createTransporter();
 
-  const response = await fetch(
-    "https://connectors.replit.com/api/v2/mailer/send",
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X_REPLIT_TOKEN": authToken,
-      },
-      body: JSON.stringify({
-        to: message.to,
-        cc: message.cc,
-        subject: message.subject,
-        text: message.text,
-        html: message.html,
-        attachments: message.attachments,
-      }),
-    }
-  );
+  // Convert attachments to nodemailer format if present
+  const attachments = message.attachments?.map((attachment) => ({
+    filename: attachment.filename,
+    content: attachment.content,
+    contentType: attachment.contentType,
+    encoding: attachment.encoding,
+  }));
 
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.message || "Failed to send email");
+  const mailOptions = {
+    from: process.env.SMTP_USER, // sender address
+    to: Array.isArray(message.to) ? message.to.join(', ') : message.to,
+    cc: message.cc ? (Array.isArray(message.cc) ? message.cc.join(', ') : message.cc) : undefined,
+    subject: message.subject,
+    text: message.text,
+    html: message.html,
+    attachments: attachments,
+  };
+
+  try {
+    const result = await transporter.sendMail(mailOptions);
+    
+    return {
+      accepted: result.accepted as string[],
+      rejected: result.rejected as string[],
+      messageId: result.messageId,
+      response: result.response,
+    };
+  } catch (error) {
+    throw new Error(`Failed to send email: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
-
-  return await response.json();
 }
