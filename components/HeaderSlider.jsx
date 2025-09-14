@@ -182,11 +182,11 @@ const HeaderSlider = () => {
             </div>
             <div className="flex items-center flex-1 justify-center">
               <Image
-                className="md:w-72 w-48 transform hover:scale-105 transition-transform duration-500"
+                className="md:w-96 w-72 transform hover:scale-105 transition-transform duration-500"
                 src={slide.productImage}
                 alt={`Slide ${index + 1}`}
-                width={288}
-                height={288}
+                width={400}
+                height={400}
               />
             </div>
             </div>
