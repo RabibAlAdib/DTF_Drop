@@ -90,7 +90,7 @@ const Cart = () => {
                           </button>
                         </div>
                       </td>
-                      <td className="py-4 md:px-4 px-1 text-gray-600">${product.offerPrice || product.price}</td>
+                      <td className="py-4 md:px-4 px-1 text-gray-600">BDT {product.offerPrice || product.price}</td>
                       <td className="py-4 md:px-4 px-1">
                         <div className="flex items-center md:gap-2 gap-1">
                           <button onClick={() => updateCartQuantity(baseProductId, cartItems[itemKey] - 1, variantInfo)}>
@@ -115,7 +115,7 @@ const Cart = () => {
                           </button>
                         </div>
                       </td>
-                      <td className="py-4 md:px-4 px-1 text-gray-600">${((product.offerPrice || product.price) * cartItems[itemKey]).toFixed(2)}</td>
+                      <td className="py-4 md:px-4 px-1 text-gray-600">BDT {((product.offerPrice || product.price) * cartItems[itemKey]).toFixed(2)}</td>
                     </tr>
                   );
                 })}
