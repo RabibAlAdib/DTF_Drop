@@ -92,6 +92,36 @@ PAYMENTS_ENABLED=false
 (Set to 'true' when payment gateways are configured and tested)
 
 ================================================================================
+🚨 CRITICAL SECURITY WARNING
+================================================================================
+
+*** IMPORTANT: SECRETS MANAGEMENT ***
+
+⚠️  IMMEDIATE ACTION REQUIRED: The current .env file contains sensitive API keys
+    and secrets that should NOT be stored in version control. This is a critical
+    security risk that must be addressed before production deployment.
+
+IMMEDIATE STEPS:
+1. Remove .env from git tracking: `git rm --cached .env`
+2. Add .env to .gitignore (if not already present)
+3. Rotate ALL exposed credentials:
+   - Clerk API keys (get new ones from Clerk dashboard)
+   - MongoDB connection string (change password)
+   - Cloudinary API keys (regenerate from dashboard)
+   - Inngest keys (regenerate if possible)
+
+4. Use environment-specific secret management:
+   - For development: Use .env.local (automatically gitignored)
+   - For production: Use platform secrets (Vercel, Railway, etc.)
+   - Never commit secrets to version control
+
+SECURE SETUP PROCESS:
+1. Create .env.local file (never committed to git)
+2. Copy required variables from .env to .env.local
+3. Update all API keys with new, secure credentials
+4. Test thoroughly before deployment
+
+================================================================================
 🔧 DEVELOPMENT vs PRODUCTION SETUP
 ================================================================================
 
