@@ -61,7 +61,9 @@ const OrderSchema = new mongoose.Schema({
     isDhaka: { type: Boolean, required: true }, // true for Inside Dhaka, false for Outside
     deliveryCharge: { type: Number, required: true },
     estimatedDeliveryDate: { type: Date, required: false },
-    deliveryNotes: { type: String, required: false }
+    deliveryNotes: { type: String, required: false },
+    specialInstructions: { type: String, required: false },
+    deliverySlot: { type: String, required: false } // morning, afternoon, evening
   },
   
   // Payment information
@@ -75,11 +77,19 @@ const OrderSchema = new mongoose.Schema({
     status: { 
       type: String, 
       required: true, 
-      enum: ['pending', 'paid', 'failed', 'refunded'],
+      enum: ['pending', 'processing', 'paid', 'failed', 'refunded', 'partially_refunded'],
       default: 'pending'
     },
     transactionId: { type: String, required: false },
-    paymentDate: { type: Date, required: false }
+    paymentDate: { type: Date, required: false },
+    paymentId: { type: String, required: false },
+    
+    // Refund information
+    refundId: { type: String, required: false },
+    refundDate: { type: Date, required: false },
+    refundAmount: { type: Number, required: false },
+    refundReason: { type: String, required: false },
+    requiresManualProcessing: { type: Boolean, default: false }
   },
   
   // Order status tracking
@@ -113,6 +123,13 @@ const OrderSchema = new mongoose.Schema({
     giftMessage: { type: String, required: false },
     recipientName: { type: String, required: false }
   },
+  
+  // Shipping and tracking information
+  trackingNumber: { type: String, required: false },
+  shippedAt: { type: Date, required: false },
+  deliveredAt: { type: Date, required: false },
+  returnRequestDate: { type: Date, required: false },
+  returnReason: { type: String, required: false },
   
   // Admin notes and tracking
   adminNotes: { type: String, required: false },

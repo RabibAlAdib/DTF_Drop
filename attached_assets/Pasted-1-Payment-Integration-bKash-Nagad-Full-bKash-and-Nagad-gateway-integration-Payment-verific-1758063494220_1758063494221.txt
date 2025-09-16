@@ -1,0 +1,164 @@
+1. Payment Integration (bKash/Nagad)
+Full bKash and Nagad gateway integration.
+
+
+Payment verification after transaction.
+
+
+Payment status tracking in order history.
+
+
+Refund processing flow (API call + update order status).
+
+
+Until api available keep status coming soon.
+
+
+
+.env keys required:
+
+ BKASH_API_KEY=
+BKASH_API_SECRET=
+NAGAD_API_KEY=
+NAGAD_API_SECRET=
+
+
+2. Real Order Management (Customer + Seller Side)
+Replace dummy data with real MongoDB queries.
+
+
+Add order status updates: Processing → Shipped → Delivered.
+
+
+Add order cancellation request system.
+
+
+Return & exchange request flow.
+
+
+Order tracking number field.
+
+
+Delivery date estimation.
+
+
+3. User Profile Page
+Dedicated /profile page. Collect from clerk
+
+
+Show user info.
+
+
+Order history list with filters (by date, status).
+
+
+4. Product Review & Rating System
+Review submission form (stars + text).
+
+
+Display ratings on product pages.
+
+
+Image upload option for reviews.
+
+
+Review moderation (approve/remove by seller).
+
+
+“Verified purchase” badge for customers who actually bought the product.
+
+
+5. Inventory Management
+Auto stock deduction after order placed.
+
+
+Out of stock → disable purchase.
+
+
+Low stock alerts for sellers.
+
+
+Bulk stock update option.
+
+
+Stock history log.
+
+
+6. Coupon & Discount System
+Extend existing promo code field.
+
+
+Add edit option in offer list page to manage coupon codes from seller dashboard.
+
+
+Apply discounts automatically if code is valid.
+
+
+7. Shipping Enhancements
+Delivery time estimation (3–4 business days).
+
+
+Shipment tracking integration (placeholder API).
+
+
+Special delivery instructions field (e.g., “Deliver after 6 PM”).
+
+
+Delivery scheduling option.
+
+
+8. Admin Panel (Seller)
+Manage users (ban/unban).
+
+
+Order monitoring dashboard.
+
+
+Sales reports (daily/weekly/monthly).
+
+
+Analytics overview.
+
+
+
+🔘 Buttons & Functions That Need Fixing (Later Phase)
+Non-Functional Buttons (Currently Useless)
+Payment method buttons (Cash on Delivery, bKash, Nagad): Only show “Coming Soon.”
+
+
+Later: integrate with real APIs and update backend.
+
+
+Order status update buttons (Seller Dashboard): Clicking them does nothing.
+
+
+Later: connect to /api/orders/ to actually update status.
+
+
+Email send button (Contact Form): Removed functionality.
+
+
+ Restore  with lib/emailService.js.
+
+
+Inventory management buttons: No backend support yet.
+ connect to /api/inventory.
+
+
+Review submission button: Exists in UI but not functional.
+
+
+ connect to /api/reviews.
+
+
+Analytics charts (Seller Dashboard): Show placeholder only.
+
+
+connect to sales/order data in MongoDB.
+
+
+Admin buttons: No admin routes exist.
+
+
+build /app/seller_admin/.
+
