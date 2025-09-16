@@ -3,23 +3,29 @@ import { auth } from '@clerk/nextjs/server';
 import connectDB from '@/config/db';
 import Review from '@/models/Review';
 import Product from '@/models/Product';
+import { getSellerAuth } from '@/lib/authUtil';
 
 await connectDB();
 
 // GET /api/reviews/moderate - Get pending reviews for moderation
 export async function GET(req) {
   try {
-    const { userId } = auth();
+    // Use getSellerAuth to handle both cookie and Bearer token authentication
+    const { userId, isSeller, error } = await getSellerAuth(req);
     
-    if (!userId) {
+    if (!userId || error) {
       return NextResponse.json({ 
         success: false, 
-        message: "Authentication required" 
+        message: error || "Authentication required" 
       }, { status: 401 });
     }
 
-    // TODO: Add seller/admin authorization check
-    // For now, allowing all authenticated users to moderate reviews for their products
+    if (!isSeller) {
+      return NextResponse.json({ 
+        success: false, 
+        message: "Only sellers are authorized for this action" 
+      }, { status: 403 });
+    }
 
     const { searchParams } = new URL(req.url);
     const status = searchParams.get('status') || 'pending';

@@ -2,19 +2,28 @@ import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import connectDB from '@/config/db';
 import Product from '@/models/Product';
+import { getSellerAuth } from '@/lib/authUtil';
 
 await connectDB();
 
 // GET /api/inventory/alerts - Get low stock and out of stock alerts
 export async function GET(req) {
   try {
-    const { userId } = auth();
+    // Use getSellerAuth to handle both cookie and Bearer token authentication
+    const { userId, isSeller, error } = await getSellerAuth(req);
     
-    if (!userId) {
+    if (!userId || error) {
       return NextResponse.json({ 
         success: false, 
-        message: "Authentication required" 
+        message: error || "Authentication required" 
       }, { status: 401 });
+    }
+
+    if (!isSeller) {
+      return NextResponse.json({ 
+        success: false, 
+        message: "Only sellers are authorized for this action" 
+      }, { status: 403 });
     }
 
     const { searchParams } = new URL(req.url);
@@ -112,13 +121,21 @@ export async function GET(req) {
 // POST /api/inventory/alerts/dismiss - Dismiss or acknowledge alerts
 export async function POST(req) {
   try {
-    const { userId } = auth();
+    // Use getSellerAuth to handle both cookie and Bearer token authentication
+    const { userId, isSeller, error } = await getSellerAuth(req);
     
-    if (!userId) {
+    if (!userId || error) {
       return NextResponse.json({ 
         success: false, 
-        message: "Authentication required" 
+        message: error || "Authentication required" 
       }, { status: 401 });
+    }
+
+    if (!isSeller) {
+      return NextResponse.json({ 
+        success: false, 
+        message: "Only sellers are authorized for this action" 
+      }, { status: 403 });
     }
 
     const { alertIds, action = 'acknowledge' } = await req.json();

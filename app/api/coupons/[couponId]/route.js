@@ -10,7 +10,7 @@ await connectDB();
 export async function GET(req, { params }) {
   try {
     const { userId } = auth();
-    const { couponId } = params;
+    const { couponId } = await params;
     
     if (!userId) {
       return NextResponse.json({ 

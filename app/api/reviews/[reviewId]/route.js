@@ -9,7 +9,7 @@ await connectDB();
 // GET /api/reviews/[reviewId] - Get specific review
 export async function GET(req, { params }) {
   try {
-    const { reviewId } = params;
+    const { reviewId } = await params;
     
     const review = await Review.findById(reviewId)
       .populate('productId', 'name images price');
@@ -39,7 +39,7 @@ export async function GET(req, { params }) {
 export async function PUT(req, { params }) {
   try {
     const { userId } = auth();
-    const { reviewId } = params;
+    const { reviewId } = await params;
     
     if (!userId) {
       return NextResponse.json({ 

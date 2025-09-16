@@ -18,7 +18,7 @@ export async function GET(req, { params }) {
       }, { status: 401 });
     }
 
-    const { orderId } = params;
+    const { orderId } = await params;
     
     if (!orderId) {
       return NextResponse.json({
@@ -102,7 +102,7 @@ export async function PATCH(req, { params }) {
       }, { status: 401 });
     }
 
-    const { orderId } = params;
+    const { orderId } = await params;
     const updateData = await req.json();
     
     if (!orderId) {

@@ -21,7 +21,7 @@ export async function GET(request, { params }) {
   try {
     await connectDB();
     
-    const { id } = params;
+    const { id } = await params;
     
     const offer = await Offer.findById(id)
       .populate('applicableProducts', 'name price offerPrice images')
@@ -73,7 +73,7 @@ export async function PUT(request, { params }) {
       }, { status: 401 });
     }
 
-    const { id } = params;
+    const { id } = await params;
     const formData = await request.formData();
     
     await connectDB();
