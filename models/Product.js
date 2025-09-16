@@ -53,6 +53,18 @@ const productSchema = new mongoose.Schema({
   reviews: { type: Array, required: false, default: [] },
   numberofSales: { type: Number, required: false, default: 0 },
   
+  // NEW: Review system integration
+  rating: { 
+    type: Number, 
+    default: 0, 
+    min: 0, 
+    max: 5 
+  },
+  reviewCount: { 
+    type: Number, 
+    default: 0 
+  },
+  
   // NEW: Gender field
   gender: { 
     type: String, 
