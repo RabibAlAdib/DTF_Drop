@@ -26,8 +26,9 @@ const nextConfig = {
     },
     // Standalone output for production deployment
     output: 'standalone',
-    // Increase request body size limits for file uploads
+    // Configure allowed dev origins and other experimental features
     experimental: {
+        allowedDevOrigins: ['localhost', '127.0.0.1', '*.replit.dev'],
         // Support for larger request bodies in Server Actions
         serverActions: {
             bodySizeLimit: '50mb',

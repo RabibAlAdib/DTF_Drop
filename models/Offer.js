@@ -183,7 +183,6 @@ offerSchema.pre('save', function(next) {
 offerSchema.index({ userId: 1, isActive: 1 });
 offerSchema.index({ isActive: 1, validFrom: 1, validTo: 1 });
 offerSchema.index({ offerType: 1, isActive: 1, priority: -1 });
-offerSchema.index({ offerCode: 1 }, { sparse: true });
 offerSchema.index({ category: 1, isActive: 1 });
 offerSchema.index({ createdAt: -1 });
 
