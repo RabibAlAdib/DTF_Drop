@@ -1,0 +1,139 @@
+1. Order Page Update
+
+Create a function to calculate total cost of all items + delivery charge.
+
+Delivery charge:
+
+Inside Dhaka → 70 BDT
+
+Outside Dhaka → 130 BDT
+
+Delivery charge must auto-detect from shipping address.
+
+2. Cart → Order Confirmation Flow
+
+Add order confirmation modal/page.
+
+Must show: product(s), color, size, quantity, price breakdown, delivery charge, and final total.
+
+Add “Confirm Order” button.
+
+3. Product Variants & Multi-Image Handling
+
+Some products have multiple images based on color.
+
+Make sure system tracks:
+
+Multiple colors per product (if ordered together).
+
+Multiple sizes for the same product.
+
+4. Core Order Details (Form Fields)
+
+Order Form must include:
+
+Product details (size, color, qty, custom design).
+
+Custom design upload (image file).
+
+Optional text customization (name/number/slogan).
+
+Customer Info (auto-filled from user data but editable):
+
+Full Name
+
+Email Address
+
+Phone Number
+
+Delivery Address (allow multiple saved addresses).
+
+Delivery Section:
+
+Shipping address (auto from customer info, non-editable).
+
+Delivery charge auto-calculated (inside/outside Dhaka).
+
+Payment Section:
+
+Cash on Delivery (works now).
+
+Add placeholder buttons for bKash / Nagad (real integration can be later).
+
+Promo Code field (apply discount if valid).
+
+Confirmation:
+
+Show full order summary (products + shipping + total).
+
+Require final customer confirmation before submitting.
+
+5. Save Orders to Database (No More Dummy Data)
+
+Replace all dummy orders with real data saved in MongoDB.
+
+Update /api/orders to fetch and display real orders for customers and sellers.
+
+6. Email Notification System (Basic Setup)
+
+Send order confirmation email to customer after order placed.
+
+Send order notification email to seller.
+
+Store email templates in templates/email/.
+
+Create lib/emailService.js.
+
+Use .env file for SMTP credentials:
+
+EMAIL_HOST=
+EMAIL_PORT=
+EMAIL_USER=
+EMAIL_PASS=
+
+
+Document in SETUP_NOTES.txt how to add SMTP keys later.
+
+🚧 Phase 2 – Can Be Added Later (Not Urgent)
+
+Once site is live and bringing sales, add these in later updates:
+
+Payment Integration (bKash/Nagad real gateway + refunds)
+
+Order Management System: status updates, cancellation, returns.
+
+User Profile Page: order history, account settings.
+
+Review & Rating System (with images + moderation).
+
+Inventory Management (low stock alerts, bulk updates).
+
+Coupons & Discounts (advanced seller dashboard integration).
+
+Shipping Enhancements: delivery scheduling, tracking integration.
+
+Admin Panel (manage users, sales reports, system analytics).
+
+Mobile optimization, performance upgrades, SEO improvements.
+
+Marketing features: email automation, social media sharing, product recommendations.
+
+🔐 Important Notes
+
+Do not hardcode API keys or secrets.
+
+Use .env for: payment keys, email credentials, etc.
+
+Example:
+
+BKASH_API_KEY=
+BKASH_API_SECRET=
+NAGAD_API_KEY=
+EMAIL_HOST=
+EMAIL_USER=
+EMAIL_PASS=
+
+
+Create a SETUP_NOTES.txt file with clear instructions on where and how to add these keys later.
+
+Avoid Replit-specific dependencies – everything should be deployable elsewhere if needed.
