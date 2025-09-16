@@ -700,17 +700,6 @@ const Product = () => {
                 Add to Cart
               </button>
               <button
-                className={`flex-1 py-3 px-6 rounded-lg font-semibold transition-colors ${
-                  isVariantAvailable()
-                    ? "bg-orange-600 text-white hover:bg-orange-700"
-                    : "bg-gray-400 text-gray-200 cursor-not-allowed"
-                }`}
-                onClick={handleOrderNow}
-                disabled={!isVariantAvailable()}
-              >
-                Order Now
-              </button>
-              <button
                 className={`p-3 rounded-lg border-2 transition-colors ${
                   isFavorite(productData._id)
                     ? "bg-red-50 border-red-500 text-red-500 hover:bg-red-100"
