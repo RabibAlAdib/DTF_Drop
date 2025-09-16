@@ -13,6 +13,10 @@ import {
   sendOrderConfirmationEmail,
   sendSellerNotificationEmail 
 } from '@/lib/emailService';
+import {
+  checkStockAvailability,
+  deductStock
+} from '@/lib/inventoryService';
 
 // Connect to database
 await connectDB();
@@ -102,6 +106,23 @@ export async function POST(req) {
       });
     }
 
+    // CRITICAL: Check stock availability before processing order
+    const stockCheck = await checkStockAvailability(verifiedItems.map(item => ({
+      productId: item.productId,
+      color: item.color,
+      size: item.size,
+      quantity: item.quantity
+    })));
+
+    if (!stockCheck.allAvailable) {
+      return NextResponse.json({
+        success: false,
+        message: 'Some items are out of stock or have insufficient quantity',
+        outOfStockItems: stockCheck.outOfStockItems,
+        lowStockWarnings: stockCheck.lowStockWarnings
+      }, { status: 400 });
+    }
+
     // Recalculate order total with verified pricing
     const orderCalculation = calculateOrderTotal(
       verifiedItems, 
@@ -150,6 +171,61 @@ export async function POST(req) {
     // Save the order
     const savedOrder = await order.save();
 
+    // CRITICAL: Deduct stock after successful order creation
+    let stockDeductionSuccess = false;
+    try {
+      const stockDeduction = await deductStock(
+        verifiedItems.map(item => ({
+          productId: item.productId,
+          color: item.color,
+          size: item.size,
+          quantity: item.quantity
+        })),
+        savedOrder._id.toString()
+      );
+
+      if (!stockDeduction.success) {
+        // CRITICAL: Stock deduction failed - implement compensation logic
+        console.error('❌ CRITICAL: Stock deduction failed for order:', savedOrder._id, stockDeduction.failedItems);
+        
+        // Mark order as requiring manual review due to stock issues
+        await Order.findByIdAndUpdate(savedOrder._id, {
+          status: 'pending_review',
+          internalNotes: `Stock deduction failed: ${stockDeduction.failedItems.map(item => 
+            `${item.productId} (${item.color}-${item.size}): ${item.reason}`
+          ).join('; ')}`
+        });
+
+        // Log for manual intervention
+        console.error('🔴 ORDER REQUIRES MANUAL REVIEW - Stock deduction failed:', {
+          orderId: savedOrder._id,
+          failedItems: stockDeduction.failedItems,
+          timestamp: new Date().toISOString()
+        });
+        
+        stockDeductionSuccess = false;
+      } else {
+        console.log('✅ Stock successfully deducted for order:', savedOrder._id);
+        stockDeductionSuccess = true;
+      }
+    } catch (stockError) {
+      console.error('❌ CRITICAL ERROR during stock deduction for order:', savedOrder._id, stockError);
+      
+      // Mark order for urgent manual review
+      await Order.findByIdAndUpdate(savedOrder._id, {
+        status: 'pending_review',
+        internalNotes: `URGENT: Stock deduction error - manual intervention required. Error: ${stockError.message}`
+      });
+      
+      console.error('🚨 URGENT: ORDER REQUIRES IMMEDIATE MANUAL REVIEW:', {
+        orderId: savedOrder._id,
+        error: stockError.message,
+        timestamp: new Date().toISOString()
+      });
+      
+      stockDeductionSuccess = false;
+    }
+
     // Clear user's cart after successful order
     try {
       await User.findByIdAndUpdate(
@@ -164,19 +240,6 @@ export async function POST(req) {
     } catch (cartError) {
       console.error('Error clearing cart:', cartError);
       // Don't fail the order if cart clearing fails
-    }
-
-    // Update product sales count (optional analytics)
-    try {
-      for (const item of verifiedItems) {
-        await Product.findByIdAndUpdate(
-          item.productId,
-          { $inc: { numberofSales: item.quantity } }
-        );
-      }
-    } catch (salesError) {
-      console.error('Error updating sales count:', salesError);
-      // Don't fail the order if sales update fails
     }
 
     // Send email notifications (don't fail order if emails fail)

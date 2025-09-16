@@ -47,13 +47,7 @@ const productSchema = new mongoose.Schema({
   
   date: { type: Number, required: true, default: Date.now() },
   
-  // UPDATED: Rating system with default values
-  ratings: { type: Number, required: false, default: 4.3 },
-  numOfReviews: { type: Number, required: false, default: 2 },
-  reviews: { type: Array, required: false, default: [] },
-  numberofSales: { type: Number, required: false, default: 0 },
-  
-  // NEW: Review system integration
+  // Standardized rating system
   rating: { 
     type: Number, 
     default: 0, 
@@ -64,6 +58,7 @@ const productSchema = new mongoose.Schema({
     type: Number, 
     default: 0 
   },
+  numberofSales: { type: Number, required: false, default: 0 },
   
   // NEW: Gender field
   gender: { 

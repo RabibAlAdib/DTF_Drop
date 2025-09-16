@@ -177,7 +177,7 @@ async function updateProductRating(productId) {
     
     await Product.findByIdAndUpdate(productId, {
       rating: stats.averageRating || 0,
-      reviews: stats.totalReviews || 0
+      reviewCount: stats.totalReviews || 0
     });
     
     console.log(`Updated product ${productId} rating: ${stats.averageRating} (${stats.totalReviews} reviews)`);
