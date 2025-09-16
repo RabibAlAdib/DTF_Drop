@@ -9,6 +9,10 @@ import {
   calculateOrderTotal,
   convertCartToOrderItems 
 } from '@/lib/orderCalculations';
+import { 
+  sendOrderConfirmationEmail,
+  sendSellerNotificationEmail 
+} from '@/lib/emailService';
 
 // Connect to database
 await connectDB();
@@ -173,6 +177,27 @@ export async function POST(req) {
     } catch (salesError) {
       console.error('Error updating sales count:', salesError);
       // Don't fail the order if sales update fails
+    }
+
+    // Send email notifications (don't fail order if emails fail)
+    try {
+      // Send order confirmation to customer
+      await sendOrderConfirmationEmail(savedOrder);
+      
+      // Send notification to sellers for their products
+      const sellerProductIds = [...new Set(verifiedItems.map(item => item.productId))];
+      const sellerProducts = await Product.find({ _id: { $in: sellerProductIds } }).populate('userId', 'email');
+      
+      const sellerEmails = [...new Set(sellerProducts.map(product => product.userId?.email).filter(Boolean))];
+      
+      for (const sellerEmail of sellerEmails) {
+        await sendSellerNotificationEmail(savedOrder, sellerEmail);
+      }
+      
+      console.log('📧 Order notification emails sent successfully');
+    } catch (emailError) {
+      console.error('📧 Error sending order emails (order still successful):', emailError);
+      // Don't fail the order if email sending fails
     }
 
     return NextResponse.json({

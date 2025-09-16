@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmation - DTF Drop</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #FF6B35;
+        }
+        .logo {
+            font-size: 32px;
+            font-weight: bold;
+            color: #FF6B35;
+            margin-bottom: 10px;
+        }
+        .tagline {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+        .content {
+            line-height: 1.8;
+            color: #333;
+        }
+        .greeting {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+        .order-details {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 30px;
+            border-radius: 8px;
+            margin: 30px 0;
+            border-left: 4px solid #FF6B35;
+        }
+        .order-details h3 {
+            color: #FF6B35;
+            margin-top: 0;
+            font-size: 20px;
+        }
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .detail-row:last-child {
+            border-bottom: none;
+            font-weight: bold;
+            font-size: 16px;
+            color: #FF6B35;
+        }
+        .items-list {
+            background: white;
+            padding: 20px;
+            border-radius: 6px;
+            margin: 15px 0;
+        }
+        .items-list ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .items-list li {
+            margin: 10px 0;
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            background: #28a745;
+            color: white;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .next-steps {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 30px 0;
+        }
+        .next-steps h4 {
+            color: #856404;
+            margin-top: 0;
+        }
+        .contact-info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 30px 0;
+            text-align: center;
+        }
+        .contact-info h4 {
+            color: #0c5460;
+            margin-top: 0;
+        }
+        .whatsapp-link {
+            display: inline-block;
+            background: #25d366;
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid #dee2e6;
+            font-size: 14px;
+            color: #666;
+        }
+        .footer-logo {
+            font-size: 18px;
+            font-weight: bold;
+            color: #FF6B35;
+            margin-bottom: 10px;
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+            .detail-row {
+                flex-direction: column;
+                gap: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">DTF Drop</div>
+            <div class="tagline">Custom Drop Shoulder T-Shirts</div>
+            <h2 style="color: #333; margin: 0;">Order Confirmation</h2>
+        </div>
+        
+        <div class="content">
+            <div class="greeting">
+                Dear {{customerName}}, 🎉
+            </div>
+            
+            <p>Thank you for choosing DTF Drop! We're thrilled to create your custom drop shoulder t-shirt(s). Your order has been received and is being processed with care.</p>
+            
+            <div class="order-details">
+                <h3>📋 Order Summary</h3>
+                <div class="detail-row">
+                    <span>Order Number:</span>
+                    <strong>{{orderNumber}}</strong>
+                </div>
+                <div class="detail-row">
+                    <span>Order Date:</span>
+                    <span>{{orderDate}}</span>
+                </div>
+                <div class="detail-row">
+                    <span>Payment Method:</span>
+                    <span>{{paymentMethod}}</span>
+                </div>
+                <div class="detail-row">
+                    <span>Delivery Zone:</span>
+                    <span>{{deliveryZone}}</span>
+                </div>
+                <div class="detail-row">
+                    <span>Total Amount:</span>
+                    <strong>৳{{totalAmount}}</strong>
+                </div>
+            </div>
+
+            <div class="items-list">
+                <h4>🛍️ Items Ordered:</h4>
+                {{orderItems}}
+                
+                <div style="margin-top: 20px; padding-top: 15px; border-top: 2px solid #f0f0f0;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span>Subtotal:</span>
+                        <span>৳{{subtotal}}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span>Delivery Charge:</span>
+                        <span>৳{{deliveryCharge}}</span>
+                    </div>
+                    {{#if discountAmount}}
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px; color: #28a745;">
+                        <span>Discount Applied:</span>
+                        <span>-৳{{discountAmount}}</span>
+                    </div>
+                    {{/if}}
+                    <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 16px; color: #FF6B35; border-top: 1px solid #dee2e6; padding-top: 10px;">
+                        <span>Total:</span>
+                        <span>৳{{totalAmount}}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="next-steps">
+                <h4>📦 What Happens Next?</h4>
+                <ul style="margin: 0; padding-left: 20px;">
+                    <li>Your order is being processed by our design team</li>
+                    <li>Custom designs will be printed on premium drop shoulder t-shirts</li>
+                    <li>Quality check and packaging</li>
+                    <li>Shipment and delivery to your address</li>
+                </ul>
+                <p><strong>Expected Delivery:</strong> 3-7 business days</p>
+            </div>
+
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 6px; margin: 20px 0;">
+                <h4 style="margin-top: 0; color: #333;">📍 Delivery Address:</h4>
+                <p style="margin: 0; line-height: 1.6;">{{deliveryAddress}}</p>
+            </div>
+
+            <div class="contact-info">
+                <h4>Need Help? We're Here for You!</h4>
+                <p>Have questions about your order? Want to make changes? Our friendly team is ready to assist!</p>
+                <a href="https://wa.me/8801344823831" class="whatsapp-link">💬 Chat on WhatsApp</a>
+                <p>Or call us at: <strong>+880 1344-823831</strong></p>
+            </div>
+
+            <p>We appreciate your business and can't wait for you to rock your new DTF Drop t-shirt!</p>
+            
+            <p style="margin-top: 30px;">
+                Best regards,<br>
+                <strong>The DTF Drop Team</strong> 👕<br>
+                <em>Making every design come to life!</em>
+            </p>
+        </div>
+        
+        <div class="footer">
+            <div class="footer-logo">DTF Drop</div>
+            <p>Custom Drop Shoulder T-Shirts | Premium Quality | Fast Delivery</p>
+            <p>This is an automated email confirmation. Please do not reply directly to this email.</p>
+            <p style="font-size: 12px; color: #999;">
+                If you have any issues with this email, please contact us through WhatsApp or our website.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

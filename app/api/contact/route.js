@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { sendContactFormEmail } from '@/lib/emailService';
 
 export async function POST(request) {
   try {
@@ -12,7 +13,7 @@ export async function POST(request) {
       );
     }
 
-    // Log contact form submission (email functionality removed)
+    // Log contact form submission
     console.log('Contact form submission received:', {
       name,
       email,
@@ -20,6 +21,25 @@ export async function POST(request) {
       message,
       timestamp: new Date().toISOString()
     });
+
+    // Send email notification
+    try {
+      const emailResult = await sendContactFormEmail({
+        name,
+        email,
+        subject,
+        message
+      });
+      
+      if (emailResult.success) {
+        console.log('📧 Contact form email sent successfully');
+      } else {
+        console.error('📧 Contact form email failed:', emailResult.message);
+      }
+    } catch (emailError) {
+      console.error('📧 Contact form email error:', emailError);
+      // Don't fail the contact form if email fails
+    }
 
     return NextResponse.json({
       success: true,

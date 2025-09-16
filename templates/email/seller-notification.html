@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Order Received - DTF Drop</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #FF6B35 0%, #FF8A50 100%);
+            color: white;
+            border-radius: 8px;
+        }
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .alert-badge {
+            display: inline-block;
+            background: #28a745;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        .content {
+            line-height: 1.8;
+            color: #333;
+        }
+        .order-summary {
+            background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+            padding: 25px;
+            border-radius: 8px;
+            margin: 25px 0;
+            border-left: 4px solid #2196F3;
+        }
+        .order-summary h3 {
+            color: #1976D2;
+            margin-top: 0;
+            font-size: 18px;
+        }
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .detail-item {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #e0e0e0;
+        }
+        .detail-label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .detail-value {
+            font-size: 16px;
+            color: #333;
+            font-weight: bold;
+        }
+        .customer-info {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 6px;
+            margin: 20px 0;
+        }
+        .items-section {
+            background: white;
+            border: 2px solid #FF6B35;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .items-section h4 {
+            color: #FF6B35;
+            margin-top: 0;
+        }
+        .item-card {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 10px 0;
+            border-left: 3px solid #FF6B35;
+        }
+        .customization-note {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+        .action-buttons {
+            text-align: center;
+            margin: 30px 0;
+        }
+        .btn-primary {
+            display: inline-block;
+            background: #FF6B35;
+            color: white;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: bold;
+            margin: 10px;
+            font-size: 16px;
+        }
+        .btn-secondary {
+            display: inline-block;
+            background: #6c757d;
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 20px;
+            font-weight: bold;
+            margin: 10px;
+            font-size: 14px;
+        }
+        .priority-indicator {
+            background: #dc3545;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid #dee2e6;
+            font-size: 14px;
+            color: #666;
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">DTF Drop</div>
+            <h2 style="margin: 10px 0;">🔔 New Order Alert!</h2>
+            <div class="alert-badge">ACTION REQUIRED</div>
+        </div>
+        
+        <div class="content">
+            <p style="font-size: 18px; margin-bottom: 30px;">
+                <strong>Great news!</strong> You've received a new order for your products. 
+                <span class="priority-indicator">High Priority</span>
+            </p>
+
+            <div class="order-summary">
+                <h3>📋 Order Overview</h3>
+                
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <div class="detail-label">Order Number</div>
+                        <div class="detail-value">{{orderNumber}}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Order Value</div>
+                        <div class="detail-value" style="color: #28a745;">৳{{totalAmount}}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Payment Method</div>
+                        <div class="detail-value">{{paymentMethod}}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Order Date</div>
+                        <div class="detail-value">{{orderDate}}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="customer-info">
+                <h4 style="color: #1976D2; margin-top: 0;">👤 Customer Information</h4>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                    <div>
+                        <strong>Name:</strong> {{customerName}}<br>
+                        <strong>Phone:</strong> <a href="tel:{{customerPhone}}">{{customerPhone}}</a><br>
+                        <strong>Email:</strong> <a href="mailto:{{customerEmail}}">{{customerEmail}}</a>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 15px;">
+                    <strong>📍 Delivery Address:</strong><br>
+                    <span style="background: white; padding: 10px; border-radius: 4px; display: inline-block; margin-top: 5px;">
+                        {{deliveryAddress}}
+                    </span>
+                </div>
+            </div>
+
+            <div class="items-section">
+                <h4>🛍️ Items to Fulfill</h4>
+                {{orderItems}}
+                
+                <div style="margin-top: 20px; padding: 15px; background: #e8f5e8; border-radius: 6px;">
+                    <strong>💰 Payment Breakdown:</strong>
+                    <div style="margin-top: 10px;">
+                        <div>Items Subtotal: ৳{{subtotal}}</div>
+                        <div>Delivery Charge: ৳{{deliveryCharge}}</div>
+                        {{#if discountAmount}}
+                        <div style="color: #dc3545;">Discount Applied: -৳{{discountAmount}}</div>
+                        {{/if}}
+                        <div style="font-weight: bold; border-top: 1px solid #ccc; padding-top: 5px; margin-top: 5px;">
+                            <strong>Total Order Value: ৳{{totalAmount}}</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{#if hasCustomizations}}
+            <div class="customization-note">
+                <h5 style="margin-top: 0; color: #856404;">⚠️ Special Attention Required</h5>
+                <p>This order contains custom designs or special instructions. Please review all customization details carefully before proceeding with production.</p>
+            </div>
+            {{/if}}
+
+            <div class="action-buttons">
+                <a href="{{sellerDashboardUrl}}/orders" class="btn-primary">
+                    🎯 Manage This Order
+                </a>
+                <br>
+                <a href="https://wa.me/{{customerPhone}}" class="btn-secondary">
+                    💬 Contact Customer
+                </a>
+            </div>
+
+            <div style="background: #d4edda; border: 1px solid #c3e6cb; border-radius: 6px; padding: 20px; margin: 25px 0;">
+                <h4 style="color: #155724; margin-top: 0;">⏰ Next Steps:</h4>
+                <ol style="margin: 0; padding-left: 20px; color: #155724;">
+                    <li>Review order details and customizations</li>
+                    <li>Confirm product availability and production timeline</li>
+                    <li>Update order status in your dashboard</li>
+                    <li>Begin production process</li>
+                    <li>Update customer with progress</li>
+                </ol>
+            </div>
+
+            <p style="text-align: center; font-style: italic; color: #666;">
+                Thank you for being a valued seller on DTF Drop! 
+                Let's make this order amazing for our customer. 🚀
+            </p>
+        </div>
+        
+        <div class="footer">
+            <div style="font-weight: bold; color: #FF6B35; margin-bottom: 10px;">DTF Drop Seller Portal</div>
+            <p>This notification was sent because you received a new order.</p>
+            <p style="font-size: 12px; color: #999;">
+                Need help? Contact support through the seller dashboard or WhatsApp.
+            </p>
+        </div>
+    </div>
+</body>
+</html>
