@@ -40,45 +40,18 @@ const AddProduct = () => {
   const DESIGN_TYPES = ['Anime', 'Typography', 'Game', 'WWE', 'Sports', 'Motivational', 'Jokes', 'Islamic', 'Customized', 'Cartoon', 'Movie/TV', 'Music/Band', 'Minimalist', 'Abstract', 'Nature', 'Festival/Seasonal', 'Couple/Friendship', 'Quotes', 'Retro/Vintage', 'Geek/Tech', 'Streetwear', 'Hip-Hop/Rap', 'Graffiti/Urban', 'Fantasy/Mythology', 'Sci-Fi', 'Superheroes/Comics', 'Animals/Pets', 'Cars/Bikes', 'Food/Drinks', 'Travel/Adventure', 'National/Patriotic', 'Memes', 'Spiritual/Inspirational', 'Kids/Family', 'Occupations (Doctor, Engineer, etc.)', 'College/University Life', 'Fitness/Gym', 'Luxury/High Fashion', 'Gaming Esports Teams'];
   const GENDERS = ['male', 'female', 'both'];
 
-  // Function to get Cloudinary signature
-  const getCloudinarySignature = async () => {
-    try {
-      const token = await getToken();
-      const response = await axios.post('/api/cloudinary/signature', {}, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-      return response.data;
-    } catch (error) {
-      throw new Error('Failed to get upload signature');
-    }
-  };
-
-  // Function to upload image directly to Cloudinary
+  // Simple direct upload - no signature needed
   const uploadToCloudinary = async (file, slotIndex) => {
     try {
       // Update slot to show uploading status
       updateImageSlot(slotIndex, 'uploading', true);
 
-      // Get signature
-      const signatureData = await getCloudinarySignature();
-      
-      if (!signatureData.success) {
-        throw new Error('Failed to get upload signature');
-      }
-
-      // Prepare form data for Cloudinary
+      // Prepare form data for direct upload
       const formData = new FormData();
       formData.append('file', file);
-      formData.append('signature', signatureData.signature);
-      formData.append('timestamp', signatureData.timestamp);
-      formData.append('api_key', signatureData.api_key);
-      formData.append('folder', 'products');
-      formData.append('transformation', 'c_limit,w_800,h_800,q_auto,f_auto');
 
-      // Upload to Cloudinary
-      const uploadResponse = await axios.post(signatureData.upload_url, formData, {
+      // Upload directly to our server endpoint
+      const uploadResponse = await axios.post('/api/cloudinary/upload', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -90,12 +63,16 @@ const AddProduct = () => {
         }
       });
 
+      if (!uploadResponse.data.success) {
+        throw new Error(uploadResponse.data.message || 'Upload failed');
+      }
+
       // Update slot with URL and stop uploading status
-      updateImageSlot(slotIndex, 'url', uploadResponse.data.secure_url);
+      updateImageSlot(slotIndex, 'url', uploadResponse.data.url);
       updateImageSlot(slotIndex, 'uploading', false);
       
       toast.success(`Image ${slotIndex + 1} uploaded successfully!`);
-      return uploadResponse.data.secure_url;
+      return uploadResponse.data.url;
 
     } catch (error) {
       updateImageSlot(slotIndex, 'uploading', false);
@@ -103,10 +80,11 @@ const AddProduct = () => {
       updateImageSlot(slotIndex, 'url', null);
       
       console.error('Cloudinary upload error:', error);
-      toast.error(`Failed to upload image ${slotIndex + 1}: ${error.message}`);
+      toast.error(`Failed to upload image ${slotIndex + 1}: ${error.response?.data?.message || error.message}`);
       throw error;
     }
   };
+
 
   const addImageSlot = () => {
     if (imageSlots.length < 10) {
