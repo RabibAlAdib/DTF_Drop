@@ -220,8 +220,8 @@ const OrderSummary = () => {
         setPromoDiscount(0);
         setPromoCode('');
         
-        // Redirect to success page or orders page
-        router.push(`/orders?success=true&orderNumber=${response.data.order.orderNumber}`);
+        // Redirect to success page
+        router.push(`/order-placed?orderNumber=${response.data.order.orderNumber}`);
       } else {
         toast.error(response.data.message || 'Failed to place order');
       }
