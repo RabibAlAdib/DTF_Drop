@@ -1,6 +1,6 @@
 # Overview
 
-This is an e-commerce web application called "DTF Drop" (Quick Cart) built with Next.js that specializes in drop shoulder clothing. The platform allows sellers to list products and buyers to browse and purchase items. The application features user authentication, product management, and automated user synchronization using event-driven architecture.
+This is an e-commerce web application called "DTF Drop" built with Next.js that specializes in drop shoulder clothing. The platform allows sellers to list products and buyers to browse and purchase items. The application features user authentication, product management, and automated user synchronization using event-driven architecture.
 
 # User Preferences
 
