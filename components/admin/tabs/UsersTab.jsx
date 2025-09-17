@@ -23,7 +23,11 @@ const UsersTab = () => {
       }
     } catch (error) {
       console.error('Error fetching users:', error);
-      toast.error('Failed to fetch users');
+      if (error.response?.status === 403) {
+        toast.error('Admin access required');
+      } else {
+        toast.error('Failed to fetch users');
+      }
       setUsers([]);
     } finally {
       setLoading(false);
@@ -44,8 +48,12 @@ const UsersTab = () => {
         toast.error(response.data.message || 'Failed to update role');
       }
     } catch (error) {
-      toast.error('Failed to update user role');
       console.error('Role update error:', error);
+      if (error.response?.status === 403) {
+        toast.error('Admin access required');
+      } else {
+        toast.error('Failed to update user role');
+      }
     }
   };
 
@@ -64,8 +72,12 @@ const UsersTab = () => {
         toast.error(response.data.message || 'Failed to delete user');
       }
     } catch (error) {
-      toast.error('Failed to delete user');
       console.error('User deletion error:', error);
+      if (error.response?.status === 403) {
+        toast.error('Admin access required');
+      } else {
+        toast.error('Failed to delete user');
+      }
     }
   };
 

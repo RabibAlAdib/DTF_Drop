@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { toast } from 'react-hot-toast';
 
 const StatsTab = () => {
   const [stats, setStats] = useState({
@@ -20,7 +21,7 @@ const StatsTab = () => {
     try {
       setLoading(true);
       
-      // Make direct API calls without complex authentication
+      // Make direct API calls with admin authentication
       const [usersResponse, productsResponse, ordersResponse] = await Promise.all([
         axios.get('/api/user/count'),
         axios.get('/api/product/count'),
@@ -35,6 +36,11 @@ const StatsTab = () => {
       });
     } catch (error) {
       console.error('Error fetching stats:', error);
+      if (error.response?.status === 403) {
+        toast.error('Admin access required for statistics');
+      } else {
+        toast.error('Failed to load system statistics');
+      }
       // Use fallback data if API calls fail
       setStats({
         totalUsers: 0,
@@ -131,7 +137,7 @@ const StatsTab = () => {
           </button>
           
           <button
-            onClick={() => window.location.href = '/products'}
+            onClick={() => window.location.href = '/all-products'}
             className="flex items-center space-x-2 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-600 transition-colors"
           >
             <span>📦</span>

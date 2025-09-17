@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
+import axios from 'axios';
 
 const SettingsTab = () => {
   const [settings, setSettings] = useState({
@@ -14,6 +15,30 @@ const SettingsTab = () => {
   });
   
   const [loading, setLoading] = useState(false);
+  const [initialLoad, setInitialLoad] = useState(true);
+
+  useEffect(() => {
+    fetchSettings();
+  }, []);
+
+  const fetchSettings = async () => {
+    try {
+      setInitialLoad(true);
+      const response = await axios.get('/api/settings');
+      if (response.data.success) {
+        setSettings(response.data.settings);
+      }
+    } catch (error) {
+      console.error('Error fetching settings:', error);
+      if (error.response?.status === 403) {
+        toast.error('Admin access required');
+      } else {
+        toast.error('Failed to load settings');
+      }
+    } finally {
+      setInitialLoad(false);
+    }
+  };
 
   // Environment Variables Display
   const [envVars, setEnvVars] = useState([
@@ -36,11 +61,19 @@ const SettingsTab = () => {
   const saveSettings = async () => {
     setLoading(true);
     try {
-      // Simulate save operation
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      toast.success('Settings saved successfully!');
+      const response = await axios.post('/api/settings', settings);
+      if (response.data.success) {
+        toast.success('Settings saved successfully!');
+      } else {
+        toast.error(response.data.message || 'Failed to save settings');
+      }
     } catch (error) {
-      toast.error('Failed to save settings');
+      console.error('Error saving settings:', error);
+      if (error.response?.status === 403) {
+        toast.error('Admin access required');
+      } else {
+        toast.error('Failed to save settings');
+      }
     } finally {
       setLoading(false);
     }

@@ -1,9 +1,18 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/config/db';
 import User from '@/models/User';
+import { isAdminUser } from '@/lib/authAdmin';
 
 export async function POST(request) {
   try {
+    // Check admin authorization
+    if (!(await isAdminUser(request))) {
+      return NextResponse.json({
+        success: false,
+        message: 'Admin access required'
+      }, { status: 403 });
+    }
+
     const { userId, role } = await request.json();
     
     if (!userId || !role) {
