@@ -48,17 +48,21 @@ export async function POST(request) {
             }, { status: 400 });
         }
 
-        // In a production environment, this would update environment variables
-        // For now, we'll just simulate the update
-        // Note: In Vercel, you would use the Vercel API to update environment variables
-        
         // Log the update attempt (don't log sensitive values)
         console.log(`Admin ${userId} attempted to update ${key}`);
 
+        // IMPORTANT: This is a demonstration endpoint only
+        // In production, you would integrate with your deployment platform's API
+        // Examples:
+        // - Vercel: Use Vercel API to update environment variables
+        // - AWS: Update Parameter Store or Secrets Manager
+        // - Docker: Update container environment variables
+        
         return NextResponse.json({
-            success: true,
-            message: `${key} updated successfully`,
-            note: 'In production, this would update the actual environment variable'
+            success: false, // Changed to false to indicate it's not actually updating
+            message: `API Key Management is currently in demo mode`,
+            note: 'To enable real secret management, integrate with your deployment platform API (Vercel, AWS, etc.)',
+            demo: true
         });
 
     } catch (error) {

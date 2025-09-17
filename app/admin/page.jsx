@@ -99,7 +99,11 @@ const AdminControlPanel = () => {
                 value: value
             });
             
-            if (response.data.success) {
+            if (response.data.demo) {
+                toast.error(`${response.data.message}`, {
+                    duration: 4000
+                });
+            } else if (response.data.success) {
                 toast.success(`${keyName} updated successfully`);
                 setApiKeys(prev => ({
                     ...prev,

@@ -37,7 +37,12 @@ export async function DELETE(request, { params }) {
 
         // Check if target user is dtfdrop_admin
         const targetUser = await clerkClient.users.getUser(targetUserId);
-        if (targetUser.username === 'dtfdrop_admin') {
+        const adminUsername = 'dtfdrop_admin';
+        const adminUserId = process.env.ADMIN_USER_ID;
+        const isTargetAdmin = targetUser.username === adminUsername || 
+                             (adminUserId && targetUserId === adminUserId);
+        
+        if (isTargetAdmin) {
             return NextResponse.json({
                 success: false,
                 message: 'Cannot delete admin user'

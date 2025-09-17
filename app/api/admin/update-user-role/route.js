@@ -34,18 +34,25 @@ export async function POST(request) {
             }, { status: 400 });
         }
 
-        // Prevent admin from changing their own role or dtfdrop_admin role
+        await connectDB();
+        
+        // Get target user details
         const targetUser = await clerkClient.users.getUser(targetUserId);
-        if (targetUser.username === 'dtfdrop_admin') {
+        
+        // Prevent admin from changing their own role or dtfdrop_admin role
+        const adminUsername = 'dtfdrop_admin';
+        const adminUserId = process.env.ADMIN_USER_ID;
+        const isTargetAdmin = targetUser.username === adminUsername || 
+                             (adminUserId && targetUserId === adminUserId);
+        
+        if (isTargetAdmin) {
             return NextResponse.json({
                 success: false,
                 message: 'Cannot modify admin user role'
             }, { status: 403 });
         }
 
-        await connectDB();
-
-        // Update role in Clerk
+        // Update role in Clerk's public metadata
         await clerkClient.users.updateUser(targetUserId, {
             publicMetadata: {
                 ...targetUser.publicMetadata,
@@ -54,7 +61,12 @@ export async function POST(request) {
         });
 
         // Update role in our database
-        await User.findByIdAndUpdate(targetUserId, { role });
+        await User.findByIdAndUpdate(targetUserId, { 
+            role: role 
+        }, { 
+            upsert: true,
+            new: true 
+        });
 
         console.log(`Admin ${userId} updated user ${targetUserId} role to ${role}`);
 

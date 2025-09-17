@@ -17,15 +17,36 @@ export async function GET(request) {
 
         await connectDB();
 
-        // Get all users with basic info
-        const users = await User.find({})
+        // Get all users with basic info including username from Clerk
+        const dbUsers = await User.find({})
             .select('name email imageUrl joinDate role')
             .sort({ joinDate: -1 })
-            .limit(100); // Limit to prevent overload
+            .limit(100);
+
+        // Enhance with Clerk data to get usernames
+        const usersWithClerkData = await Promise.all(
+            dbUsers.map(async (dbUser) => {
+                try {
+                    const clerkUser = await clerkClient.users.getUser(dbUser._id);
+                    return {
+                        ...dbUser.toObject(),
+                        username: clerkUser.username,
+                        clerkId: clerkUser.id
+                    };
+                } catch (error) {
+                    // If Clerk user not found, return basic info
+                    return {
+                        ...dbUser.toObject(),
+                        username: 'unknown',
+                        clerkId: dbUser._id
+                    };
+                }
+            })
+        );
 
         return NextResponse.json({
             success: true,
-            users
+            users: usersWithClerkData
         });
 
     } catch (error) {
