@@ -7,7 +7,7 @@ export async function GET(request, context) {
     await connectDB();
     
     const { params } = await context;
-    const { id } = params;
+    const { id } = await params;
     
     // Find product by ID using MongoDB query
     const product = await Product.findById(id).lean();

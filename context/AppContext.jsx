@@ -71,26 +71,39 @@ export const AppContextProvider = (props) => {
 
   // Updated addToCart function with variant support
   const addToCart = async (itemId, variant = {}, quantity = 1) => {
-    let cartData = structuredClone(cartItems);
-    
-    // Create unique key for product variant
-    const variantKey = variant.color && variant.size 
-      ? `${itemId}_${variant.color}_${variant.size}`
-      : itemId;
-    
-    if (cartData[variantKey]) {
-      cartData[variantKey] += quantity;
-    } else {
-      cartData[variantKey] = quantity;
+    try {
+      let cartData = structuredClone(cartItems);
+      
+      // Create unique key for product variant
+      const variantKey = variant.color && variant.size 
+        ? `${itemId}_${variant.color}_${variant.size}`
+        : itemId;
+      
+      if (cartData[variantKey]) {
+        cartData[variantKey] += quantity;
+      } else {
+        cartData[variantKey] = quantity;
+      }
+      
+      // Store variant info with the cart item
+      if (!cartData._variants) {
+        cartData._variants = {};
+      }
+      cartData._variants[variantKey] = variant;
+      
+      setCartItems(cartData);
+      
+      // Save to database
+      if (user) {
+        const token = await getToken();
+        await axios.put('/api/user/cart', { cartItems: cartData }, { 
+          headers: { Authorization: `Bearer ${token}` } 
+        });
+      }
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+      toast.error('Failed to add item to cart');
     }
-    
-    // Store variant info with the cart item
-    if (!cartData._variants) {
-      cartData._variants = {};
-    }
-    cartData._variants[variantKey] = variant;
-    
-    setCartItems(cartData);
   }
 
   // Previous updateCartQuantity function (commented for reference)
@@ -108,22 +121,35 @@ export const AppContextProvider = (props) => {
 
   // Updated updateCartQuantity function with variant support
   const updateCartQuantity = async (itemId, quantity, variant = {}) => {
-    let cartData = structuredClone(cartItems);
-    
-    const variantKey = variant.color && variant.size 
-      ? `${itemId}_${variant.color}_${variant.size}`
-      : itemId;
-    
-    if (quantity === 0) {
-      delete cartData[variantKey];
-      if (cartData._variants && cartData._variants[variantKey]) {
-        delete cartData._variants[variantKey];
+    try {
+      let cartData = structuredClone(cartItems);
+      
+      const variantKey = variant.color && variant.size 
+        ? `${itemId}_${variant.color}_${variant.size}`
+        : itemId;
+      
+      if (quantity === 0) {
+        delete cartData[variantKey];
+        if (cartData._variants && cartData._variants[variantKey]) {
+          delete cartData._variants[variantKey];
+        }
+      } else {
+        cartData[variantKey] = quantity;
       }
-    } else {
-      cartData[variantKey] = quantity;
+      
+      setCartItems(cartData);
+      
+      // Save to database
+      if (user) {
+        const token = await getToken();
+        await axios.put('/api/user/cart', { cartItems: cartData }, { 
+          headers: { Authorization: `Bearer ${token}` } 
+        });
+      }
+    } catch (error) {
+      console.error('Error updating cart:', error);
+      toast.error('Failed to update cart');
     }
-    
-    setCartItems(cartData)
   }
 
   const getCartCount = () => {
