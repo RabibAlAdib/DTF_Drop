@@ -25,8 +25,7 @@ export async function GET(request) {
             // Create user if doesn't exist (first visit)
             try {
                 // Get user data from Clerk - correct API usage
-                const client = await clerkClient()
-                const clerkUser = await client.users.getUser(userId)
+                const clerkUser = await clerkClient.users.getUser(userId)
                 
                 const userData = {
                     _id: userId,
