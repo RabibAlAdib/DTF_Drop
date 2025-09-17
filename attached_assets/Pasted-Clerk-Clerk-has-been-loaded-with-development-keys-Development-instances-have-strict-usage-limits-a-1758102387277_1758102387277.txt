@@ -1,0 +1,26 @@
+Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview
+Admin page useEffect - isLoaded: false
+Still loading Clerk...
+Admin page useEffect - isLoaded: false
+Still loading Clerk...
+Image with src "/_next/static/media/logo.f9e0d1d0.png" was detected as the Largest Contentful Paint (LCP). Please add the "priority" property if this image is above the fold.
+Read more: https://nextjs.org/docs/api-reference/next/image#priority
+Admin page useEffect - isLoaded: true
+Clerk loaded, attempting admin access check
+Admin access check - making API calls to verify backend authentication
+Making request to /api/admin/system-stats
+Using auth token: false
+Failed to fetch system stats: 
+AxiosError {message: "Request failed with status code 403", name: "AxiosError", code: "ERR_BAD_REQUEST", config: {…}, request: XMLHttpRequest, …}
+
+Making request to /api/admin/users
+Failed to fetch users: 
+AxiosError {message: "Request failed with status code 403", name: "AxiosError", code: "ERR_BAD_REQUEST", config: {…}, request: XMLHttpRequest, …}
+
+Making request to /api/admin/secrets
+Detected `scroll-behavior: smooth` on the `<html>` element. In a future version, Next.js will no longer automatically disable smooth scrolling during route transitions. To prepare for this change, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior
+Failed to fetch secrets: 
+AxiosError {message: "Request failed with status code 403", name: "AxiosError", code: "ERR_BAD_REQUEST", config: {…}, request: XMLHttpRequest, …}
+
+Image with src "https://res.cloudinary.com/dvqtupjei/image/upload/v1757964704/products/sb5tc7nyg7wsjp7c51ep.jpg" was detected as the Largest Contentful Paint (LCP). Please add the "priority" property if this image is above the fold.
+Read more: https://nextjs.org/docs/api-reference/next/image#priority

@@ -60,8 +60,8 @@ const AdminControlPanel = () => {
         try {
             console.log('Making request to /api/admin/system-stats');
             
-            // Get auth token from Clerk if available
-            const token = await user?.getToken?.();
+            // Get auth token from Clerk if user is available
+            const token = user ? await user.getToken() : null;
             const headers = token ? { Authorization: `Bearer ${token}` } : {};
             
             console.log('Using auth token:', !!token);
@@ -86,7 +86,7 @@ const AdminControlPanel = () => {
         try {
             console.log('Making request to /api/admin/users');
             
-            const token = await user?.getToken?.();
+            const token = user ? await user.getToken() : null;
             const headers = token ? { Authorization: `Bearer ${token}` } : {};
             
             const response = await axios.get('/api/admin/users', { headers });
@@ -103,7 +103,7 @@ const AdminControlPanel = () => {
         try {
             console.log('Making request to /api/admin/secrets');
             
-            const token = await user?.getToken?.();
+            const token = user ? await user.getToken() : null;
             const headers = token ? { Authorization: `Bearer ${token}` } : {};
             
             const response = await axios.get('/api/admin/secrets', { headers });
