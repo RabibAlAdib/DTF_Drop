@@ -10,6 +10,7 @@ import Footer from '@/components/Footer'
 import Navbar from '@/components/Navbar'
 import FloatingCart from '@/components/FloatingCart'
 import ScrollIndicator from '@/components/ScrollIndicator'
+import FloatingAdminButton from '@/components/admin/FloatingAdminButton'
 
 const outfit = Outfit({ subsets: ['latin'] })
 
@@ -31,6 +32,7 @@ export default function RootLayout({ children }) {
                 </div>
               </main>
               <FloatingCart />
+              <FloatingAdminButton />
               <Footer />
             </ThemeProvider>
           </AppContextProvider>
