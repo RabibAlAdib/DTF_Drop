@@ -24,11 +24,7 @@ export async function GET(request) {
             secretsWithStatus[category] = secrets.map(secret => ({
                 ...secret,
                 isSet: !!process.env[secret.key],
-                currentValue: process.env[secret.key] ? 
-                    (secret.key.toLowerCase().includes('secret') || secret.key.toLowerCase().includes('password') ? 
-                        '••••••••' : 
-                        process.env[secret.key].substring(0, 20) + (process.env[secret.key].length > 20 ? '...' : '')
-                    ) : '',
+                // SECURITY: Never return actual secret values to client
                 lastUpdated: null // Could be enhanced to track update times
             }));
         });

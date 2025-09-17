@@ -241,6 +241,25 @@ const AdminControlPanel = () => {
                         <p className="text-gray-600 dark:text-gray-400">Manage environment variables and API keys by category</p>
                     </div>
                     <div className="p-6">
+                        {/* Demo Mode Banner */}
+                        <div className="bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-400 p-4 mb-6">
+                            <div className="flex">
+                                <div className="flex-shrink-0">
+                                    <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                                    </svg>
+                                </div>
+                                <div className="ml-3">
+                                    <h3 className="text-sm font-medium text-yellow-800 dark:text-yellow-200">
+                                        Demo Mode Active
+                                    </h3>
+                                    <div className="mt-2 text-sm text-yellow-700 dark:text-yellow-300">
+                                        <p>Secret management is currently in demonstration mode. Updates are simulated and will not modify actual environment variables. To enable real secret management, integrate with your deployment platform API (Vercel, AWS, etc.).</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         {secretsLoaded ? (
                             <div className="space-y-8">
                                 {Object.entries(secretsByCategory).map(([category, secrets]) => (
@@ -272,7 +291,6 @@ const AdminControlPanel = () => {
                                                     <div className="flex space-x-2">
                                                         <input
                                                             type="password"
-                                                            defaultValue={secret.currentValue}
                                                             placeholder={secret.example ? `e.g., ${secret.example}` : `Enter ${secret.key}`}
                                                             className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
                                                             onChange={(e) => {
@@ -316,17 +334,17 @@ const AdminControlPanel = () => {
                         <div className="overflow-x-auto">
                             <table className="min-w-full table-auto">
                                 <thead>
-                                    <tr className="bg-gray-50">
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Joined</th>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                    <tr className="bg-gray-50 dark:bg-gray-700">
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">User</th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Email</th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Role</th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Joined</th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-gray-200">
+                                <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                                     {users.map((user) => (
-                                        <tr key={user._id} className="hover:bg-gray-50">
+                                        <tr key={user._id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                                             <td className="px-4 py-4 whitespace-nowrap">
                                                 <div className="flex items-center">
                                                     <img 
@@ -334,23 +352,23 @@ const AdminControlPanel = () => {
                                                         alt={user.name}
                                                         className="w-8 h-8 rounded-full mr-3"
                                                     />
-                                                    <span className="text-sm font-medium text-gray-900">{user.name}</span>
+                                                    <span className="text-sm font-medium text-gray-900 dark:text-white">{user.name}</span>
                                                 </div>
                                             </td>
-                                            <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                                                 {user.email}
                                             </td>
                                             <td className="px-4 py-4 whitespace-nowrap">
                                                 <select
                                                     value={user.role || 'user'}
                                                     onChange={(e) => handleUserRoleUpdate(user._id, e.target.value)}
-                                                    className="text-sm border border-gray-300 rounded px-2 py-1"
+                                                    className="text-sm border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                                                 >
                                                     <option value="user">User</option>
                                                     <option value="seller">Seller</option>
                                                 </select>
                                             </td>
-                                            <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                                                 {new Date(user.joinDate).toLocaleDateString()}
                                             </td>
                                             <td className="px-4 py-4 whitespace-nowrap text-sm space-x-2">
@@ -374,10 +392,10 @@ const AdminControlPanel = () => {
                 </div>
 
                 {/* System Controls */}
-                <div className="bg-white rounded-lg shadow">
-                    <div className="px-6 py-4 border-b">
-                        <h2 className="text-xl font-semibold text-gray-900">System Controls</h2>
-                        <p className="text-gray-600">Dangerous operations - use with caution</p>
+                <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
+                    <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">System Controls</h2>
+                        <p className="text-gray-600 dark:text-gray-400">Dangerous operations - use with caution</p>
                     </div>
                     <div className="p-6">
                         <div className="space-y-4">
@@ -387,7 +405,7 @@ const AdminControlPanel = () => {
                             >
                                 Reset System (Clear All Data)
                             </button>
-                            <p className="text-sm text-gray-500">
+                            <p className="text-sm text-gray-500 dark:text-gray-400">
                                 ⚠️ This will permanently delete all users, products, and orders except admin user.
                             </p>
                         </div>
