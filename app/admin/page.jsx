@@ -313,7 +313,7 @@ ${secretValues.map(({ key, value }) => `   ${key}="${value}"`).join('\n')}
                                         Replit Secure Storage Active
                                     </h3>
                                     <div className="mt-2 text-sm text-green-700 dark:text-green-300">
-                                        <p>Your secrets are stored using Replit's encrypted storage system (AES-256). Changes made here will securely update your environment variables and require server restart.</p>
+                                        <p>Your secrets are managed via Replit's encrypted storage system (AES-256). For security, values must be added manually through Replit's Secrets panel and require server restart.</p>
                                     </div>
                                 </div>
                             </div>
