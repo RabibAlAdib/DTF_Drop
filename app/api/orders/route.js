@@ -286,7 +286,7 @@ export async function POST(req) {
 // GET /api/orders - Get user orders with pagination
 export async function GET(req) {
   try {
-    const { userId } = auth();
+    const { userId } = getAuth(req);
     
     if (!userId) {
       return NextResponse.json({ 

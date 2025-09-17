@@ -5,7 +5,7 @@ import { toast } from 'react-hot-toast';
 
 const OrderSummary = () => {
 
-  const { currency, router, getCartCount, getCartAmount, cartItems, products, userData, user, getToken } = useAppContext()
+  const { currency, router, getCartCount, getCartAmount, cartItems, products, userData, user, getToken, setCartItems } = useAppContext()
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [promoCode, setPromoCode] = useState('');
@@ -236,6 +236,9 @@ const OrderSummary = () => {
         setAppliedPromo(null);
         setPromoDiscount(0);
         setPromoCode('');
+        
+        // Clear cart items from context
+        setCartItems({});
         
         // Redirect to success page
         router.push(`/order-placed?orderNumber=${response.data.order.orderNumber}`);
