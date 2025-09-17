@@ -320,10 +320,13 @@ const AdminControlPanel = () => {
                                             <td className="px-4 py-4 whitespace-nowrap text-sm space-x-2">
                                                 <button
                                                     onClick={() => handleDeleteUser(user._id)}
-                                                    className="text-red-600 hover:text-red-800"
+                                                    className={`${user.username === 'dtfdrop_admin' 
+                                                        ? 'text-gray-400 cursor-not-allowed' 
+                                                        : 'text-red-600 hover:text-red-800'
+                                                    }`}
                                                     disabled={user.username === 'dtfdrop_admin'}
                                                 >
-                                                    Delete
+                                                    {user.username === 'dtfdrop_admin' ? 'Protected' : 'Delete'}
                                                 </button>
                                             </td>
                                         </tr>
