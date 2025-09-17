@@ -127,7 +127,7 @@ export async function POST(req) {
     const orderCalculation = calculateOrderTotal(
       verifiedItems, 
       orderData.delivery.address, 
-      orderData.pricing.promoCode
+      orderData.promoCode
     );
 
     if (!orderCalculation.success) {
@@ -147,7 +147,7 @@ export async function POST(req) {
         subtotal: orderCalculation.calculation.subtotal,
         deliveryCharge: orderCalculation.calculation.deliveryCharge,
         discountAmount: orderCalculation.calculation.discountAmount,
-        promoCode: orderData.pricing.promoCode || null,
+        promoCode: orderData.promoCode || null,
         totalAmount: orderCalculation.calculation.totalAmount
       },
       delivery: {
