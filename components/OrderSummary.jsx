@@ -1,12 +1,17 @@
 import { addressDummyData } from "@/assets/assets";
 import { useAppContext } from "@/context/AppContext";
 import React, { useEffect, useState } from "react";
+import axios from 'axios';
+import { toast } from 'react-hot-toast';
 
 const OrderSummary = () => {
 
   const { currency, router, getCartCount, getCartAmount, cartItems, products } = useAppContext()
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [promoCode, setPromoCode] = useState('');
+  const [appliedPromo, setAppliedPromo] = useState(null);
+  const [promoDiscount, setPromoDiscount] = useState(0);
 
   const [userAddresses, setUserAddresses] = useState([]);
 
@@ -17,6 +22,89 @@ const OrderSummary = () => {
   const handleAddressSelect = (address) => {
     setSelectedAddress(address);
     setIsDropdownOpen(false);
+  };
+
+  const handleApplyPromo = async () => {
+    if (!promoCode.trim()) {
+      toast.error('Please enter a promo code');
+      return;
+    }
+
+    try {
+      // First check if it's a dynamic offer from database
+      const response = await axios.post('/api/promo/validate', {
+        promoCode: promoCode.trim()
+      });
+
+      if (response.data.success && response.data.offer) {
+        // It's a dynamic offer
+        const offer = response.data.offer;
+        const subtotal = getCartAmount();
+        
+        if (subtotal < offer.minimumOrderValue) {
+          toast.error(`Minimum order of ${currency}${offer.minimumOrderValue} required for this promo code`);
+          return;
+        }
+
+        let discountAmount = 0;
+        if (offer.discountType === 'percentage') {
+          discountAmount = (subtotal * offer.discountValue) / 100;
+        } else if (offer.discountType === 'fixed') {
+          discountAmount = offer.discountValue;
+        }
+
+        discountAmount = Math.min(discountAmount, subtotal);
+
+        setAppliedPromo({
+          code: offer.offerCode,
+          description: offer.title,
+          discountAmount: discountAmount
+        });
+        setPromoDiscount(discountAmount);
+        toast.success(`${offer.title} applied! You saved ${currency}${discountAmount}`);
+      } else {
+        // Check hardcoded promo codes
+        const subtotal = getCartAmount();
+        
+        // Import calculateDiscount function dynamically for hardcoded codes
+        const { calculateDiscount } = await import('@/lib/orderCalculations');
+        const discountResult = calculateDiscount(subtotal, promoCode);
+
+        if (discountResult.isValid) {
+          setAppliedPromo({
+            code: discountResult.promoCode,
+            description: discountResult.description,
+            discountAmount: discountResult.discountAmount
+          });
+          setPromoDiscount(discountResult.discountAmount);
+          toast.success(discountResult.message);
+        } else {
+          toast.error(discountResult.message);
+        }
+      }
+    } catch (error) {
+      // If API call fails, try hardcoded codes
+      try {
+        const subtotal = getCartAmount();
+        const { calculateDiscount } = await import('@/lib/orderCalculations');
+        const discountResult = calculateDiscount(subtotal, promoCode);
+
+        if (discountResult.isValid) {
+          setAppliedPromo({
+            code: discountResult.promoCode,
+            description: discountResult.description,
+            discountAmount: discountResult.discountAmount
+          });
+          setPromoDiscount(discountResult.discountAmount);
+          toast.success(discountResult.message);
+        } else {
+          toast.error(discountResult.message);
+        }
+      } catch (calcError) {
+        console.error('Promo code validation error:', calcError);
+        toast.error('Failed to validate promo code');
+      }
+    }
   };
 
   const createOrder = async () => {
@@ -117,12 +205,19 @@ const OrderSummary = () => {
           <div className="flex flex-col items-start gap-3">
             <input
               type="text"
+              value={promoCode}
+              onChange={(e) => setPromoCode(e.target.value)}
               placeholder="Enter promo code"
               className="flex-grow w-full outline-none p-2.5 text-gray-600 dark:text-gray-200 bg-white dark:bg-gray-800 border dark:border-gray-600 placeholder:text-gray-400 dark:placeholder:text-gray-500"
             />
-            <button className="bg-orange-600 text-white px-9 py-2 hover:bg-orange-700">
+            <button onClick={handleApplyPromo} className="bg-orange-600 text-white px-9 py-2 hover:bg-orange-700">
               Apply
             </button>
+            {appliedPromo && (
+              <div className="w-full p-2 bg-green-50 border border-green-200 rounded text-sm text-green-700">
+                ✓ {appliedPromo.description} applied! Saving {currency}{promoDiscount}
+              </div>
+            )}
           </div>
         </div>
 
@@ -137,13 +232,15 @@ const OrderSummary = () => {
             <p className="text-gray-600 dark:text-gray-300">Shipping Fee</p>
             <p className="font-medium text-gray-800 dark:text-gray-200">Free</p>
           </div>
-          <div className="flex justify-between">
-            <p className="text-gray-600 dark:text-gray-300">Tax (2%)</p>
-            <p className="font-medium text-gray-800 dark:text-gray-200">{currency}{Math.floor(getCartAmount() * 0.02)}</p>
-          </div>
+          {promoDiscount > 0 && (
+            <div className="flex justify-between text-green-600">
+              <p>Promo Discount</p>
+              <p className="font-medium">-{currency}{promoDiscount}</p>
+            </div>
+          )}
           <div className="flex justify-between text-lg md:text-xl font-medium border-t pt-3">
             <p className="text-gray-800 dark:text-gray-200">Total</p>
-            <p className="text-gray-800 dark:text-gray-200">{currency}{getCartAmount() + Math.floor(getCartAmount() * 0.02)}</p>
+            <p className="text-gray-800 dark:text-gray-200">{currency}{getCartAmount() - promoDiscount}</p>
           </div>
         </div>
       </div>
