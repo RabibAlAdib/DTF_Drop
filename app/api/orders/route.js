@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
+import { getAuth } from '@clerk/nextjs/server';
 import connectDB from '@/config/db';
 import Order from '@/models/Order';
 import User from '@/models/User';
@@ -24,7 +24,7 @@ await connectDB();
 // POST /api/orders - Create new order
 export async function POST(req) {
   try {
-    const { userId } = auth();
+    const { userId } = getAuth(req);
     
     if (!userId) {
       return NextResponse.json({ 
