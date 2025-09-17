@@ -17,7 +17,7 @@ export async function GET(request) {
         // Get all secrets organized by category
         const secretsByCategory = getSecretsByCategory();
         
-        // For each secret, check if it's currently set (don't return the actual value)
+        // For each secret, check if it's currently set and provide status information
         const secretsWithStatus = {};
         
         Object.entries(secretsByCategory).forEach(([category, secrets]) => {
