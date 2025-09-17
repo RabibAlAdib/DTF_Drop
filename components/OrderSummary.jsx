@@ -1,4 +1,3 @@
-import { addressDummyData } from "@/assets/assets";
 import { useAppContext } from "@/context/AppContext";
 import React, { useEffect, useState } from "react";
 import axios from 'axios';
@@ -175,7 +174,7 @@ const OrderSummary = () => {
       const customerInfo = {
         name: userData?.name || user?.fullName || `${user?.firstName || ''} ${user?.lastName || ''}`.trim(),
         email: userData?.email || user?.primaryEmailAddress?.emailAddress,
-        phone: selectedAddress.phone || userData?.phone || '',
+        phone: selectedAddress.phoneNumber || userData?.phone || '',
         address: `${selectedAddress.fullName}, ${selectedAddress.area}, ${selectedAddress.city}, ${selectedAddress.state}, ${selectedAddress.pinCode || ''}`
       };
 
@@ -270,8 +269,10 @@ const OrderSummary = () => {
   }
 
   useEffect(() => {
-    fetchUserAddresses();
-  }, [])
+    if (user) {
+      fetchUserAddresses();
+    }
+  }, [user])
 
   return (
     <div className="w-full md:w-96 bg-gray-500/5 p-5">

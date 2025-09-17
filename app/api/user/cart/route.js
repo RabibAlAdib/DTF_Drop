@@ -26,8 +26,8 @@ export async function PUT(request) {
         await connectDB()
 
         // Update user's cart items in database
-        const user = await User.findByIdAndUpdate(
-            userId,
+        const user = await User.findOneAndUpdate(
+            { _id: userId },
             { cartItems: cartItems },
             { new: true }
         );
