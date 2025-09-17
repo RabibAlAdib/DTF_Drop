@@ -78,6 +78,15 @@ export async function POST(request) {
       }, { status: 400 });
     }
     
+    // Validate selected color exists in template
+    const colorInfo = template.availableColors.find(c => c.name === selectedColor);
+    if (!colorInfo) {
+      return NextResponse.json({
+        success: false,
+        message: "Invalid color selected"
+      }, { status: 400 });
+    }
+    
     // Calculate extra images count (excluding front and back)
     let extraImagesCount = 0;
     if (userDesigns.sleeve?.imageUrl) extraImagesCount++;

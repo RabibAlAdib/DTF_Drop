@@ -126,7 +126,7 @@ const customOrderSchema = new mongoose.Schema({
   },
   whatsappInstructions: { 
     type: String,
-    default: 'Please send your design files via WhatsApp for better quality printing. Our number: +880XXXXXXXXX'
+    default: 'Please send your design files via WhatsApp for better quality printing. Our number: +8801344823831'
   },
   
   // Special instructions
