@@ -12,12 +12,17 @@ const nextConfig = {
                 hostname: 'raw.githubusercontent.com',
                 pathname: '**',
             },
+            {
+                protocol: 'https',
+                hostname: 'img.clerk.com',
+                pathname: '**',
+            },
         ],
     },
-    // Standalone output for production deployment
-    output: 'standalone',
-    // Configure allowed dev origins (moved to root level in Next.js 15)
-    allowedDevOrigins: ['localhost', '127.0.0.1', '*.replit.dev', '*.replit.com'],
+    // Optimized for Vercel deployment
+    poweredByHeader: false,
+    // Configure allowed dev origins for development
+    allowedDevOrigins: ['localhost', '127.0.0.1'],
     // Configure experimental features
     experimental: {
         // Support for larger request bodies in Server Actions
@@ -25,17 +30,25 @@ const nextConfig = {
             bodySizeLimit: '50mb',
         },
     },
-    // Move serverComponentsExternalPackages to root level as required by Next.js 15+
-    serverExternalPackages: ['cloudinary'],
-    // Allow iframe embedding for Replit preview and configure API route limits
+    // External packages for server-side rendering
+    serverExternalPackages: ['cloudinary', 'nodemailer'],
+    // Security and API configuration headers
     async headers() {
         return [
             {
                 source: '/(.*)',
                 headers: [
                     {
-                        key: 'Content-Security-Policy',
-                        value: "frame-ancestors 'self' https://*.replit.com https://*.replit.dev",
+                        key: 'X-Frame-Options',
+                        value: 'SAMEORIGIN',
+                    },
+                    {
+                        key: 'X-Content-Type-Options',
+                        value: 'nosniff',
+                    },
+                    {
+                        key: 'Referrer-Policy',
+                        value: 'strict-origin-when-cross-origin',
                     },
                 ],
             },
@@ -58,6 +71,10 @@ const nextConfig = {
                 ],
             },
         ];
+    },
+    // Vercel-specific optimizations
+    env: {
+        CUSTOM_KEY: process.env.CUSTOM_KEY,
     },
 };
 
