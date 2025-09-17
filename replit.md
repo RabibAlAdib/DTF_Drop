@@ -1,6 +1,6 @@
 # Overview
 
-This is an e-commerce web application called "DTF Drop" built with Next.js that specializes in drop shoulder clothing. The platform allows sellers to list products and buyers to browse and purchase items. The application features user authentication, product management, automated user synchronization using event-driven architecture, dynamic scrolling indicators, and professional mobile enhancements.
+This is an e-commerce web application called "DTF Drop" built with Next.js that specializes in drop shoulder clothing. The platform allows sellers to list products and buyers to browse and purchase items. The application features user authentication, product management, automated user synchronization using event-driven architecture, dynamic scrolling indicators, professional mobile enhancements, and a comprehensive customization system for custom product designs.
 
 # User Preferences
 
@@ -28,7 +28,9 @@ Preferred communication style: Simple, everyday language.
 - **Schema Design**: 
   - User model with cart items, contact info, and join date tracking
   - Product model with comprehensive fields including ratings, reviews, categories, gender targeting, design types, colors, and sizes
-- **File Storage**: Cloudinary for image upload and management with automatic optimization and secure deletion functionality
+  - CustomizationTemplate model for managing custom product categories, colors, sizes, mockup images, and pricing
+  - CustomOrder model for processing custom design orders with image positioning, sizing, and WhatsApp integration
+- **File Storage**: Cloudinary for image upload and management with automatic optimization, secure deletion functionality, and custom design file handling
 
 ## Authentication & Authorization
 - **User Authentication**: Clerk handles sign-up, sign-in, and session management
@@ -40,6 +42,14 @@ Preferred communication style: Simple, everyday language.
 - **Background Processing**: Inngest functions handle user lifecycle events (create, update, delete)
 - **User Synchronization**: Automatic sync between Clerk user events and MongoDB user records
 - **Webhook Integration**: Real-time processing of authentication events for data consistency
+
+## Customization System
+- **Product Customization**: Comprehensive system allowing users to select product categories (drop shoulder, T-shirt, polo), colors, and sizes
+- **Design Tools**: Professional drag-and-drop interface for uploading and positioning up to 4 design images (front, back, sleeve, pocket)
+- **Image Management**: Cloudinary integration for secure image uploads with positioning and resizing controls
+- **Pricing Logic**: Base price includes front and back designs; sleeve and pocket designs cost BDT 30 extra each
+- **Order Processing**: Custom order creation with WhatsApp integration (+8801344823831) for high-resolution file sharing
+- **Admin Management**: Complete admin panel for sellers to manage customization templates, mockup images, colors, sizes, and pricing
 
 # External Dependencies
 
