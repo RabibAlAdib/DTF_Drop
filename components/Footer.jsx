@@ -63,7 +63,9 @@ const Footer = () => {
                   className="hover:opacity-80 transition-opacity"
                   title="Facebook"
                 >
-                  <Image src={assets.facebook_icon} alt="Facebook" className="w-6 h-6" />
+                  <svg className="w-6 h-6 fill-blue-600 dark:fill-blue-400" viewBox="0 0 24 24">
+                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                  </svg>
                 </a>
                 <a 
                   href="https://www.instagram.com/dtfdrop/" 
@@ -72,7 +74,10 @@ const Footer = () => {
                   className="hover:opacity-80 transition-opacity"
                   title="Instagram"
                 >
-                  <Image src={assets.instagram_icon} alt="Instagram" className="w-6 h-6" />
+                  <svg className="w-6 h-6 fill-pink-500 dark:fill-pink-400" viewBox="0 0 24 24">
+                    <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 6.618 5.367 11.987 11.988 11.987s11.987-5.369 11.987-11.987C24.004 5.367 18.635.001 12.017.001zM8.449 16.988c-1.297 0-2.348-1.051-2.348-2.348s1.051-2.348 2.348-2.348 2.348 1.051 2.348 2.348-1.051 2.348-2.348 2.348zm7.718 0c-1.297 0-2.348-1.051-2.348-2.348s1.051-2.348 2.348-2.348 2.348 1.051 2.348 2.348-1.051 2.348-2.348 2.348z"/>
+                    <path d="M17.96 8.233H6.04c-.22 0-.4.18-.4.4v7.004c0 .22.18.4.4.4h11.92c.22 0 .4-.18.4-.4V8.633c0-.22-.18-.4-.4-.4zM12 16.013c-2.208 0-4-1.792-4-4s1.792-4 4-4 4 1.792 4 4-1.792 4-4 4zm4.7-7.013c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1z"/>
+                  </svg>
                 </a>
                 <a 
                   href="https://www.tiktok.com/@dtf.drop" 

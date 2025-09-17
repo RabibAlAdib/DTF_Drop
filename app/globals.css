@@ -248,6 +248,24 @@ body {
   transition-duration: 300ms;
 }
 
+/* Fix text input visibility in dark mode */
+input[type="text"],
+input[type="email"], 
+input[type="password"],
+input[type="number"],
+input[type="url"],
+input[type="tel"],
+textarea,
+select {
+  @apply text-gray-900 dark:text-white;
+}
+
+/* Ensure placeholders are visible in dark mode */
+input::placeholder,
+textarea::placeholder {
+  @apply text-gray-500 dark:text-gray-400;
+}
+
 @layer base {
 
   input[type="number"]::-webkit-inner-spin-button,
