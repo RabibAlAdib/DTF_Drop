@@ -1,3 +1,5 @@
+'use client';
+
 import { ClerkProvider } from '@clerk/nextjs'
 import { AppContextProvider } from '@/context/AppContext'
 import { ThemeProvider } from '@/context/ThemeContext'
@@ -10,11 +12,6 @@ import FloatingCart from '@/components/FloatingCart'
 import ScrollIndicator from '@/components/ScrollIndicator'
 
 const outfit = Outfit({ subsets: ['latin'] })
-
-export const metadata = {
-  title: 'DTF Drop',
-  description: 'Online Drop Shoulder Shop..',
-}
 
 export default function RootLayout({ children }) {
   return (

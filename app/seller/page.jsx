@@ -502,6 +502,11 @@ const AddProduct = () => {
             
             <p className="text-sm text-gray-500 dark:text-gray-400">
               All products include M, L, XL sizes by default. Check the box above to also include XXL.
+              {includeXXL && (
+                <span className="block mt-1 text-orange-600 dark:text-orange-400 font-medium">
+                  ⚠️ XXL size will have an additional BDT 60 charge for customers
+                </span>
+              )}
             </p>
           </div>
         </div>

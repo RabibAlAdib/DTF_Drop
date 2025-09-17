@@ -29,10 +29,10 @@ const customizationTemplateSchema = new mongoose.Schema({
       required: true,
       match: /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/
     },
-    mockupImage: { 
+    mockupImages: [{ 
       type: String, 
-      required: true // PNG mockup image URL for this color
-    }
+      required: true // Array of PNG mockup image URLs for this color
+    }]
   }],
   
   // Available sizes

@@ -32,7 +32,7 @@ const CustomizationAdmin = () => {
   });
   
   // Color management
-  const [newColor, setNewColor] = useState({ name: 'Black', hexCode: '#000000', mockupImage: '' });
+  const [newColor, setNewColor] = useState({ name: 'Black', hexCode: '#000000', mockupImages: [] });
   const [isUploadingMockup, setIsUploadingMockup] = useState(false);
   
   // Size management  
@@ -110,30 +110,53 @@ const CustomizationAdmin = () => {
     }
   };
 
-  // Handle mockup file selection
+  // Handle multiple mockup file selection
   const handleMockupFileChange = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+    const files = Array.from(e.target.files);
+    if (files.length === 0) return;
     
-    // Validate file type
-    if (!file.type.includes('image/')) {
-      toast.error('Please select a valid image file');
+    // Validate file types
+    const invalidFiles = files.filter(file => !file.type.includes('image/'));
+    if (invalidFiles.length > 0) {
+      toast.error('Please select only valid image files');
+      return;
+    }
+    
+    // Limit to maximum 5 mockup images per color
+    if (newColor.mockupImages.length + files.length > 5) {
+      toast.error('Maximum 5 mockup images per color allowed');
       return;
     }
     
     try {
-      const imageUrl = await uploadMockupImage(file);
-      setNewColor(prev => ({ ...prev, mockupImage: imageUrl }));
-      toast.success('Mockup image uploaded successfully');
+      setIsUploadingMockup(true);
+      const uploadPromises = files.map(file => uploadMockupImage(file));
+      const imageUrls = await Promise.all(uploadPromises);
+      
+      setNewColor(prev => ({ 
+        ...prev, 
+        mockupImages: [...prev.mockupImages, ...imageUrls] 
+      }));
+      toast.success(`${files.length} mockup image(s) uploaded successfully`);
     } catch (error) {
       // Error already handled in uploadMockupImage
+    } finally {
+      setIsUploadingMockup(false);
     }
+  };
+  
+  // Remove mockup image from color
+  const removeMockupImage = (index) => {
+    setNewColor(prev => ({
+      ...prev,
+      mockupImages: prev.mockupImages.filter((_, i) => i !== index)
+    }));
   };
 
   // Add color to template
   const addColorToTemplate = () => {
-    if (!newColor.name || !newColor.hexCode || !newColor.mockupImage) {
-      toast.error('Please fill all color fields and upload mockup image');
+    if (!newColor.name || !newColor.hexCode || newColor.mockupImages.length === 0) {
+      toast.error('Please fill all color fields and upload at least one mockup image');
       return;
     }
     
@@ -148,7 +171,7 @@ const CustomizationAdmin = () => {
       availableColors: [...prev.availableColors, { ...newColor }]
     }));
     
-    setNewColor({ name: 'Black', hexCode: '#000000', mockupImage: '' });
+    setNewColor({ name: 'Black', hexCode: '#000000', mockupImages: [] });
     toast.success('Color added to template');
   };
 
@@ -260,13 +283,22 @@ const CustomizationAdmin = () => {
       }
     });
     setEditingTemplate(null);
-    setNewColor({ name: 'Black', hexCode: '#000000', mockupImage: '' });
+    setNewColor({ name: 'Black', hexCode: '#000000', mockupImages: [] });
     setNewSize({ size: 'M', price: '' });
   };
 
   // Edit template
   const handleEditTemplate = (template) => {
-    setFormData(template);
+    // Handle backward compatibility: convert old mockupImage to mockupImages array
+    const updatedTemplate = {
+      ...template,
+      availableColors: template.availableColors.map(color => ({
+        ...color,
+        mockupImages: color.mockupImages || (color.mockupImage ? [color.mockupImage] : [])
+      }))
+    };
+    
+    setFormData(updatedTemplate);
     setEditingTemplate(template);
     setIsFormOpen(true);
   };
@@ -516,20 +548,25 @@ const CustomizationAdmin = () => {
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Mockup Image (PNG)</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Mockup Images (PNG) - Max 5</label>
                     <input
                       type="file"
                       accept="image/*"
+                      multiple
                       onChange={handleMockupFileChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-white"
+                      disabled={isUploadingMockup}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-white disabled:opacity-50"
                     />
+                    {isUploadingMockup && (
+                      <p className="text-blue-600 text-xs mt-1">Uploading...</p>
+                    )}
                   </div>
                   
                   <div>
                     <button
                       type="button"
                       onClick={addColorToTemplate}
-                      disabled={isUploadingMockup}
+                      disabled={isUploadingMockup || newColor.mockupImages.length === 0}
                       className="w-full bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white px-4 py-2 rounded-md transition-colors"
                     >
                       {isUploadingMockup ? 'Uploading...' : 'Add Color'}
@@ -537,36 +574,79 @@ const CustomizationAdmin = () => {
                   </div>
                 </div>
                 
-                {newColor.mockupImage && (
+                {newColor.mockupImages.length > 0 && (
                   <div className="mt-3">
-                    <img src={newColor.mockupImage} alt="Mockup preview" className="w-20 h-20 object-cover rounded border" />
+                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Mockup Preview ({newColor.mockupImages.length}/5)</p>
+                    <div className="flex flex-wrap gap-2">
+                      {newColor.mockupImages.map((imageUrl, imgIndex) => (
+                        <div key={imgIndex} className="relative group">
+                          <img 
+                            src={imageUrl} 
+                            alt={`Mockup preview ${imgIndex + 1}`} 
+                            className="w-16 h-16 object-cover rounded border" 
+                          />
+                          <button
+                            type="button"
+                            onClick={() => removeMockupImage(imgIndex)}
+                            className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            ×
+                          </button>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>
               
               {/* Current Colors */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {formData.availableColors.map((color, index) => (
-                  <div key={index} className="flex items-center justify-between bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg p-3">
-                    <div className="flex items-center gap-3">
-                      <div
-                        className="w-8 h-8 rounded-full border-2 border-gray-300"
-                        style={{ backgroundColor: color.hexCode }}
-                      ></div>
-                      <div>
-                        <p className="font-medium text-gray-900 dark:text-white">{color.name}</p>
-                        <p className="text-sm text-gray-500">{color.hexCode}</p>
+                {formData.availableColors.map((color, index) => {
+                  // Handle backward compatibility: convert single mockupImage to mockupImages array
+                  const mockupImages = color.mockupImages || (color.mockupImage ? [color.mockupImage] : []);
+                  
+                  return (
+                    <div key={index} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg p-3">
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-3">
+                          <div
+                            className="w-8 h-8 rounded-full border-2 border-gray-300"
+                            style={{ backgroundColor: color.hexCode }}
+                          ></div>
+                          <div>
+                            <p className="font-medium text-gray-900 dark:text-white">{color.name}</p>
+                            <p className="text-sm text-gray-500">{color.hexCode}</p>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => removeColorFromTemplate(color.name)}
+                          className="text-red-600 hover:text-red-800 text-sm"
+                        >
+                          Remove
+                        </button>
                       </div>
+                      
+                      {mockupImages.length > 0 && (
+                        <div className="mt-2">
+                          <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">
+                            Mockups ({mockupImages.length})
+                          </p>
+                          <div className="flex flex-wrap gap-1">
+                            {mockupImages.map((imageUrl, imgIndex) => (
+                              <img 
+                                key={imgIndex}
+                                src={imageUrl} 
+                                alt={`${color.name} mockup ${imgIndex + 1}`} 
+                                className="w-12 h-12 object-cover rounded border" 
+                              />
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => removeColorFromTemplate(color.name)}
-                      className="text-red-600 hover:text-red-800 text-sm"
-                    >
-                      Remove
-                    </button>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             </div>
 

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getAdminAuth } from '@/lib/authAdmin';
+import { clerkClient } from '@clerk/nextjs/server';
 import connectDB from '@/config/db';
 import User from '@/models/User';
 

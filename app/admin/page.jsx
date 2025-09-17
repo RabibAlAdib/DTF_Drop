@@ -31,26 +31,24 @@ const AdminControlPanel = () => {
     const [selectedUser, setSelectedUser] = useState(null);
 
     useEffect(() => {
-        if (isLoaded && user) {
+        console.log('Admin page useEffect - isLoaded:', isLoaded);
+        if (isLoaded) {
+            console.log('Clerk loaded, attempting admin access check');
             checkAdminAccess();
-        } else if (isLoaded && !user) {
-            router.push('/');
+        } else {
+            console.log('Still loading Clerk...');
         }
-    }, [isLoaded, user]);
+    }, [isLoaded]);
 
     const checkAdminAccess = async () => {
         try {
-            if (user?.username !== 'dtfdrop_admin') {
-                toast.error('Access denied. Admin privileges required.');
-                router.push('/');
-                return;
-            }
+            console.log('Admin access check - making API calls to verify backend authentication');
             
-            setIsAdmin(true);
+            // Make the API calls and let backend handle authentication
+            // Only set isAdmin to true after successful authentication
             await fetchSystemStats();
             await fetchAllUsers();
             await fetchSecrets();
-            setLoading(false);
         } catch (error) {
             console.error('Admin access check failed:', error);
             toast.error('Admin verification failed');
@@ -60,18 +58,29 @@ const AdminControlPanel = () => {
 
     const fetchSystemStats = async () => {
         try {
+            console.log('Making request to /api/admin/system-stats');
             const response = await axios.get('/api/admin/system-stats');
+            console.log('System stats response:', response.data);
             if (response.data.success) {
                 setSystemStats(response.data.stats);
+                setIsAdmin(true); // Set admin status only after successful auth
+                setLoading(false);
             }
         } catch (error) {
             console.error('Failed to fetch system stats:', error);
+            if (error.response?.status === 403 || error.response?.status === 401) {
+                toast.error('Access denied. Admin privileges required.');
+                setLoading(false);
+                router.push('/');
+            }
         }
     };
 
     const fetchAllUsers = async () => {
         try {
+            console.log('Making request to /api/admin/users');
             const response = await axios.get('/api/admin/users');
+            console.log('Users response:', response.data);
             if (response.data.success) {
                 setUsers(response.data.users);
             }
@@ -82,7 +91,9 @@ const AdminControlPanel = () => {
 
     const fetchSecrets = async () => {
         try {
+            console.log('Making request to /api/admin/secrets');
             const response = await axios.get('/api/admin/secrets');
+            console.log('Secrets response:', response.data);
             if (response.data.success) {
                 setSecretsByCategory(response.data.secrets);
                 setSecretsLoaded(true);
@@ -224,7 +235,7 @@ ${secretValues.map(({ key, value }) => `   ${key}="${value}"`).join('\n')}
         }
 
         try {
-            const response = await axios.post('/api/admin/system-reset');
+            const response = await axios.post('/api/admin/system-reset', {});
             
             if (response.data.success) {
                 toast.success('System reset successfully');
