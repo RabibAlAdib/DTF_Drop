@@ -11,6 +11,8 @@ const OrderSummary = () => {
   const [promoCode, setPromoCode] = useState('');
   const [appliedPromo, setAppliedPromo] = useState(null);
   const [promoDiscount, setPromoDiscount] = useState(0);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('cash_on_delivery');
+  const [deliveryCharge, setDeliveryCharge] = useState(0);
 
   const [userAddresses, setUserAddresses] = useState([]);
 
@@ -40,6 +42,21 @@ const OrderSummary = () => {
   const handleAddressSelect = (address) => {
     setSelectedAddress(address);
     setIsDropdownOpen(false);
+    // Calculate delivery charge based on address
+    calculateDeliveryCharge(address);
+  };
+
+  const calculateDeliveryCharge = (address) => {
+    if (!address) return;
+    
+    const addressLower = `${address.area} ${address.city} ${address.state}`.toLowerCase();
+    const isDhaka = addressLower.includes('dhaka');
+    const charge = isDhaka ? 70 : 130;
+    setDeliveryCharge(charge);
+  };
+
+  const handlePaymentMethodChange = (method) => {
+    setSelectedPaymentMethod(method);
   };
 
   const handleApplyPromo = async () => {
@@ -197,7 +214,7 @@ const OrderSummary = () => {
         customerInfo,
         items: orderItems,
         payment: {
-          method: 'cash_on_delivery' // Default payment method
+          method: selectedPaymentMethod
         },
         delivery: {
           address: customerInfo.address,
@@ -274,6 +291,12 @@ const OrderSummary = () => {
     }
   }, [user])
 
+  useEffect(() => {
+    if (selectedAddress) {
+      calculateDeliveryCharge(selectedAddress);
+    }
+  }, [selectedAddress])
+
   return (
     <div className="w-full md:w-96 bg-gray-500/5 p-5">
       <h2 className="text-xl md:text-2xl font-medium text-gray-700 dark:text-gray-200">
@@ -347,6 +370,56 @@ const OrderSummary = () => {
           </div>
         </div>
 
+        <div>
+          <label className="text-base font-medium uppercase text-gray-600 dark:text-gray-300 block mb-2">
+            Payment Method
+          </label>
+          <div className="space-y-3">
+            <div className="flex items-center">
+              <input 
+                type="radio" 
+                id="cash_on_delivery" 
+                name="payment_method" 
+                value="cash_on_delivery"
+                checked={selectedPaymentMethod === 'cash_on_delivery'}
+                onChange={(e) => handlePaymentMethodChange(e.target.value)}
+                className="mr-3 w-4 h-4 text-orange-600 bg-gray-100 border-gray-300 focus:ring-orange-500 dark:focus:ring-orange-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+              />
+              <label htmlFor="cash_on_delivery" className="text-gray-700 dark:text-gray-200 cursor-pointer">
+                💵 Cash on Delivery
+              </label>
+            </div>
+            <div className="flex items-center">
+              <input 
+                type="radio" 
+                id="bkash" 
+                name="payment_method" 
+                value="bkash"
+                checked={selectedPaymentMethod === 'bkash'}
+                onChange={(e) => handlePaymentMethodChange(e.target.value)}
+                className="mr-3 w-4 h-4 text-orange-600 bg-gray-100 border-gray-300 focus:ring-orange-500 dark:focus:ring-orange-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+              />
+              <label htmlFor="bkash" className="text-gray-700 dark:text-gray-200 cursor-pointer">
+                📱 bKash
+              </label>
+            </div>
+            <div className="flex items-center">
+              <input 
+                type="radio" 
+                id="nagad" 
+                name="payment_method" 
+                value="nagad"
+                checked={selectedPaymentMethod === 'nagad'}
+                onChange={(e) => handlePaymentMethodChange(e.target.value)}
+                className="mr-3 w-4 h-4 text-orange-600 bg-gray-100 border-gray-300 focus:ring-orange-500 dark:focus:ring-orange-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+              />
+              <label htmlFor="nagad" className="text-gray-700 dark:text-gray-200 cursor-pointer">
+                💳 Nagad
+              </label>
+            </div>
+          </div>
+        </div>
+
         <hr className="border-gray-500/30 my-5" />
 
         <div className="space-y-4">
@@ -355,8 +428,10 @@ const OrderSummary = () => {
             <p className="text-gray-800 dark:text-gray-200">{currency}{getCartAmount()}</p>
           </div>
           <div className="flex justify-between">
-            <p className="text-gray-600 dark:text-gray-300">Shipping Fee</p>
-            <p className="font-medium text-gray-800 dark:text-gray-200">Free</p>
+            <p className="text-gray-600 dark:text-gray-300">Delivery Charge</p>
+            <p className="font-medium text-gray-800 dark:text-gray-200">
+              {deliveryCharge > 0 ? `${currency}${deliveryCharge}` : 'Select address'}
+            </p>
           </div>
           {promoDiscount > 0 && (
             <div className="flex justify-between text-green-600">
@@ -366,7 +441,7 @@ const OrderSummary = () => {
           )}
           <div className="flex justify-between text-lg md:text-xl font-medium border-t pt-3">
             <p className="text-gray-800 dark:text-gray-200">Total</p>
-            <p className="text-gray-800 dark:text-gray-200">{currency}{getCartAmount() - promoDiscount}</p>
+            <p className="text-gray-800 dark:text-gray-200">{currency}{getCartAmount() - promoDiscount + deliveryCharge}</p>
           </div>
         </div>
       </div>
