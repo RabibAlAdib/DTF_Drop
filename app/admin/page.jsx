@@ -59,7 +59,13 @@ const AdminControlPanel = () => {
     const fetchSystemStats = async () => {
         try {
             console.log('Making request to /api/admin/system-stats');
-            const response = await axios.get('/api/admin/system-stats');
+            
+            // Get auth token from Clerk if available
+            const token = await user?.getToken?.();
+            const headers = token ? { Authorization: `Bearer ${token}` } : {};
+            
+            console.log('Using auth token:', !!token);
+            const response = await axios.get('/api/admin/system-stats', { headers });
             console.log('System stats response:', response.data);
             if (response.data.success) {
                 setSystemStats(response.data.stats);
@@ -79,7 +85,11 @@ const AdminControlPanel = () => {
     const fetchAllUsers = async () => {
         try {
             console.log('Making request to /api/admin/users');
-            const response = await axios.get('/api/admin/users');
+            
+            const token = await user?.getToken?.();
+            const headers = token ? { Authorization: `Bearer ${token}` } : {};
+            
+            const response = await axios.get('/api/admin/users', { headers });
             console.log('Users response:', response.data);
             if (response.data.success) {
                 setUsers(response.data.users);
@@ -92,7 +102,11 @@ const AdminControlPanel = () => {
     const fetchSecrets = async () => {
         try {
             console.log('Making request to /api/admin/secrets');
-            const response = await axios.get('/api/admin/secrets');
+            
+            const token = await user?.getToken?.();
+            const headers = token ? { Authorization: `Bearer ${token}` } : {};
+            
+            const response = await axios.get('/api/admin/secrets', { headers });
             console.log('Secrets response:', response.data);
             if (response.data.success) {
                 setSecretsByCategory(response.data.secrets);

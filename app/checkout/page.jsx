@@ -527,26 +527,28 @@ const CheckoutPage = () => {
                     <span>Cash on Delivery (COD)</span>
                   </label>
                   
-                  <label className="flex items-center opacity-50 cursor-not-allowed">
+                  <label className="flex items-center cursor-pointer">
                     <input
                       type="radio"
                       name="payment"
                       value="bkash"
-                      disabled
+                      checked={paymentMethod === 'bkash'}
+                      onChange={(e) => setPaymentMethod(e.target.value)}
                       className="mr-3"
                     />
-                    <span>bKash (Coming Soon)</span>
+                    <span>bKash - Mobile Payment</span>
                   </label>
                   
-                  <label className="flex items-center opacity-50 cursor-not-allowed">
+                  <label className="flex items-center cursor-pointer">
                     <input
                       type="radio"
                       name="payment"
-                      value="card"
-                      disabled
+                      value="nagad"
+                      checked={paymentMethod === 'nagad'}
+                      onChange={(e) => setPaymentMethod(e.target.value)}
                       className="mr-3"
                     />
-                    <span>Credit/Debit Card (Coming Soon)</span>
+                    <span>Nagad - Mobile Payment</span>
                   </label>
                 </div>
               </div>

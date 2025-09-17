@@ -148,11 +148,12 @@ const OrderSchema = new mongoose.Schema({
   toObject: { virtuals: true }
 });
 
-// Indexes for better query performance
+// Indexes for better query performance  
+// Note: orderNumber already has unique index from schema definition
 OrderSchema.index({ userId: 1, createdAt: -1 });
-OrderSchema.index({ orderNumber: 1 });
-OrderSchema.index({ status: 1 });
+OrderSchema.index({ status: 1, createdAt: -1 });
 OrderSchema.index({ 'payment.status': 1 });
+OrderSchema.index({ 'delivery.isDhaka': 1 });
 
 // Virtual to calculate total items count
 OrderSchema.virtual('totalItems').get(function() {
