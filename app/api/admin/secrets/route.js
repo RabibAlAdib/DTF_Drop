@@ -4,7 +4,17 @@ import { getSecretsByCategory, getSecretConfig, SECRETS_CONFIG } from '@/lib/sec
 
 export async function GET(request) {
     try {
-        // Get all secrets organized by category - temporarily bypass auth for dtfdrop_admin
+        // Check admin authentication - CRITICAL SECURITY ENFORCEMENT
+        const { userId, isAdmin, error } = await getAdminAuth(request);
+        
+        if (!userId || !isAdmin || error) {
+            return NextResponse.json({
+                success: false,
+                message: error || 'Admin authentication required'
+            }, { status: 403 });
+        }
+
+        // Get all secrets organized by category
         const secretsByCategory = getSecretsByCategory();
         
         // For each secret, check if it's currently set and provide status information
@@ -47,22 +57,32 @@ export async function GET(request) {
 
 export async function POST(request) {
     try {
-        const { secretsToUpdate } = await request.json();
-
-        if (!secretsToUpdate || !Array.isArray(secretsToUpdate)) {
+        // Check admin authentication - CRITICAL SECURITY ENFORCEMENT
+        const { userId, isAdmin, error } = await getAdminAuth(request);
+        
+        if (!userId || !isAdmin || error) {
             return NextResponse.json({
                 success: false,
-                message: 'secretsToUpdate array is required'
+                message: error || 'Admin authentication required'
+            }, { status: 403 });
+        }
+
+        const { secretKeys } = await request.json();
+
+        if (!secretKeys || !Array.isArray(secretKeys)) {
+            return NextResponse.json({
+                success: false,
+                message: 'secretKeys array is required'
             }, { status: 400 });
         }
 
-        // Filter out empty values and validate keys
-        const validUpdates = [];
+        // Validate secret keys only (never accept values via API for security)
+        const validKeys = [];
         const errors = [];
 
-        secretsToUpdate.forEach(({ key, value }) => {
+        secretKeys.forEach((key) => {
             if (!key) {
-                errors.push('Key is required for all updates');
+                errors.push('Key is required');
                 return;
             }
 
@@ -77,10 +97,7 @@ export async function POST(request) {
                 return;
             }
 
-            // Only include secrets that have actual values (not empty or just whitespace)
-            if (value && value.trim() !== '' && value !== '••••••••') {
-                validUpdates.push({ key, value: value.trim() });
-            }
+            validKeys.push(key);
         });
 
         if (errors.length > 0) {
@@ -91,29 +108,27 @@ export async function POST(request) {
             }, { status: 400 });
         }
 
-        if (validUpdates.length === 0) {
+        if (validKeys.length === 0) {
             return NextResponse.json({
                 success: false,
-                message: 'No valid secrets to update. Please provide at least one secret with a value.'
+                message: 'No valid secrets to update.'
             }, { status: 400 });
         }
 
-        console.log(`Admin requested update of ${validUpdates.length} secrets: ${validUpdates.map(u => u.key).join(', ')}`);
+        console.log(`Admin ${userId} requested secure update of ${validKeys.length} secrets: ${validKeys.join(', ')}`);
 
-        // For security, we'll use Replit's ask_secrets mechanism
         return NextResponse.json({
             success: true,
-            message: `Ready to update ${validUpdates.length} secrets securely`,
-            needsSecretInput: true,
-            secretsToUpdate: validUpdates.map(({ key }) => key),
-            instructions: 'These secrets will be updated using Replit\'s secure secret management system'
+            message: `Use Replit Secrets panel to add these ${validKeys.length} secrets manually`,
+            secretKeys: validKeys,
+            instructions: 'For security, values must be entered directly in Replit Secrets panel'
         });
 
     } catch (error) {
         console.error('Admin secret update error:', error);
         return NextResponse.json({
             success: false,
-            message: 'Failed to process secret updates'
+            message: 'Failed to process secret update request'
         }, { status: 500 });
     }
 }

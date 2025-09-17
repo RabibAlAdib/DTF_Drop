@@ -111,7 +111,7 @@ const AdminControlPanel = () => {
         // Get only secrets that have been changed and have actual values
         const secretsToUpdate = Object.entries(secretsFormData)
             .filter(([key, value]) => value && value.trim() !== '' && value !== '••••••••')
-            .map(([key, value]) => ({ key, value }));
+            .map(([key, value]) => key); // SECURITY: Only send keys, never values
 
         if (secretsToUpdate.length === 0) {
             toast.error('No secrets to update. Please enter values for the secrets you want to change.');
@@ -122,68 +122,60 @@ const AdminControlPanel = () => {
 
         try {
             const response = await axios.post('/api/admin/secrets', {
-                secretsToUpdate: secretsToUpdate
+                secretKeys: secretsToUpdate
             });
 
-            if (response.data.success && response.data.needsSecretInput) {
-                // Use the browser's built-in functionality to trigger secret input
-                toast.success(`Prepared to update ${secretsToUpdate.length} secrets securely!`);
-                toast.info('The system will now request secure input for the secrets...', { duration: 6000 });
-                
-                // Create secret update request with actual values
-                const secretMap = {};
-                secretsToUpdate.forEach(({ key, value }) => {
-                    secretMap[key] = value;
-                });
-                
-                // Request secrets to be added via Replit's secure system
-                await requestSecretsUpdate(secretMap);
-                
-            } else if (response.data.success) {
-                toast.success('Secrets updated successfully!');
-                await fetchSecrets();
+            if (response.data.success) {
+                // Create the secure manual update guide
+                showSecretUpdateGuide(secretsToUpdate, secretsFormData);
+                toast.success('Secret update guide prepared!');
             } else {
-                toast.error(response.data.message || 'Failed to update secrets');
+                toast.error(response.data.message || 'Failed to prepare secret updates');
             }
         } catch (error) {
             console.error('Secrets update error:', error);
-            toast.error('Failed to update secrets');
+            toast.error('Failed to prepare secret updates');
         } finally {
             setIsUpdatingSecrets(false);
         }
     };
 
-    const requestSecretsUpdate = async (secretMap) => {
-        // This function handles the secure secret update process
-        const secretKeys = Object.keys(secretMap);
-        const message = `🔐 Update ${secretKeys.length} secrets in DTF Drop Admin Panel:
+    const showSecretUpdateGuide = (secretKeys, formData) => {
+        // Create secure update instructions
+        const secretValues = secretKeys.map(key => ({
+            key,
+            value: formData[key] || ''
+        }));
 
-${secretKeys.map(key => `• ${key}`).join('\n')}
+        const instructionsText = `🔐 DTF Drop Secrets Update Guide
 
-Your new values:
-${Object.entries(secretMap).map(([key, value]) => `${key}="${value}"`).join('\n')}
+To securely update your secrets in Replit:
 
-Once updated, I'll refresh the admin panel to show the new configuration.`;
+1. Open the "Secrets" panel in your workspace (Tools → Secrets)
+2. Add/update these ${secretKeys.length} secrets:
 
-        try {
-            // This will trigger the secure secret input mechanism
-            const response = await fetch('/api/admin/request-secrets-update', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    secretKeys: secretKeys,
-                    message: message
-                })
-            });
+${secretValues.map(({ key, value }) => `   ${key}="${value}"`).join('\n')}
 
-            if (response.ok) {
-                setTimeout(() => {
-                    fetchSecrets(); // Refresh after a moment
-                }, 2000);
-            }
-        } catch (error) {
-            console.warn('Direct secret update method not available, using fallback');
-        }
+3. Restart your application after adding secrets
+4. Come back here and click "Refresh Configuration" to verify
+
+⚠️ Keep this information secure and delete after use.`;
+
+        // Show the guide in a popup for user to copy
+        const popup = window.open('', '_blank', 'width=600,height=400');
+        popup.document.write(`
+            <html>
+                <head><title>Secure Secrets Update Guide</title></head>
+                <body style="font-family: monospace; padding: 20px; background: #f5f5f5;">
+                    <h2>🔐 Secret Update Guide</h2>
+                    <textarea readonly style="width: 100%; height: 300px; font-family: monospace; padding: 10px;">${instructionsText}</textarea>
+                    <br><br>
+                    <button onclick="navigator.clipboard.writeText(document.querySelector('textarea').value); alert('Copied to clipboard!')">Copy Instructions</button>
+                    <button onclick="window.close()" style="margin-left: 10px;">Close</button>
+                    <p><small>⚠️ Close this window after copying the instructions for security</small></p>
+                </body>
+            </html>
+        `);
     };
 
     const handleUserRoleUpdate = async (userId, newRole) => {
@@ -421,31 +413,59 @@ Once updated, I'll refresh the admin panel to show the new configuration.`;
                                     ))}
                                     
                                     {/* Update Button */}
-                                    <div className="flex items-center justify-between bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
-                                        <div>
-                                            <h4 className="text-sm font-medium text-gray-800 dark:text-gray-200">Update Secrets</h4>
-                                            <p className="text-sm text-gray-600 dark:text-gray-400">
-                                                Only secrets with new values will be updated securely
-                                            </p>
+                                    <div className="space-y-4">
+                                        <div className="flex items-center justify-between bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
+                                            <div>
+                                                <h4 className="text-sm font-medium text-gray-800 dark:text-gray-200">Generate Update Guide</h4>
+                                                <p className="text-sm text-gray-600 dark:text-gray-400">
+                                                    Create secure instructions for updating secrets manually in Replit
+                                                </p>
+                                            </div>
+                                            <div className="flex space-x-3">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => fetchSecrets()}
+                                                    className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500"
+                                                >
+                                                    Refresh Configuration
+                                                </button>
+                                                <button
+                                                    type="submit"
+                                                    disabled={isUpdatingSecrets}
+                                                    className={`px-6 py-3 rounded-lg font-medium transition-all duration-200 ${
+                                                        isUpdatingSecrets
+                                                            ? 'bg-gray-400 cursor-not-allowed text-white'
+                                                            : 'bg-blue-600 hover:bg-blue-700 focus:bg-blue-700 text-white shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'
+                                                    }`}
+                                                >
+                                                    {isUpdatingSecrets ? (
+                                                        <div className="flex items-center space-x-2">
+                                                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                                                            <span>Preparing...</span>
+                                                        </div>
+                                                    ) : (
+                                                        'Generate Update Guide'
+                                                    )}
+                                                </button>
+                                            </div>
                                         </div>
-                                        <button
-                                            type="submit"
-                                            disabled={isUpdatingSecrets}
-                                            className={`px-6 py-3 rounded-lg font-medium transition-all duration-200 ${
-                                                isUpdatingSecrets
-                                                    ? 'bg-gray-400 cursor-not-allowed text-white'
-                                                    : 'bg-blue-600 hover:bg-blue-700 focus:bg-blue-700 text-white shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'
-                                            }`}
-                                        >
-                                            {isUpdatingSecrets ? (
-                                                <div className="flex items-center space-x-2">
-                                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                                                    <span>Updating...</span>
+                                        
+                                        {/* Security Notice */}
+                                        <div className="bg-orange-50 dark:bg-orange-900/20 border-l-4 border-orange-400 p-4">
+                                            <div className="flex">
+                                                <div className="flex-shrink-0">
+                                                    <svg className="h-5 w-5 text-orange-400" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                                                    </svg>
                                                 </div>
-                                            ) : (
-                                                'Update All Secrets'
-                                            )}
-                                        </button>
+                                                <div className="ml-3">
+                                                    <p className="text-sm text-orange-700 dark:text-orange-300">
+                                                        <strong>Security Notice:</strong> For maximum security, secret values are never transmitted to the server. 
+                                                        You must manually add secrets via Replit's Secrets panel and restart the application.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </form>
                             </div>

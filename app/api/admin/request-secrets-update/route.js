@@ -1,8 +1,19 @@
 import { NextResponse } from 'next/server';
+import { getAdminAuth } from '@/lib/authAdmin';
 
 export async function POST(request) {
     try {
-        const { secretKeys, message } = await request.json();
+        // Check admin authentication - CRITICAL SECURITY ENFORCEMENT
+        const { userId, isAdmin, error } = await getAdminAuth(request);
+        
+        if (!userId || !isAdmin || error) {
+            return NextResponse.json({
+                success: false,
+                message: error || 'Admin authentication required'
+            }, { status: 403 });
+        }
+
+        const { secretKeys } = await request.json();
 
         if (!secretKeys || !Array.isArray(secretKeys)) {
             return NextResponse.json({
@@ -11,14 +22,14 @@ export async function POST(request) {
             }, { status: 400 });
         }
 
-        // This endpoint serves as a bridge to trigger secure secret updates
-        console.log(`Admin requested secure update of ${secretKeys.length} secrets:`, secretKeys.join(', '));
+        // SECURITY: Only log keys, never values
+        console.log(`Admin ${userId} requested secure update of ${secretKeys.length} secrets:`, secretKeys.join(', '));
 
         return NextResponse.json({
             success: true,
-            message: `Prepared secure update request for ${secretKeys.length} secrets`,
+            message: `Admin must use Replit Secrets panel to add ${secretKeys.length} secrets manually`,
             secretKeys: secretKeys,
-            instructions: 'Use Replit Secrets panel to add these keys with your values'
+            instructions: 'For security, secret values cannot be processed by the application. Use Replit Secrets panel directly.'
         });
 
     } catch (error) {
