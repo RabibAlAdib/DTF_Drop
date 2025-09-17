@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getAdminAuth } from '@/lib/authAdmin';
+import { isValidSecretKey, getSecretConfig } from '@/lib/secretsConfig';
 
 export async function POST(request) {
     try {
@@ -22,30 +23,20 @@ export async function POST(request) {
             }, { status: 400 });
         }
 
-        // Validate allowed keys
-        const allowedKeys = [
-            'CLERK_SECRET_KEY',
-            'MONGODB_URI', 
-            'CLOUDINARY_CLOUD_NAME',
-            'CLOUDINARY_API_KEY',
-            'CLOUDINARY_API_SECRET',
-            'INNGEST_SIGNING_KEY',
-            'INNGEST_EVENT_KEY',
-            'EMAIL_HOST',
-            'EMAIL_PORT',
-            'EMAIL_USER', 
-            'EMAIL_PASS',
-            'BKASH_API_KEY',
-            'BKASH_API_SECRET',
-            'NAGAD_MERCHANT_ID',
-            'NAGAD_PUBLIC_KEY'
-        ];
-
-        if (!allowedKeys.includes(key)) {
+        // Validate the key using centralized config
+        if (!isValidSecretKey(key)) {
             return NextResponse.json({
                 success: false,
-                message: 'Invalid API key name'
+                message: 'Invalid secret key name'
             }, { status: 400 });
+        }
+
+        const secretConfig = getSecretConfig(key);
+        if (secretConfig && secretConfig.internal) {
+            return NextResponse.json({
+                success: false,
+                message: 'Cannot modify internal system secrets'
+            }, { status: 403 });
         }
 
         // Log the update attempt (don't log sensitive values)

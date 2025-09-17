@@ -266,6 +266,27 @@ textarea::placeholder {
   @apply text-gray-500 dark:text-gray-400;
 }
 
+/* Fix dark mode form input visibility */
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="number"]:focus,
+input[type="url"]:focus,
+input[type="tel"]:focus,
+textarea:focus,
+select:focus {
+  @apply ring-2 ring-blue-500 border-blue-500 dark:ring-blue-400 dark:border-blue-400;
+}
+
+/* Ensure labels and titles are visible in dark mode */
+label {
+  @apply text-gray-700 dark:text-gray-300;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  @apply text-gray-900 dark:text-white;
+}
+
 @layer base {
 
   input[type="number"]::-webkit-inner-spin-button,

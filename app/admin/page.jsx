@@ -12,24 +12,9 @@ const AdminControlPanel = () => {
     const [loading, setLoading] = useState(true);
     const [isAdmin, setIsAdmin] = useState(false);
     
-    // API Keys Management State
-    const [apiKeys, setApiKeys] = useState({
-        CLERK_SECRET_KEY: '',
-        MONGODB_URI: '',
-        CLOUDINARY_CLOUD_NAME: '',
-        CLOUDINARY_API_KEY: '',
-        CLOUDINARY_API_SECRET: '',
-        INNGEST_SIGNING_KEY: '',
-        INNGEST_EVENT_KEY: '',
-        EMAIL_HOST: '',
-        EMAIL_PORT: '',
-        EMAIL_USER: '',
-        EMAIL_PASS: '',
-        BKASH_API_KEY: '',
-        BKASH_API_SECRET: '',
-        NAGAD_MERCHANT_ID: '',
-        NAGAD_PUBLIC_KEY: ''
-    });
+    // Secrets Management State
+    const [secretsByCategory, setSecretsByCategory] = useState({});
+    const [secretsLoaded, setSecretsLoaded] = useState(false);
 
     // System Stats State
     const [systemStats, setSystemStats] = useState({
@@ -62,6 +47,7 @@ const AdminControlPanel = () => {
             setIsAdmin(true);
             await fetchSystemStats();
             await fetchAllUsers();
+            await fetchSecrets();
             setLoading(false);
         } catch (error) {
             console.error('Admin access check failed:', error);
@@ -92,9 +78,27 @@ const AdminControlPanel = () => {
         }
     };
 
-    const handleApiKeyUpdate = async (keyName, value) => {
+    const fetchSecrets = async () => {
         try {
-            const response = await axios.post('/api/admin/update-secret', {
+            const response = await axios.get('/api/admin/secrets');
+            if (response.data.success) {
+                setSecretsByCategory(response.data.secrets);
+                setSecretsLoaded(true);
+            }
+        } catch (error) {
+            console.error('Failed to fetch secrets:', error);
+            toast.error('Failed to load secrets configuration');
+        }
+    };
+
+    const handleSecretUpdate = async (keyName, value) => {
+        if (!value.trim()) {
+            toast.error('Please enter a value for the secret');
+            return;
+        }
+
+        try {
+            const response = await axios.post('/api/admin/secrets', {
                 key: keyName,
                 value: value
             });
@@ -105,16 +109,13 @@ const AdminControlPanel = () => {
                 });
             } else if (response.data.success) {
                 toast.success(`${keyName} updated successfully`);
-                setApiKeys(prev => ({
-                    ...prev,
-                    [keyName]: value
-                }));
+                await fetchSecrets();
             } else {
-                toast.error(response.data.message || 'Failed to update API key');
+                toast.error(response.data.message || 'Failed to update secret');
             }
         } catch (error) {
-            toast.error('Failed to update API key');
-            console.error('API key update error:', error);
+            toast.error('Failed to update secret');
+            console.error('Secret update error:', error);
         }
     };
 
@@ -233,48 +234,83 @@ const AdminControlPanel = () => {
                     </div>
                 </div>
 
-                {/* API Keys Management */}
-                <div className="bg-white rounded-lg shadow mb-8">
-                    <div className="px-6 py-4 border-b">
-                        <h2 className="text-xl font-semibold text-gray-900">API Keys & Secrets Management</h2>
-                        <p className="text-gray-600">Manage environment variables and API keys</p>
+                {/* Secrets Management */}
+                <div className="bg-white dark:bg-gray-800 rounded-lg shadow mb-8">
+                    <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Secrets & API Keys Management</h2>
+                        <p className="text-gray-600 dark:text-gray-400">Manage environment variables and API keys by category</p>
                     </div>
                     <div className="p-6">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {Object.entries(apiKeys).map(([keyName, currentValue]) => (
-                                <div key={keyName} className="space-y-2">
-                                    <label className="block text-sm font-medium text-gray-700">
-                                        {keyName.replace(/_/g, ' ')}
-                                    </label>
-                                    <div className="flex space-x-2">
-                                        <input
-                                            type="password"
-                                            value={apiKeys[keyName]}
-                                            onChange={(e) => setApiKeys(prev => ({
-                                                ...prev,
-                                                [keyName]: e.target.value
-                                            }))}
-                                            placeholder={`Enter ${keyName}`}
-                                            className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                        />
-                                        <button
-                                            onClick={() => handleApiKeyUpdate(keyName, apiKeys[keyName])}
-                                            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        >
-                                            Update
-                                        </button>
+                        {secretsLoaded ? (
+                            <div className="space-y-8">
+                                {Object.entries(secretsByCategory).map(([category, secrets]) => (
+                                    <div key={category} className="border-l-4 border-blue-500 pl-4">
+                                        <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">
+                                            {category}
+                                        </h3>
+                                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                                            {secrets.map((secret) => (
+                                                <div key={secret.key} className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                                                    <div className="flex justify-between items-start mb-2">
+                                                        <div>
+                                                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                                {secret.name.replace(/_/g, ' ')}
+                                                                {secret.required && <span className="text-red-500 ml-1">*</span>}
+                                                            </label>
+                                                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                                                {secret.description}
+                                                            </p>
+                                                        </div>
+                                                        <div className={`px-2 py-1 rounded text-xs font-medium ${
+                                                            secret.isSet 
+                                                                ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400' 
+                                                                : 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400'
+                                                        }`}>
+                                                            {secret.isSet ? 'Set' : 'Missing'}
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex space-x-2">
+                                                        <input
+                                                            type="password"
+                                                            defaultValue={secret.currentValue}
+                                                            placeholder={secret.example ? `e.g., ${secret.example}` : `Enter ${secret.key}`}
+                                                            className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
+                                                            onChange={(e) => {
+                                                                // Store the value for update
+                                                                e.target.setAttribute('data-secret-value', e.target.value);
+                                                            }}
+                                                        />
+                                                        <button
+                                                            onClick={(e) => {
+                                                                const input = e.target.previousElementSibling;
+                                                                const value = input.getAttribute('data-secret-value') || input.value;
+                                                                handleSecretUpdate(secret.key, value);
+                                                            }}
+                                                            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+                                                        >
+                                                            Update
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
-                        </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="text-center py-8">
+                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                                <p className="text-gray-600 dark:text-gray-400">Loading secrets configuration...</p>
+                            </div>
+                        )}
                     </div>
                 </div>
 
                 {/* User Management */}
-                <div className="bg-white rounded-lg shadow mb-8">
-                    <div className="px-6 py-4 border-b">
-                        <h2 className="text-xl font-semibold text-gray-900">User Management</h2>
-                        <p className="text-gray-600">Manage user accounts and roles</p>
+                <div className="bg-white dark:bg-gray-800 rounded-lg shadow mb-8">
+                    <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">User Management</h2>
+                        <p className="text-gray-600 dark:text-gray-400">Manage user accounts and roles</p>
                     </div>
                     <div className="p-6">
                         <div className="overflow-x-auto">
