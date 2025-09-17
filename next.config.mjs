@@ -14,21 +14,12 @@ const nextConfig = {
             },
         ],
     },
-    // Configure for Replit environment - use hostname allowlist in webpack config
-    webpack: (config, { dev }) => {
-        if (dev) {
-            config.devServer = {
-                ...config.devServer,
-                allowedHosts: 'all'
-            };
-        }
-        return config;
-    },
     // Standalone output for production deployment
     output: 'standalone',
-    // Configure allowed dev origins and other experimental features
+    // Configure allowed dev origins (moved to root level in Next.js 15)
+    allowedDevOrigins: ['localhost', '127.0.0.1', '*.replit.dev', '*.replit.com'],
+    // Configure experimental features
     experimental: {
-        allowedDevOrigins: ['localhost', '127.0.0.1', '*.replit.dev'],
         // Support for larger request bodies in Server Actions
         serverActions: {
             bodySizeLimit: '50mb',
