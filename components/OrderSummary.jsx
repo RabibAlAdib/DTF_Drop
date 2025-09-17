@@ -6,7 +6,7 @@ import { toast } from 'react-hot-toast';
 
 const OrderSummary = () => {
 
-  const { currency, router, getCartCount, getCartAmount, cartItems, products } = useAppContext()
+  const { currency, router, getCartCount, getCartAmount, cartItems, products, userData, user, getToken } = useAppContext()
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [promoCode, setPromoCode] = useState('');
@@ -16,7 +16,26 @@ const OrderSummary = () => {
   const [userAddresses, setUserAddresses] = useState([]);
 
   const fetchUserAddresses = async () => {
-    setUserAddresses(addressDummyData);
+    try {
+      const token = await getToken();
+      const response = await axios.get('/api/user/addresses', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      if (response.data.success) {
+        setUserAddresses(response.data.addresses);
+        // Auto-select default address
+        const defaultAddress = response.data.addresses.find(addr => addr.isDefault);
+        if (defaultAddress && !selectedAddress) {
+          setSelectedAddress(defaultAddress);
+        }
+      } else {
+        setUserAddresses([]);
+      }
+    } catch (error) {
+      console.error('Error fetching addresses:', error);
+      setUserAddresses([]);
+    }
   }
 
   const handleAddressSelect = (address) => {
@@ -108,7 +127,113 @@ const OrderSummary = () => {
   };
 
   const createOrder = async () => {
+    if (!user) {
+      toast.error('Please sign in to place an order');
+      router.push('/sign-in');
+      return;
+    }
 
+    if (!selectedAddress) {
+      toast.error('Please select a delivery address');
+      return;
+    }
+
+    if (getCartCount() === 0) {
+      toast.error('Your cart is empty');
+      return;
+    }
+
+    try {
+      // Convert cart items to order format
+      const orderItems = Object.keys(cartItems)
+        .filter(itemKey => itemKey !== '_variants' && cartItems[itemKey] > 0)
+        .map(itemKey => {
+          const baseProductId = itemKey.split('_')[0];
+          const product = products.find(p => p._id === baseProductId);
+          const variantInfo = cartItems._variants?.[itemKey] || {};
+          const quantity = cartItems[itemKey];
+          
+          if (!product) {
+            throw new Error(`Product not found for item: ${itemKey}`);
+          }
+
+          const unitPrice = product.offerPrice || product.price;
+          
+          return {
+            productId: baseProductId,
+            productName: product.name,
+            color: variantInfo.color || 'Default',
+            size: variantInfo.size || 'Default',
+            unitPrice: unitPrice,
+            quantity: quantity,
+            totalPrice: unitPrice * quantity,
+            productImage: product.images?.[0] || product.image
+          };
+        });
+
+      // Prepare customer info
+      const customerInfo = {
+        name: userData?.name || user?.fullName || `${user?.firstName || ''} ${user?.lastName || ''}`.trim(),
+        email: userData?.email || user?.primaryEmailAddress?.emailAddress,
+        phone: selectedAddress.phone || userData?.phone || '',
+        address: `${selectedAddress.fullName}, ${selectedAddress.area}, ${selectedAddress.city}, ${selectedAddress.state}, ${selectedAddress.pinCode || ''}`
+      };
+
+      // Validate required fields
+      if (!customerInfo.name || customerInfo.name.trim().length < 2) {
+        toast.error('Valid customer name is required');
+        return;
+      }
+      if (!customerInfo.email || !/\S+@\S+\.\S+/.test(customerInfo.email)) {
+        toast.error('Valid email address is required');
+        return;
+      }
+      if (!customerInfo.phone || customerInfo.phone.trim().length < 10) {
+        toast.error('Valid phone number is required (minimum 10 digits)');
+        return;
+      }
+
+      // Prepare order data
+      const orderData = {
+        customerInfo,
+        items: orderItems,
+        payment: {
+          method: 'cash_on_delivery' // Default payment method
+        },
+        delivery: {
+          address: customerInfo.address,
+          notes: ''
+        },
+        promoCode: appliedPromo?.code || '',
+        discountAmount: promoDiscount || 0
+      };
+
+      // Create order
+      const token = await getToken();
+      const response = await axios.post('/api/orders', orderData, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      if (response.data.success) {
+        toast.success('Order placed successfully!');
+        // Clear applied promo
+        setAppliedPromo(null);
+        setPromoDiscount(0);
+        setPromoCode('');
+        
+        // Redirect to success page or orders page
+        router.push(`/orders?success=true&orderNumber=${response.data.order.orderNumber}`);
+      } else {
+        toast.error(response.data.message || 'Failed to place order');
+      }
+    } catch (error) {
+      console.error('Order creation error:', error);
+      if (error.response?.data?.message) {
+        toast.error(error.response.data.message);
+      } else {
+        toast.error('Failed to place order. Please try again.');
+      }
+    }
   }
 
   const generateCartMessage = () => {

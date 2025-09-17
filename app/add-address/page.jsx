@@ -2,8 +2,12 @@
 import { assets } from "@/assets/assets";
 import Image from "next/image";
 import { useState } from "react";
+import { useAppContext } from "@/context/AppContext";
+import { toast } from 'react-hot-toast';
+import axios from 'axios';
 
 const AddAddress = () => {
+    const { router, getToken } = useAppContext();
 
     const [address, setAddress] = useState({
         fullName: '',
@@ -15,7 +19,34 @@ const AddAddress = () => {
 
     const onSubmitHandler = async (e) => {
         e.preventDefault();
+        
+        // Validate required fields
+        if (!address.fullName || !address.phoneNumber || !address.area || !address.city || !address.state) {
+            toast.error('Please fill in all required fields');
+            return;
+        }
 
+        if (address.phoneNumber.length < 10) {
+            toast.error('Please enter a valid phone number');
+            return;
+        }
+
+        try {
+            const token = await getToken();
+            const response = await axios.post('/api/user/addresses', address, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            if (response.data.success) {
+                toast.success('Address added successfully!');
+                router.back(); // Go back to previous page
+            } else {
+                toast.error(response.data.message || 'Failed to add address');
+            }
+        } catch (error) {
+            console.error('Add address error:', error);
+            toast.error('Failed to add address. Please try again.');
+        }
     }
 
     return (
