@@ -7,6 +7,7 @@ import { Toaster } from 'react-hot-toast'
 import Footer from '@/components/Footer'
 import Navbar from '@/components/Navbar'
 import FloatingCart from '@/components/FloatingCart'
+import ScrollIndicator from '@/components/ScrollIndicator'
 
 const outfit = Outfit({ subsets: ['latin'] })
 
@@ -22,10 +23,15 @@ export default function RootLayout({ children }) {
         <ClerkProvider>
           <AppContextProvider>
             <ThemeProvider>
+              <ScrollIndicator />
               <Navbar />
               <Toaster />
-              <main className="min-h-screen bg-white dark:bg-black text-gray-900 dark:text-white transition-colors duration-300">
-                {children}
+              <main className="min-h-screen bg-white dark:bg-black text-gray-900 dark:text-white transition-colors duration-300 relative">
+                <div className="mx-auto max-w-full px-4 sm:px-6 lg:px-8">
+                  <div className="md:text-left text-center animate-fade-in-up">
+                    {children}
+                  </div>
+                </div>
               </main>
               <FloatingCart />
               <Footer />

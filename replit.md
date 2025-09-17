@@ -1,6 +1,6 @@
 # Overview
 
-This is an e-commerce web application called "DTF Drop" built with Next.js that specializes in drop shoulder clothing. The platform allows sellers to list products and buyers to browse and purchase items. The application features user authentication, product management, and automated user synchronization using event-driven architecture.
+This is an e-commerce web application called "DTF Drop" built with Next.js that specializes in drop shoulder clothing. The platform allows sellers to list products and buyers to browse and purchase items. The application features user authentication, product management, automated user synchronization using event-driven architecture, dynamic scrolling indicators, and professional mobile enhancements.
 
 # User Preferences
 
@@ -12,8 +12,9 @@ Preferred communication style: Simple, everyday language.
 - **Framework**: Next.js 15 with App Router architecture
 - **Styling**: Tailwind CSS for utility-first styling with custom scrollbar and input styling
 - **State Management**: React Context API (AppContextProvider) for global state management
-- **UI Components**: Custom components with React Hot Toast for notifications
+- **UI Components**: Custom components with React Hot Toast for notifications, dynamic scroll indicators, and professional mobile enhancements
 - **Font**: Outfit font from Google Fonts for consistent typography
+- **Visual Enhancements**: Dynamic scrolling indicator with gradient effects, professional animations (fade-in-up, float-up, slide-in-left, shimmer), and mobile-first responsive design
 
 ## Backend Architecture
 - **API Routes**: Next.js API routes following RESTful conventions
@@ -27,7 +28,7 @@ Preferred communication style: Simple, everyday language.
 - **Schema Design**: 
   - User model with cart items, contact info, and join date tracking
   - Product model with comprehensive fields including ratings, reviews, categories, gender targeting, design types, colors, and sizes
-- **File Storage**: Cloudinary for image upload and management with automatic optimization
+- **File Storage**: Cloudinary for image upload and management with automatic optimization and secure deletion functionality
 
 ## Authentication & Authorization
 - **User Authentication**: Clerk handles sign-up, sign-in, and session management

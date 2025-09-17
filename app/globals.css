@@ -11,6 +11,31 @@ html {
 body {
   padding-top: 80px;
   /* Match actual navbar height */
+  padding-left: 6px; /* Space for scroll indicator */
+}
+
+/* Mobile-first professional layout */
+@media (max-width: 768px) {
+  body {
+    padding-left: 6px; /* More space for mobile scroll indicator */
+  }
+  
+  /* Professional mobile content spacing */
+  .mobile-professional {
+    @apply px-4 py-6 space-y-6;
+  }
+  
+  /* Enhanced mobile cards */
+  .mobile-card {
+    @apply bg-white dark:bg-gray-900 rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-800;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+  
+  /* Professional mobile buttons */
+  .mobile-btn {
+    @apply w-full py-3 px-6 rounded-lg font-medium transition-all duration-300 transform hover:scale-105 active:scale-95;
+  }
 }
 
 /* Smooth scroll for anchor links and better scrolling performance */
@@ -114,6 +139,50 @@ body {
   }
 }
 
+@keyframes slide-in-left {
+  0% {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes float-up {
+  0% {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes professional-entrance {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.98);
+    filter: blur(2px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
 .animate-gentle-bounce {
   animation: gentle-bounce 4s ease-in-out infinite;
 }
@@ -133,6 +202,24 @@ body {
 
 .animate-border-glow {
   animation: border-glow 2s ease-in-out infinite;
+}
+
+.animate-slide-in-left {
+  animation: slide-in-left 0.8s ease-out forwards;
+}
+
+.animate-float-up {
+  animation: float-up 0.7s ease-out forwards;
+}
+
+.animate-professional-entrance {
+  animation: professional-entrance 1s ease-out forwards;
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
 }
 
 /* Dark mode enhancements */
