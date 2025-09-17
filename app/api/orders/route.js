@@ -247,14 +247,12 @@ export async function POST(req) {
       // Send order confirmation to customer
       await sendOrderConfirmationEmail(savedOrder);
       
-      // Send notification to sellers for their products
-      const sellerProductIds = [...new Set(verifiedItems.map(item => item.productId))];
-      const sellerProducts = await Product.find({ _id: { $in: sellerProductIds } }).populate('userId', 'email');
+      // Send notification to admin/seller email instead of trying to populate User
+      // Using a default seller email since User population is causing schema issues
+      const adminEmail = process.env.EMAIL_USER || 'dtfdrop25@gmail.com';
       
-      const sellerEmails = [...new Set(sellerProducts.map(product => product.userId?.email).filter(Boolean))];
-      
-      for (const sellerEmail of sellerEmails) {
-        await sendSellerNotificationEmail(savedOrder, sellerEmail);
+      if (adminEmail) {
+        await sendSellerNotificationEmail(savedOrder, adminEmail);
       }
       
       console.log('📧 Order notification emails sent successfully');
