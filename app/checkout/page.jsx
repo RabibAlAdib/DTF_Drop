@@ -536,7 +536,7 @@ const CheckoutPage = () => {
                       onChange={(e) => setPaymentMethod(e.target.value)}
                       className="mr-3"
                     />
-                    <span>bKash - Mobile Payment</span>
+                    <span>bKash - Mobile Payment {process.env.BKASH_API_KEY ? '' : '(Configuration Required)'}</span>
                   </label>
                   
                   <label className="flex items-center cursor-pointer">
@@ -548,7 +548,7 @@ const CheckoutPage = () => {
                       onChange={(e) => setPaymentMethod(e.target.value)}
                       className="mr-3"
                     />
-                    <span>Nagad - Mobile Payment</span>
+                    <span>Nagad - Mobile Payment {process.env.NAGAD_MERCHANT_ID ? '' : '(Configuration Required)'}</span>
                   </label>
                 </div>
               </div>

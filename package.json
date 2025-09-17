@@ -12,6 +12,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@clerk/backend": "^2.14.0",
     "@clerk/nextjs": "^6.31.8",
     "axios": "^1.11.0",
     "cloudinary": "^2.7.0",
