@@ -3,8 +3,10 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
+import { useAuth } from '@clerk/nextjs';
 
 const StatsTab = () => {
+  const { getToken } = useAuth();
   const [stats, setStats] = useState({
     totalUsers: 0,
     totalProducts: 0,
@@ -21,11 +23,15 @@ const StatsTab = () => {
     try {
       setLoading(true);
       
-      // Make direct API calls with admin authentication
+      // Get authentication token from Clerk
+      const token = await getToken();
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      
+      // Make API calls with admin authentication
       const [usersResponse, productsResponse, ordersResponse] = await Promise.all([
-        axios.get('/api/user/count'),
-        axios.get('/api/product/count'),
-        axios.get('/api/order/count')
+        axios.get('/api/user/count', { headers }),
+        axios.get('/api/product/count', { headers }),
+        axios.get('/api/order/count', { headers })
       ]);
 
       setStats({
