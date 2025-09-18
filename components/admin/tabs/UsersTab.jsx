@@ -3,8 +3,10 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
+import { useAuth } from '@clerk/nextjs';
 
 const UsersTab = () => {
+  const { getToken } = useAuth();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -17,7 +19,9 @@ const UsersTab = () => {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('/api/user/list');
+      const token = await getToken();
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      const response = await axios.get('/api/user/list', { headers });
       if (response.data.success) {
         setUsers(response.data.users || []);
       }
@@ -36,10 +40,12 @@ const UsersTab = () => {
 
   const updateUserRole = async (userId, newRole) => {
     try {
+      const token = await getToken();
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
       const response = await axios.post('/api/user/update-role', {
         userId,
         role: newRole
-      });
+      }, { headers });
       
       if (response.data.success) {
         toast.success(`User role updated to ${newRole}`);
@@ -63,7 +69,9 @@ const UsersTab = () => {
     }
 
     try {
-      const response = await axios.delete(`/api/user/delete/${userId}`);
+      const token = await getToken();
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      const response = await axios.delete(`/api/user/delete/${userId}`, { headers });
       
       if (response.data.success) {
         toast.success('User deleted successfully');

@@ -3,8 +3,10 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
 import axios from 'axios';
+import { useAuth } from '@clerk/nextjs';
 
 const SettingsTab = () => {
+  const { getToken } = useAuth();
   const [settings, setSettings] = useState({
     siteName: 'DTF Drop',
     currency: 'BDT',
@@ -24,7 +26,9 @@ const SettingsTab = () => {
   const fetchSettings = async () => {
     try {
       setInitialLoad(true);
-      const response = await axios.get('/api/settings');
+      const token = await getToken();
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      const response = await axios.get('/api/settings', { headers });
       if (response.data.success) {
         setSettings(response.data.settings);
       }
@@ -61,7 +65,9 @@ const SettingsTab = () => {
   const saveSettings = async () => {
     setLoading(true);
     try {
-      const response = await axios.post('/api/settings', settings);
+      const token = await getToken();
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      const response = await axios.post('/api/settings', settings, { headers });
       if (response.data.success) {
         toast.success('Settings saved successfully!');
       } else {
