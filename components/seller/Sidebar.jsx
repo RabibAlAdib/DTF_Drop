@@ -21,15 +21,7 @@ const SideBar = () => {
         { name: 'Customization Admin', path: '/seller/customization-admin', icon: assets.menu_icon },
     ];
 
-    // Add admin button only for dtfdrop_admin user
-    if (user?.username === 'dtfdrop_admin') {
-        menuItems.push({ 
-            name: 'System Admin', 
-            path: '/admin', 
-            icon: assets.admin_icon || assets.menu_icon,
-            isAdmin: true
-        });
-    }
+    // System Admin button removed - using floating admin button instead
 
     return (
         <div className='md:w-64 w-16 border-r min-h-screen text-base border-gray-300 dark:border-gray-600 py-2 flex flex-col bg-white dark:bg-gray-900'>

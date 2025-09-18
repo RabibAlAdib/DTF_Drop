@@ -46,7 +46,7 @@ export async function PUT(request, { params }) {
       }, { status: 401 });
     }
     
-    const isSellerAuth = await authSeller(request);
+    const isSellerAuth = await authSeller(userId);
     if (!isSellerAuth) {
       return NextResponse.json({
         success: false,
@@ -98,7 +98,7 @@ export async function DELETE(request, { params }) {
       }, { status: 401 });
     }
     
-    const isSellerAuth = await authSeller(request);
+    const isSellerAuth = await authSeller(userId);
     if (!isSellerAuth) {
       return NextResponse.json({
         success: false,

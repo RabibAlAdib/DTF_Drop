@@ -8,14 +8,15 @@ const FloatingAdminButton = () => {
   const { user, isLoaded } = useUser();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Check if current user is the admin
+  // Check if current user is the admin (match server-side logic)
   const isAdminUser = () => {
     if (!isLoaded || !user) return false;
     
-    const email = user.emailAddresses?.[0]?.emailAddress;
-    const username = user.username;
+    // Get primary email address (same logic as server)
+    const primaryEmail = user.emailAddresses?.find(email => email.id === user.primaryEmailAddressId)?.emailAddress;
     
-    return email === 'dtfdrop25@gmail.com' || username === 'dtfdrop_admin';
+    // Only check email like server-side authentication
+    return primaryEmail === 'dtfdrop25@gmail.com';
   };
 
   // Don't render if not admin user
