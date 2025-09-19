@@ -19,11 +19,6 @@ const FacebookIcon = () => (
   </svg>
 );
 
-const GroupIcon = () => (
-  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-    <path d="M16 4c0-1.11.89-2 2-2s2 .89 2 2-.89 2-2 2-2-.89-2-2zM4 18v-4h3v4h2v-7.5c0-1.1-.9-2-2-2s-2 .9-2 2V18H4zm5-12c1.11 0 2-.89 2-2s-.89-2-2-2-2 .89-2 2 .89 2 2 2zm1 13h2v-4h1l1-7c0-.83-.67-1.5-1.5-1.5h-3c-.83 0-1.5.67-1.5 1.5l1 7h1v4z"/>
-  </svg>
-);
 
 const About = () => {
   return (
@@ -158,7 +153,7 @@ const About = () => {
                 rel="noopener noreferrer"
                 className="flex items-center gap-3 bg-white text-blue-600 px-8 py-3 rounded-lg hover:bg-gray-100 transition-all duration-200 font-semibold transform hover:scale-105"
               >
-                <GroupIcon />
+                <FacebookIcon />
                 <span>Visit Our Facebook Group</span>
               </a>
             </div>
