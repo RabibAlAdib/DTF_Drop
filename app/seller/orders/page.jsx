@@ -106,7 +106,6 @@ const Orders = () => {
         );
     }
     
-    orderComponent()
 
     return (
         <div className="flex-1 h-screen overflow-scroll flex flex-col justify-between text-sm">
@@ -128,6 +127,8 @@ const Orders = () => {
                     </div>
                 ) : (
                     <div className="space-y-6">
+                            {orderComponent()}
+
                         {orders.map((order, index) => (
                             <div key={order._id || index} className="border rounded-lg p-6 bg-white shadow-sm">
                                 {/* Order Header */}
