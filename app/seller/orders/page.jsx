@@ -107,7 +107,6 @@ const Orders = () => {
                     </div>
                 ) : (
                     <div className="space-y-6">
-                        console.log(orders)
                         {orders.map((order, index) => (
                             <div key={order._id || index} className="border rounded-lg p-6 bg-white shadow-sm">
                                 {/* Order Header */}
@@ -117,6 +116,7 @@ const Orders = () => {
                                         <p className="text-gray-600">
                                             {new Date(order.createdAt).toLocaleDateString()} at {new Date(order.createdAt).toLocaleTimeString()}
                                         </p>
+                                        <p>{order}</p>
                                     </div>
                                     <div className="flex items-center gap-3 mt-2 md:mt-0">
                                         <select
