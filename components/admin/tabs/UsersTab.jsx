@@ -11,19 +11,43 @@ const UsersTab = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterRole, setFilterRole] = useState('all');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalUsers, setTotalUsers] = useState(0);
+  const [pageSize] = useState(20);
 
   useEffect(() => {
-    fetchUsers();
+    fetchUsers(1);
   }, []);
 
-  const fetchUsers = async () => {
+  // Debounced search effect
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setCurrentPage(1);
+      fetchUsers(1);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchTerm, filterRole]);
+
+  const fetchUsers = async (page = 1) => {
     try {
       setLoading(true);
       const token = await getToken();
       const headers = token ? { Authorization: `Bearer ${token}` } : {};
-      const response = await axios.get('/api/user/list', { headers });
+      
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: pageSize.toString(),
+        ...(searchTerm && { search: searchTerm }),
+        ...(filterRole !== 'all' && { role: filterRole })
+      });
+      
+      const response = await axios.get(`/api/user/list?${params}`, { headers });
       if (response.data.success) {
         setUsers(response.data.users || []);
+        setTotalPages(response.data.pagination?.totalPages || 1);
+        setTotalUsers(response.data.pagination?.totalUsers || 0);
+        setCurrentPage(response.data.pagination?.currentPage || 1);
       }
     } catch (error) {
       console.error('Error fetching users:', error);
@@ -49,7 +73,7 @@ const UsersTab = () => {
       
       if (response.data.success) {
         toast.success(`User role updated to ${newRole}`);
-        await fetchUsers(); // Refresh the list
+        await fetchUsers(currentPage); // Refresh current page
       } else {
         toast.error(response.data.message || 'Failed to update role');
       }
@@ -75,7 +99,7 @@ const UsersTab = () => {
       
       if (response.data.success) {
         toast.success('User deleted successfully');
-        await fetchUsers(); // Refresh the list
+        await fetchUsers(currentPage); // Refresh current page
       } else {
         toast.error(response.data.message || 'Failed to delete user');
       }
@@ -89,12 +113,12 @@ const UsersTab = () => {
     }
   };
 
-  const filteredUsers = users.filter(user => {
-    const matchesSearch = user.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         user.email?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesRole = filterRole === 'all' || user.role === filterRole;
-    return matchesSearch && matchesRole;
-  });
+  const handlePageChange = (page) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+      fetchUsers(page);
+    }
+  };
 
   const getRoleBadgeColor = (role) => {
     switch (role) {
@@ -117,7 +141,7 @@ const UsersTab = () => {
         </div>
         
         <button
-          onClick={fetchUsers}
+          onClick={() => fetchUsers(currentPage)}
           disabled={loading}
           className="flex items-center space-x-2 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors disabled:opacity-50"
         >
@@ -173,12 +197,12 @@ const UsersTab = () => {
 
             {/* Users */}
             <div className="divide-y divide-gray-200 dark:divide-gray-700">
-              {filteredUsers.length === 0 ? (
+              {users.length === 0 ? (
                 <div className="p-8 text-center text-gray-500 dark:text-gray-400">
                   No users found matching your criteria
                 </div>
               ) : (
-                filteredUsers.map((user) => (
+                users.map((user) => (
                   <div key={user._id} className="grid grid-cols-1 md:grid-cols-5 gap-4 p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
                     {/* User Info */}
                     <div className="flex items-center space-x-3">
@@ -242,23 +266,62 @@ const UsersTab = () => {
         )}
       </div>
 
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+          <div className="text-sm text-gray-600 dark:text-gray-400">
+            Showing {((currentPage - 1) * pageSize) + 1} to {Math.min(currentPage * pageSize, totalUsers)} of {totalUsers} users
+          </div>
+          <div className="flex space-x-1">
+            <button
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1 || loading}
+              className="px-3 py-1 text-sm bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded disabled:opacity-50 hover:bg-gray-200 dark:hover:bg-gray-600"
+            >
+              Previous
+            </button>
+            {[...Array(Math.min(5, totalPages))].map((_, i) => {
+              const page = Math.max(1, currentPage - 2) + i;
+              if (page > totalPages) return null;
+              return (
+                <button
+                  key={page}
+                  onClick={() => handlePageChange(page)}
+                  disabled={loading}
+                  className={`px-3 py-1 text-sm rounded ${
+                    page === currentPage
+                      ? 'bg-purple-600 text-white'
+                      : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                  }`}
+                >
+                  {page}
+                </button>
+              );
+            })}
+            <button
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages || loading}
+              className="px-3 py-1 text-sm bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded disabled:opacity-50 hover:bg-gray-200 dark:hover:bg-gray-600"
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Summary Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
           <p className="text-sm text-blue-600 dark:text-blue-400 font-medium">Total Users</p>
-          <p className="text-2xl font-bold text-blue-700 dark:text-blue-300">{users.length}</p>
+          <p className="text-2xl font-bold text-blue-700 dark:text-blue-300">{totalUsers}</p>
         </div>
         <div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4">
-          <p className="text-sm text-purple-600 dark:text-purple-400 font-medium">Sellers</p>
-          <p className="text-2xl font-bold text-purple-700 dark:text-purple-300">
-            {users.filter(u => u.role === 'seller').length}
-          </p>
+          <p className="text-sm text-purple-600 dark:text-purple-400 font-medium">Current Page</p>
+          <p className="text-2xl font-bold text-purple-700 dark:text-purple-300">{users.length} users</p>
         </div>
         <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-4">
-          <p className="text-sm text-green-600 dark:text-green-400 font-medium">Customers</p>
-          <p className="text-2xl font-bold text-green-700 dark:text-green-300">
-            {users.filter(u => !u.role || u.role === 'customer').length}
-          </p>
+          <p className="text-sm text-green-600 dark:text-green-400 font-medium">Page {currentPage}</p>
+          <p className="text-2xl font-bold text-green-700 dark:text-green-300">of {totalPages}</p>
         </div>
       </div>
     </div>

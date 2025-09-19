@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
+import { auth, clerkClient } from '@clerk/nextjs/server';
 import connectDB from '@/config/db';
 import Order from '@/models/Order';
 import Product from '@/models/Product';
@@ -21,7 +21,13 @@ export async function GET(req) {
       }, { status: 401 });
     }
 
-    if (!isSeller) {
+    // Check if user is admin first - admins bypass seller requirement
+    const user = await clerkClient.users.getUser(userId);
+    const primaryEmail = user.emailAddresses?.find(email => email.id === user.primaryEmailAddressId)?.emailAddress;
+    const isAdmin = primaryEmail === 'dtfdrop25@gmail.com';
+    
+    // Only require seller role if not admin
+    if (!isAdmin && !isSeller) {
       return NextResponse.json({ 
         success: false, 
         message: "Only sellers are authorized for this action" 
@@ -34,8 +40,34 @@ export async function GET(req) {
     const status = searchParams.get('status');
     const skip = (page - 1) * limit;
 
-    // Build query to find ALL orders (as requested by user)
     let query = {};
+    let sellerProductIds = [];
+    let sellerProductObjectIds = [];
+    
+    if (!isAdmin) {
+      // For regular sellers, find only orders containing their products
+      const sellerProducts = await Product.find({ userId: userId }).select('_id');
+      sellerProductObjectIds = sellerProducts.map(product => product._id); // Keep as ObjectIds for query
+      sellerProductIds = sellerProducts.map(product => product._id.toString()); // Strings for filtering
+      
+      if (sellerProductIds.length === 0) {
+        return NextResponse.json({
+          success: true,
+          orders: [],
+          pagination: {
+            currentPage: page,
+            totalPages: 0,
+            totalOrders: 0,
+            hasNextPage: false,
+            hasPrevPage: false
+          }
+        });
+      }
+      
+      query = {
+        'items.productId': { $in: sellerProductObjectIds } // Use ObjectIds for DB query
+      };
+    }
 
     if (status && status !== 'all') {
       query.status = status;
@@ -52,8 +84,25 @@ export async function GET(req) {
     const totalOrders = await Order.countDocuments(query);
     const totalPages = Math.ceil(totalOrders / limit);
 
-    // Show all orders without filtering
-    const filteredOrders = orders;
+    // Filter orders appropriately based on user role
+    const filteredOrders = isAdmin ? orders : orders.map(order => {
+      const sellerItems = order.items.filter(item => 
+        sellerProductIds.includes(String(item.productId)) // Ensure string comparison
+      );
+      
+      return {
+        ...order,
+        items: sellerItems,
+        // Redact sensitive customer info for regular sellers
+        customerInfo: {
+          name: order.customerInfo?.name || 'Customer'
+        },
+        shippingAddress: {
+          city: order.shippingAddress?.city
+          // Hide full address for privacy
+        }
+      };
+    });
 
     // Format orders with complete information including addresses
     const formattedOrders = filteredOrders.map(order => ({

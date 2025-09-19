@@ -2,14 +2,24 @@
 
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/nextjs';
-import UsersTab from './tabs/UsersTab';
-import StatsTab from './tabs/StatsTab';
-import SettingsTab from './tabs/SettingsTab';
+import dynamic from 'next/dynamic';
+
+// Lazy load tabs for better performance
+const UsersTab = dynamic(() => import('./tabs/UsersTab'), {
+  loading: () => <div className="flex items-center justify-center py-12"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div></div>
+});
+const StatsTab = dynamic(() => import('./tabs/StatsTab'), {
+  loading: () => <div className="flex items-center justify-center py-12"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div></div>
+});
+const SettingsTab = dynamic(() => import('./tabs/SettingsTab'), {
+  loading: () => <div className="flex items-center justify-center py-12"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div></div>
+});
 
 const AdminModal = ({ isOpen, onClose }) => {
   const { user } = useUser();
   const [activeTab, setActiveTab] = useState('stats');
   const [isMobile, setIsMobile] = useState(false);
+  const [loadedTabs, setLoadedTabs] = useState(new Set(['stats'])); // Track loaded tabs
 
   useEffect(() => {
     const checkMobile = () => {
@@ -90,7 +100,10 @@ const AdminModal = ({ isOpen, onClose }) => {
             {tabs.map((tab) => (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
+                onClick={() => {
+                  setActiveTab(tab.id);
+                  setLoadedTabs(prev => new Set([...prev, tab.id]));
+                }}
                 className={`
                   flex-1 flex items-center justify-center space-x-2 py-4 px-6 text-sm font-medium transition-all
                   ${activeTab === tab.id
@@ -107,9 +120,9 @@ const AdminModal = ({ isOpen, onClose }) => {
 
           {/* Tab Content */}
           <div className="flex-1 overflow-y-auto p-6">
-            {activeTab === 'stats' && <StatsTab />}
-            {activeTab === 'users' && <UsersTab />}
-            {activeTab === 'settings' && <SettingsTab />}
+            {activeTab === 'stats' && loadedTabs.has('stats') && <StatsTab />}
+            {activeTab === 'users' && loadedTabs.has('users') && <UsersTab />}
+            {activeTab === 'settings' && loadedTabs.has('settings') && <SettingsTab />}
           </div>
         </div>
       </div>
