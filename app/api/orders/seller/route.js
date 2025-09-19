@@ -34,28 +34,8 @@ export async function GET(req) {
     const status = searchParams.get('status');
     const skip = (page - 1) * limit;
 
-    // First, find all products owned by this seller
-    const sellerProducts = await Product.find({ userId: userId }).select('_id');
-    const sellerProductIds = sellerProducts.map(product => product._id.toString());
-
-    if (sellerProductIds.length === 0) {
-      return NextResponse.json({
-        success: true,
-        orders: [],
-        pagination: {
-          currentPage: page,
-          totalPages: 0,
-          totalOrders: 0,
-          hasNextPage: false,
-          hasPrevPage: false
-        }
-      });
-    }
-
-    // Build query to find orders containing seller's products
-    let query = {
-      'items.productId': { $in: sellerProductIds }
-    };
+    // Build query to find ALL orders (as requested by user)
+    let query = {};
 
     if (status && status !== 'all') {
       query.status = status;
@@ -72,35 +52,26 @@ export async function GET(req) {
     const totalOrders = await Order.countDocuments(query);
     const totalPages = Math.ceil(totalOrders / limit);
 
-    // Filter orders to only show items from this seller
-    const filteredOrders = orders.map(order => {
-      const sellerItems = order.items.filter(item => 
-        sellerProductIds.includes(item.productId)
-      );
-      
-      // Calculate seller's portion of the order total
-      const sellerSubtotal = sellerItems.reduce((sum, item) => sum + item.totalPrice, 0);
-      const sellerTotal = sellerItems.length === order.items.length 
-        ? order.pricing.totalAmount 
-        : sellerSubtotal + (order.pricing.deliveryCharge * (sellerItems.length / order.items.length));
+    // Show all orders without filtering
+    const filteredOrders = orders;
 
-      return {
-        ...order,
-        items: sellerItems,
-        pricing: {
-          ...order.pricing,
-          sellerSubtotal,
-          sellerTotal: Math.round(sellerTotal)
-        }
-      };
-    });
-
-    // Format orders for response
+    // Format orders with complete information including addresses
     const formattedOrders = filteredOrders.map(order => ({
       _id: order._id,
       orderNumber: order.orderNumber,
       status: order.status,
-      customerInfo: order.customerInfo,
+      customerInfo: {
+        name: order.customerInfo?.name,
+        email: order.customerInfo?.email,
+        phone: order.customerInfo?.phone
+      },
+      shippingAddress: {
+        fullName: order.shippingAddress?.fullName,
+        address: order.shippingAddress?.address,
+        city: order.shippingAddress?.city,
+        postalCode: order.shippingAddress?.postalCode,
+        phone: order.shippingAddress?.phone
+      },
       items: order.items.map(item => ({
         productId: item.productId,
         productName: item.productName,
