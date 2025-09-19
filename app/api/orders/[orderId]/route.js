@@ -33,6 +33,8 @@ export async function GET(req, { params }) {
       userId: userId 
     }).lean();
 
+    consol.log(order)
+
     if (!order) {
       return NextResponse.json({
         success: false,
