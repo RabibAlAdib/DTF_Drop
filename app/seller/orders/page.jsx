@@ -32,7 +32,7 @@ const Orders = () => {
             
             if (data.success) {
                 setOrders(data.orders);
-                consol.log(orders)
+                console.log(orders)
             } else {
                 toast.error(data.message || "Failed to fetch orders");
             }
