@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { auth, clerkClient } from '@clerk/nextjs/server';
+import { createClerkClient } from '@clerk/backend';
 import connectDB from '@/config/db';
 import Order from '@/models/Order';
 import Product from '@/models/Product';
@@ -22,6 +22,9 @@ export async function GET(req) {
     }
 
     // Check if user is admin first - admins bypass seller requirement
+    const clerkClient = createClerkClient({ 
+      secretKey: process.env.CLERK_SECRET_KEY 
+    });
     const user = await clerkClient.users.getUser(userId);
     const primaryEmail = user.emailAddresses?.find(email => email.id === user.primaryEmailAddressId)?.emailAddress;
     const isAdmin = primaryEmail === 'dtfdrop25@gmail.com';
@@ -161,6 +164,105 @@ export async function GET(req) {
     return NextResponse.json({
       success: false,
       message: 'Failed to fetch orders. Please try again.',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    }, { status: 500 });
+  }
+}
+
+// PUT /api/orders/seller - Update order status (admin/seller only)
+export async function PUT(req) {
+  try {
+    // Use getSellerAuth to handle both cookie and Bearer token authentication
+    const { userId, isSeller, error } = await getSellerAuth(req);
+    
+    if (!userId || error) {
+      return NextResponse.json({ 
+        success: false, 
+        message: error || "Authentication required" 
+      }, { status: 401 });
+    }
+
+    // Check if user is admin first - admins bypass seller requirement
+    const clerkClient = createClerkClient({ 
+      secretKey: process.env.CLERK_SECRET_KEY 
+    });
+    const user = await clerkClient.users.getUser(userId);
+    const primaryEmail = user.emailAddresses?.find(email => email.id === user.primaryEmailAddressId)?.emailAddress;
+    const isAdmin = primaryEmail === 'dtfdrop25@gmail.com';
+    
+    // Only require seller role if not admin
+    if (!isAdmin && !isSeller) {
+      return NextResponse.json({ 
+        success: false, 
+        message: "Only sellers are authorized for this action" 
+      }, { status: 403 });
+    }
+
+    const { orderId, status } = await req.json();
+    
+    if (!orderId || !status) {
+      return NextResponse.json({
+        success: false,
+        message: 'Order ID and status are required'
+      }, { status: 400 });
+    }
+
+    // Validate status
+    const validStatuses = ['pending', 'processing', 'shipped', 'delivered', 'cancelled'];
+    if (!validStatuses.includes(status)) {
+      return NextResponse.json({
+        success: false,
+        message: 'Invalid status. Valid statuses: ' + validStatuses.join(', ')
+      }, { status: 400 });
+    }
+
+    // Find the order
+    const order = await Order.findById(orderId);
+    if (!order) {
+      return NextResponse.json({
+        success: false,
+        message: 'Order not found'
+      }, { status: 404 });
+    }
+
+    // Check if seller owns products in this order (unless admin)
+    if (!isAdmin) {
+      const sellerProducts = await Product.find({ userId: userId }).select('_id');
+      const sellerProductIds = sellerProducts.map(product => product._id.toString());
+      
+      const hasSellerProducts = order.items.some(item => 
+        sellerProductIds.includes(String(item.productId))
+      );
+      
+      if (!hasSellerProducts) {
+        return NextResponse.json({
+          success: false,
+          message: 'You can only update orders containing your products'
+        }, { status: 403 });
+      }
+    }
+
+    // Update order status
+    order.status = status;
+    order.updatedAt = new Date();
+    await order.save();
+
+    return NextResponse.json({
+      success: true,
+      message: 'Order status updated successfully',
+      order: {
+        _id: order._id,
+        orderNumber: order.orderNumber,
+        status: order.status,
+        updatedAt: order.updatedAt
+      }
+    });
+
+  } catch (error) {
+    console.error('Update order status error:', error);
+    return NextResponse.json({
+      success: false,
+      message: 'Failed to update order status. Please try again.',
       error: process.env.NODE_ENV === 'development' ? error.message : undefined
     }, { status: 500 });
   }
