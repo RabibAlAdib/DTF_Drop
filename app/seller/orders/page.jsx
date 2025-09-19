@@ -87,6 +87,27 @@ const Orders = () => {
 
     if (loading) return <Loading />;
 
+
+    const entries = Object.keys(orders); // ["_id", "orderNumber", "status"]
+
+    // Render the keys in React
+    function orderComponent() {
+        return (
+            <div>
+              <h3>Order Details:</h3>
+              <ul>
+                {entries.map(([key, value]) => (
+                  <li key={key}>
+                    {key}: {String(value)} {/* Convert value to string if it's an object */}
+                  </li>
+                ))}
+              </ul>
+            </div>
+        );
+    }
+    
+    orderComponent()
+
     return (
         <div className="flex-1 h-screen overflow-scroll flex flex-col justify-between text-sm">
             <div className="md:p-10 p-4 space-y-5">
@@ -116,7 +137,6 @@ const Orders = () => {
                                         <p className="text-gray-600">
                                             {new Date(order.createdAt).toLocaleDateString()} at {new Date(order.createdAt).toLocaleTimeString()}
                                         </p>
-                                        <p>{order}</p>
                                     </div>
                                     <div className="flex items-center gap-3 mt-2 md:mt-0">
                                         <select
