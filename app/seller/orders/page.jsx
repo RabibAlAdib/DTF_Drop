@@ -32,7 +32,6 @@ const Orders = () => {
             
             if (data.success) {
                 setOrders(data.orders);
-                console.log(orders)
             } else {
                 toast.error(data.message || "Failed to fetch orders");
             }
@@ -108,6 +107,7 @@ const Orders = () => {
                     </div>
                 ) : (
                     <div className="space-y-6">
+                        console.log(orders)
                         {orders.map((order, index) => (
                             <div key={order._id || index} className="border rounded-lg p-6 bg-white shadow-sm">
                                 {/* Order Header */}
