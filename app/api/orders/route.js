@@ -157,34 +157,69 @@ export async function POST(req) {
       }, { status: 400 });
     }
 
-    // Create order object
+    // Calculate estimated delivery date
+    const calculateEstimatedDelivery = (isDhaka) => {
+      const now = new Date();
+      const deliveryDays = isDhaka ? 2 : 4; // 2 days for Dhaka, 4 for outside
+      const estimatedDate = new Date(now.getTime() + deliveryDays * 24 * 60 * 60 * 1000);
+      return estimatedDate;
+    };
+
+    // Create complete order object with all required fields
     const order = new Order({
       userId: userId,
       customerInfo: orderData.customerInfo,
       items: verifiedItems,
+      
+      // Complete pricing information
       pricing: {
         subtotal: orderCalculation.calculation.subtotal,
         deliveryCharge: orderCalculation.calculation.deliveryCharge,
-        discountAmount: orderCalculation.calculation.discountAmount,
+        discountAmount: orderCalculation.calculation.discountAmount || 0,
         promoCode: orderData.promoCode || null,
         totalAmount: orderCalculation.calculation.totalAmount
       },
+      
+      // Structured shipping address (extracted from customerInfo)
+      shippingAddress: {
+        fullName: orderData.customerInfo.name,
+        address: orderData.customerInfo.address,
+        city: orderData.delivery.isDhaka ? 'Dhaka' : 'Outside Dhaka',
+        postalCode: orderData.customerInfo.postalCode || '',
+        phone: orderData.customerInfo.phone
+      },
+      
+      // Complete delivery information
       delivery: {
-        address: orderData.delivery.address,
+        address: orderData.delivery.address || orderData.customerInfo.address,
         isDhaka: orderCalculation.calculation.delivery.isDhaka,
         deliveryCharge: orderCalculation.calculation.deliveryCharge,
-        deliveryNotes: orderData.delivery.deliveryNotes || ''
+        estimatedDeliveryDate: calculateEstimatedDelivery(orderCalculation.calculation.delivery.isDhaka),
+        deliveryNotes: orderData.delivery.deliveryNotes || '',
+        specialInstructions: orderData.delivery.specialInstructions || '',
+        deliverySlot: orderData.delivery.deliverySlot || 'any'
       },
+      
+      // Payment information
       payment: {
         method: orderData.payment.method || 'cash_on_delivery',
         status: 'pending'
       },
+      
+      // Gift information
       giftInfo: {
         isGift: orderData.giftInfo?.isGift || false,
         giftMessage: orderData.giftInfo?.giftMessage || '',
         recipientName: orderData.giftInfo?.recipientName || ''
       },
-      status: 'pending'
+      
+      // Order status with initial tracking
+      status: 'pending',
+      statusHistory: [{
+        status: 'pending',
+        timestamp: new Date(),
+        note: 'Order placed successfully'
+      }]
     });
 
     // Save the order

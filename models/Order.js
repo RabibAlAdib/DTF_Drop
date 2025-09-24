@@ -46,6 +46,15 @@ const OrderSchema = new mongoose.Schema({
     }
   }],
   
+  // Structured shipping address (for seller dashboard display)
+  shippingAddress: {
+    fullName: { type: String, required: true },
+    address: { type: String, required: true },
+    city: { type: String, required: false },
+    postalCode: { type: String, required: false },
+    phone: { type: String, required: true }
+  },
+  
   // Order totals
   pricing: {
     subtotal: { type: Number, required: true }, // Sum of all item totals

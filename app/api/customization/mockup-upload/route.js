@@ -3,7 +3,11 @@ import { NextResponse } from "next/server";
 import { getAuth } from '@clerk/nextjs/server';
 import authSeller from "@/lib/authSeller";
 
-// Configure Cloudinary
+// Configure Cloudinary with error handling for missing env vars
+if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
+  console.error('Missing Cloudinary environment variables');
+}
+
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
@@ -13,8 +17,7 @@ cloudinary.config({
 
 export async function POST(request) {
   try {
-    // Require authentication for security
-    const { getAuth } = await import('@clerk/nextjs/server');
+    // Optimized authentication for Vercel deployment
     const { userId } = getAuth(request);
     if (!userId) {
       return NextResponse.json({
@@ -57,42 +60,60 @@ export async function POST(request) {
       }, { status: 400 });
     }
 
+    // Process uploads with better error handling and optimization for Vercel
     const uploadPromises = files.map(async (file, index) => {
-      if (!file || file.size === 0) {
-        throw new Error(`Invalid file at index ${index}`);
+      try {
+        if (!file || file.size === 0) {
+          throw new Error(`Invalid file at index ${index}`);
+        }
+
+        // Validate file size (max 10MB for Vercel optimization)
+        const maxSize = 10 * 1024 * 1024; // 10MB
+        if (file.size > maxSize) {
+          throw new Error(`File at index ${index} exceeds 10MB limit`);
+        }
+
+        // Convert file to buffer with memory optimization
+        const bytes = await file.arrayBuffer();
+        const buffer = Buffer.from(bytes);
+
+        // Upload to Cloudinary with optimized settings for production
+        const uploadResponse = await new Promise((resolve, reject) => {
+          const uploadStream = cloudinary.uploader.upload_stream(
+            {
+              folder: 'customization/mockups',
+              transformation: [
+                { width: 800, height: 800, crop: 'limit' }, // Optimized for performance
+                { quality: 'auto:good' },
+                { format: 'auto' }
+              ],
+              resource_type: 'image',
+              timeout: 30000 // 30 second timeout for Vercel
+            },
+            (error, result) => {
+              if (error) {
+                console.error(`Upload error for file ${index}:`, error);
+                reject(new Error(`Upload failed for file ${index}: ${error.message}`));
+              } else {
+                resolve(result);
+              }
+            }
+          );
+          
+          uploadStream.end(buffer);
+        });
+
+        return {
+          url: uploadResponse.secure_url,
+          public_id: uploadResponse.public_id,
+          originalName: file.name,
+          size: uploadResponse.bytes,
+          format: uploadResponse.format
+        };
+      } catch (fileError) {
+        console.error(`Error processing file ${index}:`, fileError);
+        throw new Error(`Failed to process file ${index}: ${fileError.message}`);
       }
-
-      // Convert file to buffer
-      const bytes = await file.arrayBuffer();
-      const buffer = Buffer.from(bytes);
-
-      // Upload to Cloudinary with optimization
-      const uploadResponse = await new Promise((resolve, reject) => {
-        cloudinary.uploader.upload_stream(
-          {
-            folder: 'customization/mockups',
-            transformation: [
-              { width: 1000, height: 1000, crop: 'limit' }, // High quality
-              { quality: 'auto:good' }, // Good quality, optimized size
-              { format: 'auto' }, // Auto format selection
-              { fetch_format: 'auto' } // Auto fetch format
-            ],
-            resource_type: 'image'
-          },
-          (error, result) => {
-            if (error) reject(error);
-            else resolve(result);
-          }
-        ).end(buffer);
-      });
-
-      return {
-        url: uploadResponse.secure_url,
-        public_id: uploadResponse.public_id,
-        originalName: file.name,
-        size: uploadResponse.bytes,
-        format: uploadResponse.format
-      };
     });
 
     const uploadResults = await Promise.all(uploadPromises);

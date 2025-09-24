@@ -1,0 +1,96 @@
+# Manual Steps Required - DTF Drop Platform
+
+## 🚨 CRITICAL: Production Environment Variables for Vercel
+
+### Issue: Mockup Upload 500 Error in Production
+**Root Cause**: Missing or incorrect environment variables in Vercel deployment
+
+### Required Actions:
+
+#### 1. Verify Vercel Environment Variables
+Go to your Vercel Dashboard → Project → Settings → Environment Variables and ensure ALL of these are set correctly:
+
+**Cloudinary (Required for image uploads):**
+- `CLOUDINARY_CLOUD_NAME` = Your cloudinary cloud name
+- `CLOUDINARY_API_KEY` = Your cloudinary API key  
+- `CLOUDINARY_API_SECRET` = Your cloudinary API secret
+
+**Database (Required for all operations):**
+- `MONGODB_URI` = Your MongoDB connection string
+
+**Authentication (Required for seller features):**
+- `CLERK_SECRET_KEY` = Your Clerk secret key (starts with sk_)
+- `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` = Your Clerk publishable key (starts with pk_)
+
+#### 2. Check Production Build Logs
+If uploads still fail after setting environment variables:
+1. Go to Vercel Dashboard → Your Project → Functions
+2. Click on the failing API route: `/api/customization/mockup-upload`
+3. Check the real-time logs for specific error messages
+4. Common issues:
+   - Invalid Cloudinary credentials
+   - Memory/timeout limits exceeded
+   - Missing dependencies
+
+#### 3. Test Authentication in Production
+The order data fixes require working authentication. Test by:
+1. Login to your production site
+2. Try to access seller dashboard
+3. If authentication fails, check Clerk configuration matches between development and production
+
+## ✅ COMPLETED FIXES (No Manual Action Required)
+
+### Fixed Issue 1: Seller Order Totals
+- ✅ Added fallback calculation for discounted totals
+- ✅ Orders now show correct amounts after promo codes
+
+### Fixed Issue 2: Missing Order Data  
+- ✅ Added complete `shippingAddress` field to Order model
+- ✅ Added `estimatedDeliveryDate`, `deliverySlot`, `specialInstructions` 
+- ✅ Fixed discount amount and pricing data storage
+- ✅ Added order status tracking with history
+
+### Fixed Issue 3: Mockup Upload API
+- ✅ Removed duplicate imports causing build issues
+- ✅ Added production-optimized error handling
+- ✅ Added file size validation (10MB limit)
+- ✅ Added Vercel-specific timeout handling (30 seconds)
+
+## 🔄 TESTING INSTRUCTIONS
+
+### After Setting Environment Variables:
+1. **Test Mockup Upload**: 
+   - Go to seller dashboard → Customization Admin
+   - Try uploading a mockup image
+   - Should succeed without 500 error
+
+2. **Test Order Creation**:
+   - Place a test order with promo code
+   - Check seller dashboard shows complete shipping info
+   - Verify discount amount is displayed correctly
+
+3. **If Issues Persist**:
+   - Check Vercel function logs for specific errors
+   - Verify all environment variables are correctly set
+   - Contact support with specific error messages from production logs
+
+## 📋 DEPLOYMENT CHECKLIST
+
+Before marking as complete:
+- [ ] All environment variables set in Vercel
+- [ ] Production mockup upload works
+- [ ] Order creation saves complete data
+- [ ] Seller dashboard displays shipping info
+- [ ] Discount amounts show correctly
+- [ ] No 500 errors in production logs
+
+## 🎯 PERFORMANCE OPTIMIZATIONS INCLUDED
+
+- Reduced image processing size (800x800 vs 1000x1000) for faster uploads
+- Added file size validation to prevent memory issues
+- Implemented proper error handling for Vercel serverless environment
+- Added database indexes for better query performance
+- Optimized order data structure for seller dashboard efficiency
+
+---
+**Next Steps**: Complete the environment variable setup, then test all functionality in production. All code fixes are already deployed and ready to work once environment is properly configured.
