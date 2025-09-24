@@ -21,8 +21,8 @@ const nextConfig = {
     },
     // Optimized for Vercel deployment
     poweredByHeader: false,
-    // Configure allowed dev origins for development
-    allowedDevOrigins: ['localhost', '127.0.0.1'],
+    // Configure allowed dev origins for development (allow all for Replit)
+    // allowedDevOrigins: ['localhost', '127.0.0.1'], // Commented out for Replit compatibility
     // Configure experimental features
     experimental: {
         // Support for larger request bodies in Server Actions
