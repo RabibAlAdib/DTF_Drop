@@ -2,6 +2,7 @@ import { v2 as cloudinary } from "cloudinary";
 import { getSellerAuth } from '@/lib/authUtil';
 import connectDB from "@/config/db";
 import Offer from "@/models/Offer";
+import Product from "@/models/Product"; // Import Product model for populate
 import { NextResponse } from "next/server";
 
 // Runtime configuration for handling large uploads

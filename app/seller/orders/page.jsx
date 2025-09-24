@@ -250,7 +250,13 @@ const Orders = () => {
                                         <h4 className="font-medium">Order Total</h4>
                                         <div className="text-sm">
                                             <p><strong>Subtotal:</strong> {currency}{order.pricing.subtotal}</p>
-                                            <p><strong>Delivery:</strong> {currency}{order.pricing.deliveryFee}</p>
+                                            <p><strong>Delivery:</strong> {currency}{order.pricing.deliveryCharge || order.pricing.deliveryFee}</p>
+                                            {order.pricing.discountAmount > 0 && (
+                                                <p className="text-green-600">
+                                                    <strong>Discount Applied:</strong> -{currency}{order.pricing.discountAmount}
+                                                    {order.pricing.promoCode && <span className="text-xs ml-1">({order.pricing.promoCode})</span>}
+                                                </p>
+                                            )}
                                             <p><strong>Total:</strong> <span className="font-semibold">{currency}{order.pricing.totalAmount}</span></p>
                                         </div>
                                     </div>

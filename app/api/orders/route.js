@@ -123,11 +123,30 @@ export async function POST(req) {
       }, { status: 400 });
     }
 
-    // Recalculate order total with verified pricing
+    // Look up dynamic offer if promo code is provided
+    let dynamicOffer = null;
+    if (orderData.promoCode) {
+      try {
+        const Offer = (await import('@/models/Offer')).default;
+        dynamicOffer = await Offer.findOne({
+          offerCode: orderData.promoCode.toUpperCase().trim(),
+          isActive: true,
+          validFrom: { $lte: new Date() },
+          validTo: { $gte: new Date() }
+        });
+      } catch (offerError) {
+        console.error('Error looking up dynamic offer:', offerError);
+        // Continue without dynamic offer
+      }
+    }
+
+    // Recalculate order total with verified pricing and dynamic offer
     const orderCalculation = calculateOrderTotal(
       verifiedItems, 
       orderData.delivery.address, 
-      orderData.promoCode
+      orderData.promoCode,
+      null, // forceDhaka
+      dynamicOffer
     );
 
     if (!orderCalculation.success) {
@@ -170,6 +189,17 @@ export async function POST(req) {
 
     // Save the order
     const savedOrder = await order.save();
+
+    // Update offer usage count if dynamic offer was used
+    if (dynamicOffer && orderCalculation.calculation.discountAmount > 0) {
+      try {
+        await dynamicOffer.updateOne({ $inc: { usedCount: 1 } });
+        console.log(`✅ Updated offer usage count for: ${dynamicOffer.offerCode}`);
+      } catch (offerUpdateError) {
+        console.error('❌ Failed to update offer usage count:', offerUpdateError);
+        // Don't fail the order if offer update fails
+      }
+    }
 
     // CRITICAL: Deduct stock after successful order creation
     let stockDeductionSuccess = false;
