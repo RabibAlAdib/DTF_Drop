@@ -83,7 +83,7 @@ const CustomizationAdmin = () => {
       
       // Use direct upload API instead of signature-based approach
       const formData = new FormData();
-      formData.append('file', file);
+      formData.append('files', file);
       
       const uploadResponse = await axios.post('/api/customization/mockup-upload', formData, {
         headers: {
@@ -96,7 +96,7 @@ const CustomizationAdmin = () => {
         throw new Error(uploadResponse.data.message || 'Upload failed');
       }
       
-      return uploadResponse.data.uploadedImages[0].url;
+      return uploadResponse.data.images[0].url;
       
     } catch (error) {
       console.error('Mockup upload error:', error);

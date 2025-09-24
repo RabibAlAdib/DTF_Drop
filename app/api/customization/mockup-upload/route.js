@@ -13,7 +13,8 @@ cloudinary.config({
 
 export async function POST(request) {
   try {
-    // Authenticate and check seller/admin role
+    // Require authentication for security
+    const { getAuth } = await import('@clerk/nextjs/server');
     const { userId } = getAuth(request);
     if (!userId) {
       return NextResponse.json({
@@ -29,9 +30,17 @@ export async function POST(request) {
         message: "Seller/Admin access required"
       }, { status: 403 });
     }
-
+    
     const formData = await request.formData();
-    const files = formData.getAll('files');
+    let files = formData.getAll('files');
+    
+    // Handle single file upload as well
+    if (files.length === 0) {
+      const singleFile = formData.get('file');
+      if (singleFile) {
+        files = [singleFile];
+      }
+    }
     
     if (!files || files.length === 0) {
       return NextResponse.json({
