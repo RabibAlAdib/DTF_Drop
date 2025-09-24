@@ -18,7 +18,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning={true}>
       <body className={outfit.className} suppressHydrationWarning={true}>
-        <ClerkProvider>
+        <ClerkProvider publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}>
           <AppContextProvider>
             <ThemeProvider>
               <ScrollIndicator />
