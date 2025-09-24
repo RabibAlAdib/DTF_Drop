@@ -80,7 +80,8 @@ const AddProduct = () => {
       updateImageSlot(slotIndex, 'url', null);
       
       console.error('Cloudinary upload error:', error);
-      toast.error(`Failed to upload image ${slotIndex + 1}: ${error.response?.data?.message || error.message}`);
+      const errorMsg = error.response?.data?.message || error.message || 'Upload failed';
+      toast.error(`Failed to upload image ${slotIndex + 1}: ${errorMsg}`);
       throw error;
     }
   };

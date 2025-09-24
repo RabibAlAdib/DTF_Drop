@@ -257,7 +257,7 @@ const Orders = () => {
                                                     {order.pricing.promoCode && <span className="text-xs ml-1">({order.pricing.promoCode})</span>}
                                                 </p>
                                             )}
-                                            <p><strong>Total:</strong> <span className="font-semibold">{currency}{order.pricing.totalAmount}</span></p>
+                                            <p><strong>Total:</strong> <span className="font-semibold">{currency}{order.pricing.totalAmount || (order.pricing.subtotal + (order.pricing.deliveryCharge || order.pricing.deliveryFee) - (order.pricing.discountAmount || 0))}</span></p>
                                         </div>
                                     </div>
                                 </div>

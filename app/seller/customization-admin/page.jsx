@@ -81,29 +81,27 @@ const CustomizationAdmin = () => {
     try {
       setIsUploadingMockup(true);
       
-      // Get Cloudinary signature
-      const token = await getToken();
-      const signatureResponse = await axios.post('/api/cloudinary/signature', {}, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      
-      const signatureData = signatureResponse.data;
-      
-      // Upload to Cloudinary
+      // Use direct upload API instead of signature-based approach
       const formData = new FormData();
       formData.append('file', file);
-      formData.append('api_key', signatureData.api_key);
-      formData.append('timestamp', signatureData.timestamp);
-      formData.append('signature', signatureData.signature);
-      formData.append('folder', 'customization-mockups');
-      formData.append('transformation', 'c_limit,w_800,h_800,q_auto,f_auto');
       
-      const uploadResponse = await axios.post(signatureData.upload_url, formData);
-      return uploadResponse.data.secure_url;
+      const uploadResponse = await axios.post('/api/customization/mockup-upload', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'Authorization': `Bearer ${await getToken()}`
+        }
+      });
+      
+      if (!uploadResponse.data.success) {
+        throw new Error(uploadResponse.data.message || 'Upload failed');
+      }
+      
+      return uploadResponse.data.uploadedImages[0].url;
       
     } catch (error) {
       console.error('Mockup upload error:', error);
-      toast.error('Failed to upload mockup image');
+      const errorMsg = error.response?.data?.message || error.message || 'Upload failed';
+      toast.error(`Failed to upload mockup image: ${errorMsg}`);
       throw error;
     } finally {
       setIsUploadingMockup(false);
