@@ -96,13 +96,18 @@ export async function GET(req) {
       return {
         ...order,
         items: sellerItems,
-        // Redact sensitive customer info for regular sellers
+        // Provide necessary customer info for sellers to fulfill orders
         customerInfo: {
-          name: order.customerInfo?.name || 'Customer'
+          name: order.customerInfo?.name || 'Customer',
+          email: order.customerInfo?.email || '', // Email needed for order communication
+          phone: order.customerInfo?.phone || ''  // Phone needed for delivery coordination
         },
         shippingAddress: {
-          city: order.shippingAddress?.city
-          // Hide full address for privacy
+          fullName: order.shippingAddress?.fullName || '',
+          address: order.shippingAddress?.address || '', // Address needed for shipping
+          city: order.shippingAddress?.city || '',
+          postalCode: order.shippingAddress?.postalCode || '',
+          phone: order.shippingAddress?.phone || '' // Phone needed for delivery
         }
       };
     });

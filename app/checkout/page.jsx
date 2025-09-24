@@ -527,28 +527,28 @@ const CheckoutPage = () => {
                     <span>Cash on Delivery (COD)</span>
                   </label>
                   
-                  <label className="flex items-center cursor-pointer">
+                  <label className="flex items-center cursor-not-allowed opacity-50">
                     <input
                       type="radio"
                       name="payment"
                       value="bkash"
-                      checked={paymentMethod === 'bkash'}
-                      onChange={(e) => setPaymentMethod(e.target.value)}
+                      checked={false}
+                      disabled={true}
                       className="mr-3"
                     />
-                    <span>bKash - Mobile Payment {process.env.BKASH_API_KEY ? '' : '(Configuration Required)'}</span>
+                    <span>bKash - Mobile Payment (Currently Unavailable - API Configuration Required)</span>
                   </label>
                   
-                  <label className="flex items-center cursor-pointer">
+                  <label className="flex items-center cursor-not-allowed opacity-50">
                     <input
                       type="radio"
                       name="payment"
                       value="nagad"
-                      checked={paymentMethod === 'nagad'}
-                      onChange={(e) => setPaymentMethod(e.target.value)}
+                      checked={false}
+                      disabled={true}
                       className="mr-3"
                     />
-                    <span>Nagad - Mobile Payment {process.env.NAGAD_MERCHANT_ID ? '' : '(Configuration Required)'}</span>
+                    <span>Nagad - Mobile Payment (Currently Unavailable - API Configuration Required)</span>
                   </label>
                 </div>
               </div>
