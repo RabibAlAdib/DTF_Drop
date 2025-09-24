@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import Image from 'next/image';
 import { useAppContext } from '@/context/AppContext';
@@ -19,7 +19,20 @@ const CartModal = ({ isOpen, onClose, product }) => {
 
   // Use product-specific sizes/colors if available, otherwise use defaults
   const availableSizes = product?.sizes || defaultSizes;
-  const availableColors = product?.colors || defaultColors;
+  
+  // Memoized product color detection to prevent infinite re-renders
+  const availableColors = useMemo(() => {
+    // First try to get colors from colorImages
+    if (product?.colorImages && product.colorImages.length > 0) {
+      return product.colorImages.map(img => img.color).filter(Boolean);
+    }
+    // Then try the colors array
+    if (product?.colors && product.colors.length > 0) {
+      return product.colors;
+    }
+    // Fall back to defaults only if no product-specific colors
+    return defaultColors;
+  }, [product?.colorImages, product?.colors]);
 
   // Handle client-side mounting
   useEffect(() => {
@@ -29,8 +42,8 @@ const CartModal = ({ isOpen, onClose, product }) => {
   // Reset selections when modal opens with new product
   useEffect(() => {
     if (isOpen && product) {
-      setSelectedSize(availableSizes[0] || '');
-      setSelectedColor(availableColors[0] || '');
+      setSelectedSize(availableSizes[0] || 'M'); // Default to M if no sizes
+      setSelectedColor(availableColors[0] || 'Black'); // Better fallback
       setQuantity(1);
     }
   }, [isOpen, product, availableSizes, availableColors]);
