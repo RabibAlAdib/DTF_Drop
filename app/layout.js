@@ -11,6 +11,8 @@ import Navbar from '@/components/Navbar'
 import FloatingCart from '@/components/FloatingCart'
 import ScrollIndicator from '@/components/ScrollIndicator'
 import FloatingAdminButton from '@/components/admin/FloatingAdminButton'
+import { Analytics } from "@vercel/analytics/next"
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 const outfit = Outfit({ subsets: ['latin'] })
 
@@ -37,6 +39,8 @@ export default function RootLayout({ children }) {
             </ThemeProvider>
           </AppContextProvider>
         </ClerkProvider>
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   )

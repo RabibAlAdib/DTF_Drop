@@ -68,5 +68,9 @@ Preferred communication style: Simple, everyday language.
 - **ESLint**: Code linting with Next.js specific configurations
 - **React Hot Toast**: Toast notification library for user feedback
 
+## Analytics & Performance
+- **Vercel Analytics**: Web analytics for tracking user interactions and page views
+- **Vercel Speed Insights**: Performance monitoring for Core Web Vitals and page load metrics
+
 ## HTTP Client
 - **Axios**: Promise-based HTTP client for API requests and external service communication
