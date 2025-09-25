@@ -230,7 +230,7 @@ const Navbar = () => {
         <>
           {/* Backdrop */}
           <div
-            className="md:hidden fixed inset-0 bg-black/50 backdrop-blur-xl z-40"
+            className="md:hidden fixed inset-0 bg-black/80 backdrop-blur-2xl z-40 transition-all duration-300"
             onClick={() => setMobileMenuOpen(false)}
           />
 
