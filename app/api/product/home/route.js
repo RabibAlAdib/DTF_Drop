@@ -11,7 +11,7 @@ export async function GET(request) {
       .sort({ date: -1 })
       .limit(20)
       .lean() // Use lean() for better performance
-      .select('name price offerPrice images colorImages category date description gender designType colors sizes ratings numOfReviews variants'); // Include all required fields for product display
+      .select('name price offerPrice images colorImages category date description gender designType colors sizes ratings numOfReviews variants numberofSales'); // Include all required fields for product display
     
     return NextResponse.json({
       success: true,
