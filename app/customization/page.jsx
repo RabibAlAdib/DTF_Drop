@@ -589,9 +589,9 @@ const CustomizationPage = () => {
                 className="relative w-80 h-96 bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200"
               >
                 {/* Mockup Image */}
-                {selectedColor?.mockupImage ? (
+                {selectedColor?.mockupImages?.[0] ? (
                   <img
-                    src={selectedColor.mockupImage}
+                    src={selectedColor.mockupImages[0]}
                     alt="Product Mockup"
                     className="w-full h-full object-contain"
                     draggable={false}
