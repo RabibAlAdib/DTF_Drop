@@ -13,16 +13,46 @@ export async function GET(req) {
     const { searchParams } = new URL(req.url);
     const productId = searchParams.get('productId');
     const userId = searchParams.get('userId');
-    const status = searchParams.get('status') || 'approved';
+    const requestedStatus = searchParams.get('status') || 'approved';
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '10');
     const sortBy = searchParams.get('sortBy') || 'newest';
+    
+    // Security: Determine allowed status based on authentication and role
+    let allowedStatus = 'approved'; // Default to approved for public access
+    
+    try {
+      const { userId: authUserId } = auth();
+      const user = await currentUser();
+      
+      if (authUserId && user) {
+        // Check if user is admin (you can customize this logic)
+        const isAdmin = user.emailAddresses?.some(email => 
+          email.emailAddress === 'dtfdrop25@gmail.com'
+        ) || false;
+        
+        if (isAdmin) {
+          // Admins can see all statuses
+          allowedStatus = requestedStatus;
+        } else if (userId && userId === authUserId) {
+          // Users can see their own reviews in any status
+          allowedStatus = requestedStatus;
+        } else {
+          // Regular authenticated users can only see approved reviews
+          allowedStatus = 'approved';
+        }
+      }
+    } catch (authError) {
+      // If auth fails, default to approved only
+      console.log('Auth check failed, defaulting to approved reviews only');
+      allowedStatus = 'approved';
+    }
     
     // Build query
     let query = {};
     if (productId) query.productId = productId;
     if (userId) query.userId = userId;
-    if (status !== 'all') query.status = status;
+    if (allowedStatus !== 'all') query.status = allowedStatus;
 
     // Build sort criteria
     let sort = {};
