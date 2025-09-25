@@ -29,7 +29,7 @@ const Navbar = () => {
       />
 
       {/* Desktop Menu Items - Truly Centered */}
-      <div className="hidden md:block justify-self-center bg-black">
+      <div className="hidden md:block justify-self-center">
         <div className="bg-gray-300 dark:bg-gray-800/30 rounded-full px-2 py-1">
           <div className="flex items-center gap-1">
             <Link
@@ -371,10 +371,22 @@ const Navbar = () => {
               {/* Search in Mobile Menu */}
               <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-100 dark:border-gray-700 shadow-sm">
                 <div className="flex items-center gap-2 mb-2">
-                  <svg className="w-5 h-5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  <svg
+                    className="w-5 h-5 text-gray-500 dark:text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
                   </svg>
-                  <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">Search Products</span>
+                  <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                    Search Products
+                  </span>
                 </div>
                 <SearchDropdown
                   onMobileSelect={() => setMobileMenuOpen(false)}
@@ -405,11 +417,19 @@ const Navbar = () => {
                       />
                     </svg>
                   </div>
-                  <span className="font-bold text-white">
-                    Seller Dashboard
-                  </span>
-                  <svg className="w-4 h-4 text-white/70 ml-auto group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  <span className="font-bold text-white">Seller Dashboard</span>
+                  <svg
+                    className="w-4 h-4 text-white/70 ml-auto group-hover:text-white transition-colors"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 5l7 7-7 7"
+                    />
                   </svg>
                 </button>
               )}
@@ -432,8 +452,18 @@ const Navbar = () => {
                       />
                     </div>
                     <span className="text-lg">Sign In / Register</span>
-                    <svg className="w-5 h-5 text-white/70 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                    <svg
+                      className="w-5 h-5 text-white/70 group-hover:text-white transition-colors"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M13 7l5 5m0 0l-5 5m5-5H6"
+                      />
                     </svg>
                   </button>
                 </div>
