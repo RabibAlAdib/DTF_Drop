@@ -225,254 +225,129 @@ const Navbar = () => {
         </button>
       </div>
 
-      {/* Mobile Menu Dropdown */}
+      {/* Simplified Mobile Menu - Optimized Structure */}
       {mobileMenuOpen && (
-        <>
-          {/* Backdrop */}
-          <div
-            className="md:hidden fixed inset-0 bg-black/80 backdrop-blur-2xl z-40 transition-all duration-300"
-            onClick={() => setMobileMenuOpen(false)}
+        <div className="fixed inset-0 z-[9999] md:hidden">
+          {/* Simple backdrop */}
+          <div 
+            className="absolute inset-0 bg-black/50" 
+            onClick={() => setMobileMenuOpen(false)} 
           />
-
-          {/* Mobile Menu */}
-          <div className="md:hidden fixed inset-y-0 right-0 w-80 max-w-[85vw] bg-white dark:bg-gray-900 border-l border-gray-200 dark:border-gray-700 shadow-2xl shadow-black/40 dark:shadow-black/60 z-50 transform transition-all duration-300 flex flex-col">
-            {/* Menu Header */}
-            <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-700 flex-shrink-0">
-              <h3 className="text-lg font-bold text-gray-900 dark:text-white">
-                Menu
-              </h3>
+          
+          {/* Simple menu container */}
+          <div className="absolute top-0 right-0 w-80 max-w-[90vw] h-full bg-white dark:bg-gray-900 shadow-xl">
+            {/* Header */}
+            <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white">Menu</h3>
               <div className="flex items-center gap-3">
                 <ThemeToggle />
-                <button
+                <button 
                   onClick={() => setMobileMenuOpen(false)}
-                  className="p-2 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-red-100 dark:hover:bg-red-900/30 hover:text-red-600 dark:hover:text-red-400 transition-all duration-300 group"
+                  className="p-2 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-red-100 dark:hover:bg-red-900/30 hover:text-red-600 dark:hover:text-red-400 transition-all duration-300"
                 >
-                  <svg
-                    className="w-4 h-4 group-hover:rotate-90 transition-transform duration-300"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
-                    />
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 </button>
               </div>
             </div>
-
-            {/* Menu Content - Scrollable */}
-            <div className="flex-1 overflow-y-auto p-4">
-              <div className="space-y-3">
-              {/* Navigation Links */}
-              <Link
-                href="/"
-                className="flex items-center gap-3 px-3 py-3 rounded-lg bg-white dark:bg-gray-800 hover:bg-blue-50 dark:hover:bg-gray-700 hover:shadow-sm transition-all duration-300 group border border-gray-100 dark:border-gray-700"
+            
+            {/* Direct navigation items - no complex nesting */}
+            <div className="p-4 space-y-3">
+              <Link 
+                href="/" 
                 onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-800 hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors"
               >
-                <div className="p-1.5 rounded-md bg-blue-100 dark:bg-blue-900/30 group-hover:bg-blue-200 dark:group-hover:bg-blue-800/40 transition-colors">
-                  <HomeIcon className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                </div>
-                <span className="font-medium text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                  Home
-                </span>
+                <HomeIcon className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                <span className="font-medium text-gray-900 dark:text-white">Home</span>
+              </Link>
+              
+              <Link 
+                href="/all-products" 
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-800 hover:bg-green-50 dark:hover:bg-gray-700 transition-colors"
+              >
+                <BoxIcon className="w-5 h-5 text-green-600 dark:text-green-400" />
+                <span className="font-medium text-gray-900 dark:text-white">Shop</span>
+              </Link>
+              
+              <Link 
+                href="/about" 
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-800 hover:bg-purple-50 dark:hover:bg-gray-700 transition-colors"
+              >
+                <svg className="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span className="font-medium text-gray-900 dark:text-white">About</span>
+              </Link>
+              
+              <Link 
+                href="/contact" 
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-800 hover:bg-orange-50 dark:hover:bg-gray-700 transition-colors"
+              >
+                <svg className="w-5 h-5 text-orange-600 dark:text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+                <span className="font-medium text-gray-900 dark:text-white">Contact</span>
+              </Link>
+              
+              <Link 
+                href="/customization" 
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-800 hover:bg-indigo-50 dark:hover:bg-gray-700 transition-colors"
+              >
+                <svg className="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4" />
+                </svg>
+                <span className="font-medium text-gray-900 dark:text-white">Customization</span>
               </Link>
 
-              <Link
-                href="/all-products"
-                className="flex items-center gap-3 px-3 py-3 rounded-lg bg-white dark:bg-gray-800 hover:bg-green-50 dark:hover:bg-gray-700 hover:shadow-sm transition-all duration-300 group border border-gray-100 dark:border-gray-700"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                <div className="p-1.5 rounded-md bg-green-100 dark:bg-green-900/30 group-hover:bg-green-200 dark:group-hover:bg-green-800/40 transition-colors">
-                  <BoxIcon className="w-4 h-4 text-green-600 dark:text-green-400" />
-                </div>
-                <span className="font-medium text-gray-900 dark:text-white group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors">
-                  Shop
-                </span>
-              </Link>
-
-              <Link
-                href="/about"
-                className="flex items-center gap-3 px-3 py-3 rounded-lg bg-white dark:bg-gray-800 hover:bg-purple-50 dark:hover:bg-gray-700 hover:shadow-sm transition-all duration-300 group border border-gray-100 dark:border-gray-700"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                <div className="p-1.5 rounded-md bg-purple-100 dark:bg-purple-900/30 group-hover:bg-purple-200 dark:group-hover:bg-purple-800/40 transition-colors">
-                  <svg
-                    className="w-4 h-4 text-purple-600 dark:text-purple-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                </div>
-                <span className="font-medium text-gray-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
-                  About
-                </span>
-              </Link>
-
-              <Link
-                href="/contact"
-                className="flex items-center gap-3 px-3 py-3 rounded-lg bg-white dark:bg-gray-800 hover:bg-orange-50 dark:hover:bg-gray-700 hover:shadow-sm transition-all duration-300 group border border-gray-100 dark:border-gray-700"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                <div className="p-1.5 rounded-md bg-orange-100 dark:bg-orange-900/30 group-hover:bg-orange-200 dark:group-hover:bg-orange-800/40 transition-colors">
-                  <svg
-                    className="w-4 h-4 text-orange-600 dark:text-orange-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                    />
-                  </svg>
-                </div>
-                <span className="font-medium text-gray-900 dark:text-white group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors">
-                  Contact
-                </span>
-              </Link>
-
-              <Link
-                href="/customization"
-                className="flex items-center gap-3 px-3 py-3 rounded-lg bg-white dark:bg-gray-800 hover:bg-indigo-50 dark:hover:bg-gray-700 hover:shadow-sm transition-all duration-300 group border border-gray-100 dark:border-gray-700"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                <div className="p-1.5 rounded-md bg-indigo-100 dark:bg-indigo-900/30 group-hover:bg-indigo-200 dark:group-hover:bg-indigo-800/40 transition-colors">
-                  <svg
-                    className="w-4 h-4 text-indigo-600 dark:text-indigo-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4"
-                    />
-                  </svg>
-                </div>
-                <span className="font-medium text-gray-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-                  Customization
-                </span>
-              </Link>
-
-              {/* Search in Mobile Menu */}
-              <div className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-gray-100 dark:border-gray-700 shadow-sm">
+              {/* Search */}
+              <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
                 <div className="flex items-center gap-2 mb-2">
-                  <svg
-                    className="w-4 h-4 text-gray-500 dark:text-gray-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                    />
+                  <svg className="w-4 h-4 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Search Products
-                  </span>
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Search Products</span>
                 </div>
-                <SearchDropdown
-                  onMobileSelect={() => setMobileMenuOpen(false)}
-                />
+                <SearchDropdown onMobileSelect={() => setMobileMenuOpen(false)} />
               </div>
 
-              {/* Seller Dashboard in Mobile Menu */}
+              {/* Seller Dashboard */}
               {isSeller && (
                 <button
                   onClick={() => {
                     setMobileMenuOpen(false);
                     router.push("/seller");
                   }}
-                  className="w-full flex items-center gap-3 px-3 py-3 rounded-lg bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-md hover:shadow-lg transition-all duration-300 group"
+                  className="w-full flex items-center gap-3 p-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition-colors"
                 >
-                  <div className="p-1.5 rounded-md bg-white/20 group-hover:bg-white/30 transition-colors">
-                    <svg
-                      className="w-4 h-4 text-white"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-                      />
-                    </svg>
-                  </div>
-                  <span className="font-medium text-white">Seller Dashboard</span>
-                  <svg
-                    className="w-3 h-3 text-white/70 ml-auto group-hover:text-white transition-colors"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 5l7 7-7 7"
-                    />
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                   </svg>
+                  <span className="font-medium">Seller Dashboard</span>
                 </button>
               )}
 
-              {/* User Actions if not logged in */}
+              {/* Sign In Button */}
               {!user && (
-                <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                  <button
-                    onClick={() => {
-                      setMobileMenuOpen(false);
-                      openSignIn();
-                    }}
-                    className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl transition-all duration-300 font-bold shadow-lg hover:shadow-xl group"
-                  >
-                    <div className="p-1 rounded-full bg-white/20 group-hover:bg-white/30 transition-colors">
-                      <Image
-                        src={assets.user_icon}
-                        alt="user icon"
-                        className="w-5 h-5 filter brightness-0 invert"
-                      />
-                    </div>
-                    <span className="text-base">Sign In / Register</span>
-                    <svg
-                      className="w-4 h-4 text-white/70 group-hover:text-white transition-colors"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M13 7l5 5m0 0l-5 5m5-5H6"
-                      />
-                    </svg>
-                  </button>
-                </div>
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    openSignIn();
+                  }}
+                  className="w-full flex items-center justify-center gap-3 p-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-medium"
+                >
+                  <Image src={assets.user_icon} alt="user icon" className="w-5 h-5 filter brightness-0 invert" />
+                  <span>Sign In / Register</span>
+                </button>
               )}
-              </div>
             </div>
           </div>
-        </>
+        </div>
       )}
 
       {/* Search Modal */}
