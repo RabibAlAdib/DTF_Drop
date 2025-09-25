@@ -74,7 +74,7 @@ export async function POST(request) {
   try {
     const { userId, isSeller, error } = await getSellerAuth(request);
     
-    if (!userId || !isSeller || error) {
+    if (!userId || (!isSeller && error)) {
       return NextResponse.json({
         success: false,
         message: error || "Unauthorized Access. Only Sellers are allowed to create offers."

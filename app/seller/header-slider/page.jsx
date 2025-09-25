@@ -27,10 +27,7 @@ const HeaderSliderManagement = () => {
 
   const fetchSlides = async () => {
     try {
-      const token = await getToken();
-      const response = await axios.get('/api/header-slider?mineOnly=true', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await axios.get('/api/header-slider');
       if (response.data.success) {
         setSlides(response.data.slides);
       }
@@ -172,7 +169,7 @@ const HeaderSliderManagement = () => {
   return (
     <div className="flex-1 p-6 bg-gray-50 dark:bg-gray-900 min-h-screen">
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">Header Slider Management</h1>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">Header Slider Management - All Slides</h1>
 
         {/* Create New Slide Form */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-8">

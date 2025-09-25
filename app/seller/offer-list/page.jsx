@@ -22,13 +22,10 @@ const OfferList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
 
-  const fetchSellerOffers = async () => {
+  const fetchAllOffers = async () => {
     try {
       setLoading(true);
-      const token = await getToken();
-      const { data } = await axios.get('/api/offer/seller-list', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const { data } = await axios.get('/api/offer');
       
       if (data.success) {
         setOffers(data.offers);
@@ -84,7 +81,7 @@ const OfferList = () => {
       
       if (data.success) {
         toast.success(`Offer ${!currentStatus ? 'activated' : 'deactivated'} successfully!`);
-        fetchSellerOffers(); // Refresh the list
+        fetchAllOffers(); // Refresh the list
       } else {
         toast.error(data.message || "Failed to update offer status");
       }
@@ -164,10 +161,8 @@ const OfferList = () => {
   };
 
   useEffect(() => {
-    if (user) {
-      fetchSellerOffers();
-    }
-  }, [user]);
+    fetchAllOffers();
+  }, []);
 
   if (loading) {
     return <Loading />;
@@ -182,7 +177,7 @@ const OfferList = () => {
             <div>
               <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Offer Management</h1>
               <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                Manage your promotional offers and discounts
+                Manage all promotional offers and discounts
               </p>
             </div>
             <button

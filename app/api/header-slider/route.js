@@ -26,7 +26,7 @@ export async function GET(request) {
     let query = {};
     let selectFields = 'title shortText productImage buyButtonText buyButtonAction buyButtonLink learnMoreButtonText learnMoreLink isVisible order createdAt';
     
-    // For seller management view - show only current seller's slides
+    // For seller management view - show all slides to all sellers/admin
     if (mineOnly) {
       const { userId } = getAuth(request);
       if (!userId) {
@@ -44,7 +44,7 @@ export async function GET(request) {
         }, { status: 403 });
       }
       
-      query.userId = userId;
+      // Remove user-specific filtering - show all slides
       selectFields += ' userId'; // Include userId for seller management
     } 
     // For public display - only visible slides, exclude sensitive data

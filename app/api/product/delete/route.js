@@ -46,8 +46,11 @@ export async function DELETE(request) {
       }, { status: 404 });
     }
 
-    // Check if the product belongs to the current seller
-    if (String(product.userId) !== String(userId)) {
+    // Check if the product belongs to the current seller OR if user is admin
+    const { isAdminUser } = await import('@/lib/authAdmin');
+    const isAdmin = await isAdminUser(request);
+    
+    if (!isAdmin && String(product.userId) !== String(userId)) {
       return NextResponse.json({
         success: false,
         message: "Unauthorized. You can only delete your own products."
