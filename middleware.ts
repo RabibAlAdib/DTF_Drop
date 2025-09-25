@@ -23,7 +23,7 @@ const isProtectedRoute = createRouteMatcher([
   '/favorites(.*)'
 ]);
 
-export default clerkMiddleware(async (auth, req) => {
+export default clerkMiddleware((auth, req) => {
   // Allow all public routes
   if (isPublicRoute(req)) {
     return;
@@ -31,12 +31,7 @@ export default clerkMiddleware(async (auth, req) => {
   
   // For protected routes, require authentication
   if (isProtectedRoute(req)) {
-    const session = await auth();
-    if (!session.userId) {
-      // This will redirect to sign-in page
-      return;
-    }
-    return;
+    return auth().protect();
   }
   
   // For other routes (API routes, etc.), allow but don't enforce authentication
