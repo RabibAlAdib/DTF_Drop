@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 
-const SearchDropdown = ({ onMobileSelect }) => {
+const SearchDropdown = ({ onMobileSelect, zIndexLevel = "z-[60]" }) => {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
@@ -139,7 +139,7 @@ const SearchDropdown = ({ onMobileSelect }) => {
       </div>
       
       {isOpen && results.length > 0 && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl max-h-96 overflow-y-auto z-[60]">
+        <div className={`absolute top-full left-0 right-0 mt-2 bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl max-h-96 overflow-y-auto ${zIndexLevel}`}>
           <div className="p-2">
             <div className="text-xs text-gray-500 dark:text-gray-400 px-3 py-2 font-medium">
               Search Results ({results.length})
@@ -187,7 +187,7 @@ const SearchDropdown = ({ onMobileSelect }) => {
       )}
       
       {isOpen && results.length === 0 && !loading && query.length >= 2 && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl z-[60]">
+        <div className={`absolute top-full left-0 right-0 mt-2 bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl ${zIndexLevel}`}>
           <div className="p-4 text-center text-gray-500 dark:text-gray-400">
             <svg
               className="w-8 h-8 mx-auto mb-2 opacity-50"

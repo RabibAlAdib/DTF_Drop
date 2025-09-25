@@ -379,6 +379,7 @@ const Navbar = () => {
                 </div>
                 <SearchDropdown
                   onMobileSelect={() => setMobileMenuOpen(false)}
+                  zIndexLevel="z-[99999]"
                 />
               </div>
 
