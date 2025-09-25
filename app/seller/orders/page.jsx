@@ -307,10 +307,6 @@ const Orders = () => {
                                         </h4>
                                         <div className="text-sm space-y-1">
                                             <p>
-                                                <strong>Name:</strong>{" "}
-                                                {order.shippingAddress.fullName}
-                                            </p>
-                                            <p>
                                                 <strong>Address:</strong>{" "}
                                                 {order.shippingAddress.address}
                                             </p>
