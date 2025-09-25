@@ -56,6 +56,18 @@ export async function POST(req) {
 
       await order.save();
 
+      // Update sales count for each product when payment is actually completed (avoid duplicates)
+      if (order.payment.status !== 'completed') {
+        try {
+          const { incrementSalesCount } = await import('@/lib/salesService');
+          await incrementSalesCount(order.items);
+          console.log(`✅ Sales count updated for order ${order.orderNumber} payment completion`);
+        } catch (salesError) {
+          console.error('❌ Failed to update sales count for completed payment:', salesError);
+          // Don't fail the payment process if sales count update fails
+        }
+      }
+
       console.log(`Payment completed for order ${order.orderNumber}:`, callbackResult);
 
       return NextResponse.json({

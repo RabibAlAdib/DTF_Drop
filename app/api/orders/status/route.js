@@ -102,6 +102,36 @@ export async function PUT(req) {
       await updatedOrder.save();
     }
 
+    // Handle sales count updates based on status changes
+    try {
+      const { incrementSalesCount, decrementSalesCount } = await import('@/lib/salesService');
+      
+      // For COD orders: increment sales count when delivered
+      if (status === 'delivered' && order.payment.method === 'cash_on_delivery') {
+        await incrementSalesCount(order.items);
+        console.log(`✅ Sales count incremented for COD order ${order.orderNumber} delivery`);
+      }
+      
+      // For cancelled orders: decrement sales count if payment was completed
+      if (status === 'cancelled') {
+        if (order.payment.status === 'completed' || 
+           (order.payment.method === 'cash_on_delivery' && currentStatus === 'delivered')) {
+          await decrementSalesCount(order.items);
+          console.log(`✅ Sales count decremented for cancelled order ${order.orderNumber}`);
+        }
+      }
+      
+      // For returned orders: decrement sales count
+      if (status === 'returned') {
+        await decrementSalesCount(order.items);
+        console.log(`✅ Sales count decremented for returned order ${order.orderNumber}`);
+      }
+      
+    } catch (salesError) {
+      console.error('❌ Failed to update sales count for status change:', salesError);
+      // Don't fail the status update if sales count update fails
+    }
+
     // Send status update notification email
     try {
       await sendOrderStatusUpdateEmail(updatedOrder, status);
