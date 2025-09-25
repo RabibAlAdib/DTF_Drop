@@ -315,7 +315,6 @@ const Orders = () => {
                                                 {order.shippingAddress.city}
                                             </p>
                                             <p>
-                                                <strong>Postal Code:</strong>{" "}
                                                 {
                                                     order.shippingAddress
                                                         .postalCode

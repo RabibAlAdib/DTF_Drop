@@ -97,14 +97,14 @@ const ProductCard = ({ product }) => {
                     </p>
                     
                     <div className="flex items-center gap-2 mt-2">
-                        <p className="text-xs font-medium text-orange-600">{4.5}</p>
+                        <p className="text-xs font-medium text-orange-600">{product.rating || 4.5}</p>
                         <div className="flex items-center gap-0.5">
                             {Array.from({ length: 5 }).map((_, index) => (
                                 <Image
                                     key={index}
                                     className="h-3 w-3"
                                     src={
-                                        index < Math.floor(4)
+                                        index < Math.floor(product.rating || 4)
                                             ? assets.star_icon
                                             : assets.star_dull_icon
                                     }
@@ -112,11 +112,11 @@ const ProductCard = ({ product }) => {
                                 />
                             ))}
                         </div>
-                        <span className="text-xs text-gray-500 ml-1">(128)</span>
+                        <span className="text-xs text-gray-500 ml-1">({product.reviewCount || 0})</span>
                     </div>
 
                     <div className="flex items-center justify-between w-full mt-3">
-                        <div className="flex items-center gap-2">
+                        <div className="flex flex-col gap-1">
                             <p className="text-lg font-bold text-gray-900 dark:text-white">{currency}{product.offerPrice}</p>
                             {product.price !== product.offerPrice && (
                                 <p className="text-sm text-gray-500 line-through">{currency}{product.price}</p>
