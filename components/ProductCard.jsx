@@ -86,7 +86,7 @@ const ProductCard = ({ product }) => {
 
                 <div className="px-2 pb-2">
                     <p className="md:text-base font-semibold pt-3 w-full truncate text-gray-900 dark:text-white">{product.name}</p>
-                    <p className="w-full text-xs text-gray-600 dark:text-gray-400 max-sm:hidden mt-1 line-clamp-2 leading-tight">
+                    <p className="w-full text-xs text-gray-600 dark:text-gray-400 max-sm:hidden mt-1 text-clamp-2">
                        {product.description}
                     </p>
                     
