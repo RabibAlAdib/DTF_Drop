@@ -4,6 +4,7 @@ import connectDB from '@/config/db';
 import Order from '@/models/Order';
 import User from '@/models/User';
 import Product from '@/models/Product';
+import CustomOrder from '@/models/CustomOrder';
 import { 
   validateOrderData, 
   calculateOrderTotal,
@@ -75,9 +76,11 @@ export async function POST(req) {
       }
 
       // Use current product price (not client-provided price)
-      const currentPrice = product.offerPrice || product.price;
-      const totalPrice = currentPrice * item.quantity;
-      calculatedSubtotal += totalPrice;
+      let currentPrice = product.offerPrice || product.price;
+      let totalPrice = currentPrice * item.quantity;
+      
+      // Will be updated if CustomOrder exists
+      let isCustomOrder = false;
 
       // Get variant-specific image
       let productImage = product.images?.[0] || '';
@@ -86,6 +89,76 @@ export async function POST(req) {
         if (colorImage) productImage = colorImage.url;
       }
 
+      // Check for CustomOrder data and fetch complete design information
+      let customization = item.customization || {
+        hasCustomDesign: false,
+        customDesignUrl: '',
+        customText: '',
+        customNumber: '',
+        customSlogan: '',
+        specialInstructions: ''
+      };
+      
+      let customOrderData = null;
+      
+      // If item has a CustomOrder reference, fetch the complete data
+      if (item.customization?.customOrder?.orderId) {
+        try {
+          const customOrder = await CustomOrder.findOne({ 
+            orderId: item.customization.customOrder.orderId,
+            userId: userId 
+          });
+          
+          if (customOrder) {
+            customOrderData = customOrder;
+            isCustomOrder = true;
+            
+            // Use CustomOrder pricing instead of base product price
+            currentPrice = customOrder.totalPrice;
+            totalPrice = currentPrice * item.quantity;
+            
+            // Update customization with rich data from CustomOrder
+            customization = {
+              hasCustomDesign: true,
+              customDesignUrl: customOrder.userDesigns?.front?.imageUrl || '',
+              customText: '',
+              customNumber: '',
+              customSlogan: '',
+              specialInstructions: customOrder.customerNotes || '',
+              // Store complete CustomOrder data
+              customOrderId: customOrder._id,
+              customOrderDetails: {
+                orderId: customOrder.orderId,
+                templateId: customOrder.templateId,
+                category: customOrder.category,
+                selectedColor: customOrder.selectedColor,
+                selectedSize: customOrder.selectedSize,
+                userDesigns: customOrder.userDesigns,
+                basePrice: customOrder.basePrice,
+                extraImagesCount: customOrder.extraImagesCount,
+                extraImagePrice: customOrder.extraImagePrice,
+                totalPrice: customOrder.totalPrice,
+                finalPreviewUrl: customOrder.finalPreviewUrl
+              }
+            };
+            
+            // Update CustomOrder status to indicate it's been ordered
+            await CustomOrder.findByIdAndUpdate(customOrder._id, {
+              status: 'submitted',
+              orderPlacedAt: new Date()
+            });
+            
+            console.log(`✅ CustomOrder ${customOrder.orderId} linked to order with correct pricing (₹${customOrder.totalPrice} each)`);
+          }
+        } catch (customOrderError) {
+          console.error('Error fetching CustomOrder:', customOrderError);
+          // Continue with basic customization if CustomOrder fetch fails
+        }
+      }
+      
+      // Add to calculated subtotal (now includes CustomOrder pricing if applicable)
+      calculatedSubtotal += totalPrice;
+      
       verifiedItems.push({
         productId: item.productId,
         productName: product.name,
@@ -95,14 +168,8 @@ export async function POST(req) {
         quantity: item.quantity,
         totalPrice: totalPrice,
         productImage: productImage,
-        customization: item.customization || {
-          hasCustomDesign: false,
-          customDesignUrl: '',
-          customText: '',
-          customNumber: '',
-          customSlogan: '',
-          specialInstructions: ''
-        }
+        customization: customization,
+        customOrderData: customOrderData // Store reference for easy access
       });
     }
 

@@ -450,8 +450,8 @@ const CustomizationPage = () => {
     }
   };
   
-  // Add to cart functionality
-  const handleAddToCart = () => {
+  // Add to cart functionality - Now creates proper CustomOrder
+  const handleAddToCart = async () => {
     if (!selectedTemplate || !selectedColor || !selectedSize) {
       toast.error('Please select a product, color, and size');
       return;
@@ -462,25 +462,62 @@ const CustomizationPage = () => {
       return;
     }
     
-    // Create custom order data
-    const customOrderData = {
-      templateId: selectedTemplate._id,
-      category: selectedTemplate.category,
-      color: selectedColor.name,
-      size: selectedSize.size,
-      basePrice: selectedSize.price,
-      designs: userDesigns,
-      totalPrice: calculatePrice,
-      specialInstructions: ''
-    };
+    if (!user) {
+      toast.error('Please sign in to place custom orders');
+      return;
+    }
     
-    // Add to cart with custom data (fixed parameter structure)
-    addToCart(selectedTemplate._id, {
-      color: selectedColor.name,
-      size: selectedSize.size,
-      customOrder: customOrderData
-    }, 1);
-    toast.success('Custom design added to cart!');
+    try {
+      const token = await getToken();
+      
+      // Create custom order via proper API
+      const customOrderData = {
+        templateId: selectedTemplate._id,
+        selectedColor: selectedColor.name,
+        selectedSize: selectedSize.size,
+        userDesigns: userDesigns,
+        userEmail: user.emailAddresses[0]?.emailAddress,
+        customerNotes: ''
+      };
+      
+      const toastId = toast.loading('Creating custom order...');
+      
+      const response = await axios.post('/api/customization/orders', customOrderData, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      if (response.data.success) {
+        toast.success('Custom order created successfully!', { id: toastId });
+        
+        // Show WhatsApp message with order details
+        toast.success(
+          `Order ID: ${response.data.order.orderId}. ${response.data.whatsappMessage}`,
+          { 
+            id: 'whatsapp-msg', 
+            duration: 8000,
+            position: 'top-center'
+          }
+        );
+        
+        // Optional: Also add to cart for checkout integration
+        addToCart(selectedTemplate._id, {
+          color: selectedColor.name,
+          size: selectedSize.size,
+          customOrder: {
+            orderId: response.data.order.orderId,
+            templateId: selectedTemplate._id,
+            totalPrice: calculatePrice
+          }
+        }, 1);
+        
+      } else {
+        toast.error(response.data.message || 'Failed to create custom order', { id: toastId });
+      }
+      
+    } catch (error) {
+      console.error('Custom order creation error:', error);
+      toast.error(error.response?.data?.message || 'Failed to create custom order. Please try again.');
+    }
   };
   
   if (loading) {
