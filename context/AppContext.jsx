@@ -91,6 +91,14 @@ export const AppContextProvider = (props) => {
       }
       cartData._variants[variantKey] = variant;
       
+      // Store custom order data if provided
+      if (variant.customOrder) {
+        if (!cartData._customOrders) {
+          cartData._customOrders = {};
+        }
+        cartData._customOrders[variantKey] = variant.customOrder;
+      }
+      
       setCartItems(cartData);
       
       // Save to database

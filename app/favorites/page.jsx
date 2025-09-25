@@ -122,9 +122,13 @@ const FavoritesPage = () => {
             <p className="text-sm text-gray-600 dark:text-gray-400 mt-4 mb-8">
               {favoriteProducts.length} item{favoriteProducts.length !== 1 ? 's' : ''} in your favorites
             </p>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 mt-6 pb-14 w-full">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8 mt-6 pb-14 w-full">
               {favoriteProducts.map((product, index) => (
-                <div key={product._id} className="animate-float-delay-1 hover:scale-105 transition-transform duration-300">
+                <div 
+                  key={product._id} 
+                  className="transform transition-all duration-300 hover:scale-105 hover:shadow-lg"
+                  style={{ animationDelay: `${index * 100}ms` }}
+                >
                   <ProductCard product={product} />
                 </div>
               ))}

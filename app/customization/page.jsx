@@ -1,11 +1,20 @@
 'use client'
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useAppContext } from "@/context/AppContext";
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
 import Image from "next/image";
 import { useUser } from '@clerk/nextjs';
 import Footer from '@/components/Footer';
+
+// Debounce utility function for performance optimization
+const debounce = (func, wait) => {
+  let timeout;
+  return (...args) => {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func.apply(this, args), wait);
+  };
+};
 
 const CustomizationPage = () => {
   const { getToken, addToCart } = useAppContext();
@@ -109,80 +118,98 @@ const CustomizationPage = () => {
     }
   };
 
-  // Image compression function with iterative quality reduction
-  const compressImage = (file, maxSizeKB = 2048, initialQuality = 0.8) => {
+  // Optimized image compression with smart algorithms
+  const compressImage = (file, maxSizeKB = 2048, initialQuality = 0.85) => {
     return new Promise((resolve, reject) => {
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
       const img = new Image();
       
       img.onload = () => {
-        // Calculate new dimensions while maintaining aspect ratio
         let { width, height } = img;
-        let maxDimension = 1200; // Starting max dimension
         
-        const attemptCompression = (targetWidth, targetHeight, quality) => {
-          canvas.width = targetWidth;
-          canvas.height = targetHeight;
+        // Smart dimension calculation based on file size
+        const fileSizeMB = file.size / (1024 * 1024);
+        let maxDimension = fileSizeMB > 5 ? 1000 : 1200; // More aggressive for large files
+        
+        // Maintain aspect ratio while reducing dimensions if needed
+        if (Math.max(width, height) > maxDimension) {
+          if (width > height) {
+            height = (height * maxDimension) / width;
+            width = maxDimension;
+          } else {
+            width = (width * maxDimension) / height;
+            height = maxDimension;
+          }
+        }
+        
+        // Set canvas dimensions
+        canvas.width = Math.round(width);
+        canvas.height = Math.round(height);
+        
+        // Enable high-quality rendering
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+        
+        // Draw the image
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        // Determine optimal format and quality
+        const isTransparent = file.type === 'image/png';
+        const outputFormat = isTransparent ? 'image/png' : 'image/jpeg';
+        
+        // Try different quality levels efficiently
+        const qualityLevels = [initialQuality, 0.7, 0.5, 0.3];
+        let currentQualityIndex = 0;
+        
+        const tryCompress = () => {
+          if (currentQualityIndex >= qualityLevels.length) {
+            reject(new Error(`Unable to compress image below ${maxSizeKB}KB while maintaining quality. Please use a smaller image.`));
+            return;
+          }
           
-          // Clear canvas and draw image
-          ctx.clearRect(0, 0, targetWidth, targetHeight);
-          ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
+          const quality = qualityLevels[currentQualityIndex];
           
-          // Convert to blob with compression
           canvas.toBlob((blob) => {
             if (!blob) {
-              reject(new Error('Failed to compress image - unsupported format'));
+              reject(new Error('Failed to process image - format may be unsupported'));
               return;
             }
             
             const sizeKB = blob.size / 1024;
-            console.log(`Compression attempt: ${targetWidth}x${targetHeight}, quality: ${quality.toFixed(2)}, size: ${sizeKB.toFixed(1)}KB`);
             
             if (sizeKB <= maxSizeKB) {
-              // Success! File is under target size
+              // Success! Create optimized file
               const compressedFile = new File([blob], file.name, {
-                type: file.type,
+                type: outputFormat,
                 lastModified: Date.now()
               });
               resolve(compressedFile);
             } else {
-              // Still too large, try next compression level
-              if (quality > 0.3) {
-                // Reduce quality
-                attemptCompression(targetWidth, targetHeight, quality - 0.1);
-              } else if (maxDimension > 600) {
-                // Reduce dimensions and reset quality
-                maxDimension = maxDimension * 0.8;
-                const newWidth = width > height && width > maxDimension ? maxDimension : (width * maxDimension) / Math.max(width, height);
-                const newHeight = height > width && height > maxDimension ? maxDimension : (height * maxDimension) / Math.max(width, height);
-                attemptCompression(Math.round(newWidth), Math.round(newHeight), 0.7);
-              } else {
-                // Failed to compress to target size
-                reject(new Error(`Unable to compress image below ${maxSizeKB}KB. Please use a smaller image or different format.`));
-              }
+              // Try next quality level
+              currentQualityIndex++;
+              tryCompress();
             }
-          }, file.type, quality);
+          }, outputFormat, quality);
         };
         
-        // Start with original dimensions but scaled down if too large
-        if (width > height && width > maxDimension) {
-          height = (height * maxDimension) / width;
-          width = maxDimension;
-        } else if (height > maxDimension) {
-          width = (width * maxDimension) / height;
-          height = maxDimension;
-        }
-        
-        // Begin compression attempts
-        attemptCompression(Math.round(width), Math.round(height), initialQuality);
+        tryCompress();
       };
       
       img.onerror = () => {
-        reject(new Error('Failed to load image for compression'));
+        reject(new Error('Failed to load image. Please check the file format.'));
       };
       
-      img.src = URL.createObjectURL(file);
+      // Create object URL and clean up after
+      const objectUrl = URL.createObjectURL(file);
+      const originalOnload = img.onload;
+      
+      img.onload = () => {
+        URL.revokeObjectURL(objectUrl);
+        originalOnload();
+      };
+      
+      img.src = objectUrl;
     });
   };
   
@@ -230,14 +257,20 @@ const CustomizationPage = () => {
     }
   };
   
-  // Handle file upload with improved validation and compression
+  // Optimized file upload with enhanced validation and compression
   const handleFileUpload = async (file, area) => {
     if (!file) return;
     
-    // Enhanced validation
+    // Enhanced validation with client-side checks
     const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
     if (!validTypes.includes(file.type)) {
       toast.error('Please upload a JPEG, PNG, or WebP image');
+      return;
+    }
+    
+    // Client-side file size validation (before processing)
+    if (file.size > 10 * 1024 * 1024) { // 10MB hard limit
+      toast.error('File is too large. Please use an image smaller than 10MB.');
       return;
     }
     
@@ -249,31 +282,41 @@ const CustomizationPage = () => {
     
     try {
       setUploadingArea(area);
-      toast.loading('Processing image...', { id: 'upload' });
+      let toastId = 'upload-' + area;
+      toast.loading('Processing image...', { id: toastId });
       
       let processedFile = file;
       
-      // Compress if file is over 2MB
-      if (file.size > 2 * 1024 * 1024) {
-        toast.loading('Compressing image to save space...', { id: 'upload' });
+      // Smart compression - only compress if needed
+      if (file.size > 1 * 1024 * 1024) { // 1MB threshold for compression
+        toast.loading('Optimizing image size...', { id: toastId });
         try {
-          processedFile = await compressImage(file, 2048); // Enforce 2MB limit
-          console.log(`Compressed from ${(file.size / 1024 / 1024).toFixed(2)}MB to ${(processedFile.size / 1024 / 1024).toFixed(2)}MB`);
+          const targetSize = file.size > 5 * 1024 * 1024 ? 1536 : 2048; // More aggressive for very large files
+          processedFile = await compressImage(file, targetSize);
+          
+          // Show compression stats
+          const originalMB = (file.size / 1024 / 1024).toFixed(2);
+          const compressedMB = (processedFile.size / 1024 / 1024).toFixed(2);
+          const savedPercent = ((file.size - processedFile.size) / file.size * 100).toFixed(0);
+          
+          console.log(`Image optimized: ${originalMB}MB → ${compressedMB}MB (${savedPercent}% smaller)`);
         } catch (compressionError) {
-          toast.error(compressionError.message, { id: 'upload' });
+          toast.error(compressionError.message, { id: toastId });
           return;
         }
       }
       
-      // Final size check - should never exceed 2MB after compression
+      // Final size validation
       if (processedFile.size > 2 * 1024 * 1024) {
-        toast.error('Image compression failed to meet size requirements. Please use a smaller image.', { id: 'upload' });
+        toast.error('Unable to optimize image to required size. Please use a smaller image.', { id: toastId });
         return;
       }
       
-      toast.loading('Uploading image...', { id: 'upload' });
+      // Upload with progress feedback
+      toast.loading('Uploading to cloud...', { id: toastId });
       const imageUrl = await uploadImageToCloudinary(processedFile);
       
+      // Update state with new design
       setUserDesigns(prev => ({
         ...prev,
         [area]: {
@@ -282,17 +325,20 @@ const CustomizationPage = () => {
         }
       }));
       
-      setSelectedDesign(area); // Auto-select the uploaded design
-      toast.success(`${area.charAt(0).toUpperCase() + area.slice(1)} design uploaded successfully`, { id: 'upload' });
+      setSelectedDesign(area); // Auto-select uploaded design
+      toast.success(
+        `${area.charAt(0).toUpperCase() + area.slice(1)} design uploaded! Click and drag to position.`, 
+        { id: toastId, duration: 3000 }
+      );
     } catch (error) {
       console.error('Upload error:', error);
-      toast.error(error.message || 'Failed to upload image', { id: 'upload' });
+      toast.error(error.message || 'Upload failed. Please try again.', { id: 'upload-' + area });
     } finally {
       setUploadingArea(null);
     }
   };
   
-  // Enhanced drag functionality
+  // Enhanced drag functionality with debouncing
   const handleDragStart = useCallback((e, area) => {
     if (area !== currentView) return;
     
@@ -310,6 +356,22 @@ const CustomizationPage = () => {
     });
   }, [currentView, userDesigns]);
   
+  // Debounced drag move for better performance
+  const updateDesignPosition = useCallback((area, position) => {
+    setUserDesigns(prev => ({
+      ...prev,
+      [area]: {
+        ...prev[area],
+        position
+      }
+    }));
+  }, []);
+  
+  const debouncedUpdatePosition = useCallback(
+    debounce((area, position) => updateDesignPosition(area, position), 16), // ~60fps
+    [updateDesignPosition]
+  );
+  
   const handleDragMove = useCallback((e) => {
     if (!isDragging || !mockupRef.current) return;
     
@@ -320,14 +382,8 @@ const CustomizationPage = () => {
     const newX = Math.max(0, Math.min(100, x - dragOffset.x));
     const newY = Math.max(0, Math.min(100, y - dragOffset.y));
     
-    setUserDesigns(prev => ({
-      ...prev,
-      [currentView]: {
-        ...prev[currentView],
-        position: { x: newX, y: newY }
-      }
-    }));
-  }, [isDragging, dragOffset, currentView]);
+    debouncedUpdatePosition(currentView, { x: newX, y: newY });
+  }, [isDragging, dragOffset, currentView, debouncedUpdatePosition]);
   
   const handleDragEnd = useCallback(() => {
     setIsDragging(false);
@@ -363,8 +419,8 @@ const CustomizationPage = () => {
     }));
   };
   
-  // Calculate total price
-  const calculatePrice = () => {
+  // Memoized price calculation for better performance
+  const calculatePrice = useMemo(() => {
     if (!selectedSize) return 0;
     
     let basePrice = selectedSize.price;
@@ -378,7 +434,7 @@ const CustomizationPage = () => {
     }
     
     return basePrice + extraPrice;
-  };
+  }, [selectedSize, userDesigns.sleeve.imageUrl, userDesigns.pocket.imageUrl, selectedTemplate?.extraImagePrice]);
   
   // Remove design
   const removeDesign = (area) => {
@@ -414,12 +470,16 @@ const CustomizationPage = () => {
       size: selectedSize.size,
       basePrice: selectedSize.price,
       designs: userDesigns,
-      totalPrice: calculatePrice(),
+      totalPrice: calculatePrice,
       specialInstructions: ''
     };
     
-    // Add to cart with custom data
-    addToCart(selectedTemplate._id, selectedColor.name, selectedSize.size, 1, customOrderData);
+    // Add to cart with custom data (fixed parameter structure)
+    addToCart(selectedTemplate._id, {
+      color: selectedColor.name,
+      size: selectedSize.size,
+      customOrder: customOrderData
+    }, 1);
     toast.success('Custom design added to cart!');
   };
   
@@ -857,7 +917,7 @@ const CustomizationPage = () => {
                   )}
                   <div className="border-t border-gray-200 pt-2 flex justify-between font-bold text-sm">
                     <span className="text-gray-900">Total:</span>
-                    <span className="text-green-600">৳{calculatePrice()}</span>
+                    <span className="text-green-600">৳{calculatePrice}</span>
                   </div>
                 </div>
                 
