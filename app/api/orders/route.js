@@ -184,7 +184,7 @@ export async function POST(req) {
       shippingAddress: {
         fullName: orderData.customerInfo.name,
         address: orderData.customerInfo.address,
-        city: orderData.delivery.isDhaka ? 'Dhaka' : 'Outside Dhaka',
+        city: orderCalculation.calculation.delivery.isDhaka ? 'Inside Dhaka' : 'Outside Dhaka',
         postalCode: orderData.customerInfo.postalCode || '',
         phone: orderData.customerInfo.phone
       },
