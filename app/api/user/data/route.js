@@ -22,53 +22,40 @@ export async function GET(request) {
         
         await connectDB()
 
-        // First try to find user by clerkId (new approach)
-        let user = await User.findOne({ clerkId: userId });
-        
-        // If not found by clerkId, try legacy _id lookup for existing users
-        if (!user) {
-            try {
-                user = await User.findById(userId);
+        // Try to find user by _id (standard approach)
+        let user;
+        try {
+            user = await User.findById(userId);
+        } catch (findError) {
+            // Handle CastError for legacy ObjectId users
+            if (findError.name === 'CastError') {
+                console.log('CastError detected for legacy ObjectId user, attempting email lookup:', userId);
                 
-                // If found by _id, update with clerkId for future lookups
-                if (user) {
-                    user.clerkId = userId;
-                    await user.save();
-                    console.log('Migrated legacy user to use clerkId:', userId);
-                }
-            } catch (findError) {
-                // Handle CastError for legacy ObjectId users - migrate them
-                if (findError.name === 'CastError') {
-                    console.log('CastError detected for legacy ObjectId user, attempting migration:', userId);
+                try {
+                    // Get user data from Clerk to find their email
+                    const clerkUser = await clerkClient.users.getUser(userId);
+                    const userEmail = clerkUser.emailAddresses[0]?.emailAddress;
                     
-                    try {
-                        // Get user data from Clerk to find their email
-                        const clerkUser = await clerkClient.users.getUser(userId);
-                        const userEmail = clerkUser.emailAddresses[0]?.emailAddress;
-                        
-                        if (userEmail) {
-                            // Find existing user by email and migrate to clerkId
-                            const existingUser = await User.findOne({ email: userEmail });
-                            if (existingUser) {
-                                existingUser.clerkId = userId;
-                                await existingUser.save();
-                                user = existingUser;
-                                console.log('Successfully migrated legacy ObjectId user:', { userId, email: userEmail });
-                            } else {
-                                console.log('No existing user found with email, will create new:', userEmail);
-                                user = null;
-                            }
+                    if (userEmail) {
+                        // Find existing user by email (legacy ObjectId users)
+                        const existingUser = await User.findOne({ email: userEmail });
+                        if (existingUser) {
+                            user = existingUser;
+                            console.log('Found legacy ObjectId user by email:', { userId, email: userEmail });
                         } else {
-                            console.error('Could not get email from Clerk for user:', userId);
+                            console.log('No existing user found with email, will create new:', userEmail);
                             user = null;
                         }
-                    } catch (migrationError) {
-                        console.error('Error during legacy user migration:', migrationError);
+                    } else {
+                        console.error('Could not get email from Clerk for user:', userId);
                         user = null;
                     }
-                } else {
-                    throw findError; // Re-throw other database errors
+                } catch (emailLookupError) {
+                    console.error('Error during legacy user email lookup:', emailLookupError);
+                    user = null;
                 }
+            } else {
+                throw findError; // Re-throw other database errors
             }
         }
 
@@ -80,7 +67,6 @@ export async function GET(request) {
                 
                 const userData = {
                     _id: userId,
-                    clerkId: userId, // Add clerkId for future lookups
                     name: `${clerkUser.firstName || ''} ${clerkUser.lastName || ''}`.trim() || 'User',
                     email: clerkUser.emailAddresses[0]?.emailAddress || 'user@example.com',
                     imageUrl: clerkUser.imageUrl || 'https://img.clerk.com/preview.png',
