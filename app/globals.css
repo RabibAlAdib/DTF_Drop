@@ -43,7 +43,7 @@ body {
   scroll-behavior: smooth;
 }
 
-/* Cross-browser text truncation utility */
+/* Cross-browser text truncation utility - only for overflowing text */
 .text-clamp-2 {
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -51,10 +51,10 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
   line-height: 1.2em;
-  max-height: 2.4em; /* Fallback for non-webkit browsers */
+  max-height: 2.4em;
 }
 
-/* Support for browsers that don't support -webkit-box */
+/* Fallback for browsers that don't support -webkit-box - only for overflowing text */
 @supports not (display: -webkit-box) {
   .text-clamp-2 {
     display: block;
@@ -63,13 +63,16 @@ body {
     position: relative;
   }
   
+  /* Gradient fade for overflowing text */
   .text-clamp-2::after {
-    content: "...";
+    content: "";
     position: absolute;
-    right: 0;
     bottom: 0;
-    background: inherit;
-    padding-left: 0.5em;
+    right: 0;
+    width: 30%;
+    height: 1.2em;
+    background: linear-gradient(to right, transparent, inherit);
+    pointer-events: none;
   }
 }
 
