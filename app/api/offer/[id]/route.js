@@ -87,7 +87,11 @@ export async function PUT(request, { params }) {
       }, { status: 404 });
     }
 
-    if (String(existingOffer.userId) !== String(userId)) {
+    // Check if admin or owner can update
+    const { isAdminUser } = await import('@/lib/authAdmin');
+    const isAdmin = await isAdminUser(request);
+    
+    if (!isAdmin && String(existingOffer.userId) !== String(userId)) {
       return NextResponse.json({
         success: false,
         message: "Unauthorized. You can only update your own offers."
@@ -288,7 +292,11 @@ export async function DELETE(request, { params }) {
       }, { status: 404 });
     }
 
-    if (String(existingOffer.userId) !== String(userId)) {
+    // Check if admin or owner can delete
+    const { isAdminUser } = await import('@/lib/authAdmin');
+    const isAdmin = await isAdminUser(request);
+    
+    if (!isAdmin && String(existingOffer.userId) !== String(userId)) {
       return NextResponse.json({
         success: false,
         message: "Unauthorized. You can only delete your own offers."

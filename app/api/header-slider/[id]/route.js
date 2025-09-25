@@ -49,7 +49,11 @@ export async function PUT(request, { params }) {
       }, { status: 404 });
     }
 
-    if (slide.userId !== userId) {
+    // Check if admin or owner can update
+    const { isAdminUser } = await import('@/lib/authAdmin');
+    const isAdmin = await isAdminUser(request);
+    
+    if (!isAdmin && slide.userId !== userId) {
       return NextResponse.json({
         success: false,
         message: "Unauthorized. You can only update your own slides."
@@ -110,7 +114,11 @@ export async function DELETE(request, { params }) {
       }, { status: 404 });
     }
 
-    if (slide.userId !== userId) {
+    // Check if admin or owner can delete
+    const { isAdminUser } = await import('@/lib/authAdmin');
+    const isAdmin = await isAdminUser(request);
+    
+    if (!isAdmin && slide.userId !== userId) {
       return NextResponse.json({
         success: false,
         message: "Unauthorized. You can only delete your own slides."
