@@ -543,409 +543,427 @@ const CustomizationPage = () => {
           </div>
         </div>
 
-        {/* Main Content - New Layout */}
-        <div className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {/* Main Content - 2 Column Layout */}
+        <div className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           
-          {/* Preview Section at Top */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-            
-            {/* Preview Header */}
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900">Live Preview</h3>
-                <p className="text-sm text-gray-500">Click and drag to position your designs</p>
-              </div>
-              
-              {/* View Selector */}
-              <div className="flex bg-gray-100 rounded-lg p-1">
-                {['front', 'back', 'sleeve', 'pocket'].map((view) => (
-                  <button
-                    key={view}
-                    onClick={() => {
-                      setCurrentView(view);
-                      if (userDesigns[view].imageUrl) {
-                        setSelectedDesign(view);
-                      }
-                    }}
-                    className={`px-3 py-1 rounded-md text-sm font-medium transition-all duration-200 ${
-                      currentView === view
-                        ? 'bg-white text-gray-900 shadow-sm'
-                        : 'text-gray-600 hover:text-gray-900'
-                    }`}
-                  >
-                    {view.charAt(0).toUpperCase() + view.slice(1)}
-                    {userDesigns[view].imageUrl && (
-                      <span className="ml-1 w-1.5 h-1.5 bg-green-500 rounded-full inline-block"></span>
-                    )}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Preview Canvas */}
-            <div className="flex justify-center">
-              <div
-                ref={mockupRef}
-                className="relative w-80 h-96 bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200"
-              >
-                {/* Mockup Image */}
-                {selectedColor?.mockupImages?.[0] ? (
-                  <img
-                    src={selectedColor.mockupImages[0]}
-                    alt="Product Mockup"
-                    className="w-full h-full object-contain"
-                    draggable={false}
-                  />
-                ) : (
-                  <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                    <div className="text-center text-gray-500">
-                      <svg className="w-16 h-16 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
-                      <p>Select a color to see mockup</p>
-                    </div>
-                  </div>
-                )}
-
-                {/* User Design Overlay */}
-                {userDesigns[currentView].imageUrl && (
-                  <div
-                    className={`absolute cursor-move transition-all duration-200 hover:shadow-lg ${
-                      selectedDesign === currentView ? 'ring-2 ring-orange-500 ring-opacity-50' : ''
-                    }`}
-                    style={{
-                      left: `${userDesigns[currentView].position.x}%`,
-                      top: `${userDesigns[currentView].position.y}%`,
-                      width: `${userDesigns[currentView].size.width}%`,
-                      height: `${userDesigns[currentView].size.height}%`,
-                      transform: `translate(-50%, -50%) rotate(${userDesigns[currentView].rotation}deg)`,
-                      zIndex: 10
-                    }}
-                    onMouseDown={(e) => handleDragStart(e, currentView)}
-                    onClick={() => setSelectedDesign(currentView)}
-                  >
-                    <img
-                      src={userDesigns[currentView].imageUrl}
-                      alt={`${currentView} design`}
-                      className="w-full h-full object-contain pointer-events-none"
-                      draggable={false}
-                    />
-                    
-                    {/* Resize Handle */}
-                    {selectedDesign === currentView && (
-                      <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-orange-500 rounded-full cursor-se-resize border-2 border-white shadow-lg"
-                        onMouseDown={(e) => {
-                          e.stopPropagation();
-                          setIsResizing(true);
-                        }}
-                      ></div>
-                    )}
-                  </div>
-                )}
-
-                {/* Drop Zone Overlay */}
-                {!userDesigns[currentView].imageUrl && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-5">
-                    <div className="text-center text-gray-500">
-                      <svg className="mx-auto h-12 w-12 mb-4" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-                        <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
-                      <p className="text-sm font-medium">Upload your {currentView} design</p>
-                      <p className="text-xs mt-1">Use the menu below to get started</p>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Design Info */}
-            {userDesigns[currentView].imageUrl && (
-              <div className="mt-4 text-center">
-                <p className="text-sm text-gray-600">
-                  {currentView.charAt(0).toUpperCase() + currentView.slice(1)} design at {userDesigns[currentView].position.x.toFixed(0)}%, {userDesigns[currentView].position.y.toFixed(0)}%
-                </p>
-                {selectedDesign === currentView && (
-                  <p className="text-xs text-orange-600 mt-1">
-                    Use arrow keys or drag to reposition
-                  </p>
-                )}
-              </div>
-            )}
+          {/* Mobile Options Toggle - Only visible on mobile */}
+          <div className="lg:hidden mb-4">
+            <button
+              onClick={() => setLeftMenuVisible(!leftMenuVisible)}
+              className="w-full flex items-center justify-center gap-2 bg-white border border-gray-200 rounded-lg p-3 hover:bg-gray-50 transition-colors"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4" />
+              </svg>
+              <span className="text-sm font-medium">
+                {leftMenuVisible ? 'Hide Options' : 'Show Options'}
+              </span>
+            </button>
           </div>
 
-          {/* Bottom Section - Left Sidebar + Right Controls */}
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          {/* Desktop: 2-Column Layout | Mobile: Stacked */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6">
             
-            {/* Compact Left Sidebar */}
-            <div className={`lg:col-span-2 transition-all duration-300 ease-in-out ${
+            {/* LEFT COLUMN: Preview Section */}
+            <div className="lg:col-span-7">
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6 lg:sticky lg:top-4">
+                
+                {/* Preview Header */}
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-3">
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900">Live Preview</h3>
+                    <p className="text-xs text-gray-500">Drag to position • Use arrow keys for precision</p>
+                  </div>
+                  
+                  {/* View Selector - Compact */}
+                  <div className="flex bg-gray-100 rounded-lg p-1">
+                    {['front', 'back', 'sleeve', 'pocket'].map((view) => (
+                      <button
+                        key={view}
+                        onClick={() => {
+                          setCurrentView(view);
+                          if (userDesigns[view].imageUrl) {
+                            setSelectedDesign(view);
+                          }
+                        }}
+                        className={`px-2 py-1 rounded-md text-xs font-medium transition-all duration-200 ${
+                          currentView === view
+                            ? 'bg-white text-gray-900 shadow-sm'
+                            : 'text-gray-600 hover:text-gray-900'
+                        }`}
+                      >
+                        {view.charAt(0).toUpperCase() + view.slice(1)}
+                        {userDesigns[view].imageUrl && (
+                          <span className="ml-1 w-1.5 h-1.5 bg-green-500 rounded-full inline-block"></span>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Preview Canvas - Larger and more prominent */}
+                <div className="flex justify-center">
+                  <div
+                    ref={mockupRef}
+                    className="relative w-72 h-80 sm:w-80 sm:h-96 lg:w-96 lg:h-[28rem] bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200"
+                  >
+                    {/* Mockup Image */}
+                    {selectedColor?.mockupImages?.[0] ? (
+                      <img
+                        src={selectedColor.mockupImages[0]}
+                        alt="Product Mockup"
+                        className="w-full h-full object-contain"
+                        draggable={false}
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                        <div className="text-center text-gray-500">
+                          <svg className="w-12 h-12 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                          </svg>
+                          <p className="text-sm">Select a color to see mockup</p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* User Design Overlay */}
+                    {userDesigns[currentView].imageUrl && (
+                      <div
+                        className={`absolute cursor-move transition-all duration-200 hover:shadow-lg ${
+                          selectedDesign === currentView ? 'ring-2 ring-orange-500 ring-opacity-50' : ''
+                        }`}
+                        style={{
+                          left: `${userDesigns[currentView].position.x}%`,
+                          top: `${userDesigns[currentView].position.y}%`,
+                          width: `${userDesigns[currentView].size.width}%`,
+                          height: `${userDesigns[currentView].size.height}%`,
+                          transform: `translate(-50%, -50%) rotate(${userDesigns[currentView].rotation}deg)`,
+                          zIndex: 10
+                        }}
+                        onMouseDown={(e) => handleDragStart(e, currentView)}
+                        onClick={() => setSelectedDesign(currentView)}
+                      >
+                        <img
+                          src={userDesigns[currentView].imageUrl}
+                          alt={`${currentView} design`}
+                          className="w-full h-full object-contain pointer-events-none"
+                          draggable={false}
+                        />
+                        
+                        {/* Resize Handle */}
+                        {selectedDesign === currentView && (
+                          <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-orange-500 rounded-full cursor-se-resize border-2 border-white shadow-lg"
+                            onMouseDown={(e) => {
+                              e.stopPropagation();
+                              setIsResizing(true);
+                            }}
+                          ></div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Drop Zone Overlay */}
+                    {!userDesigns[currentView].imageUrl && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-5">
+                        <div className="text-center text-gray-500">
+                          <svg className="mx-auto h-10 w-10 mb-3" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                          <p className="text-sm font-medium">Upload your {currentView} design</p>
+                          <p className="text-xs mt-1">Use options panel to upload</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Design Info - Compact */}
+                {userDesigns[currentView].imageUrl && (
+                  <div className="mt-3 text-center">
+                    <p className="text-xs text-gray-600">
+                      Position: {userDesigns[currentView].position.x.toFixed(0)}%, {userDesigns[currentView].position.y.toFixed(0)}%
+                    </p>
+                    {selectedDesign === currentView && (
+                      <p className="text-xs text-orange-600 mt-1">
+                        ← → ↑ ↓ to move • Shift for big steps
+                      </p>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* RIGHT COLUMN: Options Panel */}
+            <div className={`lg:col-span-5 transition-all duration-300 ${
               leftMenuVisible ? 'block' : 'hidden lg:block'
             }`}>
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  
-                  {/* Step 1: Product Selection */}
-                  <div className="bg-gray-50 rounded-lg p-3">
-                    <div className="flex items-center gap-2 mb-2">
-                      <div className="w-5 h-5 bg-orange-500 text-white rounded-full flex items-center justify-center text-xs font-bold">1</div>
-                      <h3 className="text-sm font-semibold text-gray-900">Product</h3>
+              
+              {/* Scrollable Options Container */}
+              <div className="space-y-3 max-h-screen lg:overflow-y-auto lg:pr-2">
+                
+                {/* Step 1: Product Selection */}
+                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="w-4 h-4 bg-orange-500 text-white rounded-full flex items-center justify-center text-xs font-bold">1</div>
+                    <h3 className="text-sm font-semibold text-gray-900">Product</h3>
+                  </div>
+                  <div className="space-y-2">
+                    {templates.map((template) => (
+                      <div
+                        key={template._id}
+                        onClick={() => {
+                          setSelectedTemplate(template);
+                          setSelectedColor(template.availableColors[0] || null);
+                          setSelectedSize(template.availableSizes[0] || null);
+                        }}
+                        className={`p-2 rounded border cursor-pointer transition-all ${
+                          selectedTemplate?._id === template._id
+                            ? 'border-orange-500 bg-orange-50'
+                            : 'border-gray-200 hover:border-gray-300'
+                        }`}
+                      >
+                        <div className="flex justify-between items-center">
+                          <div>
+                            <h4 className="text-xs font-semibold text-gray-900">{template.name}</h4>
+                            <p className="text-xs text-gray-500">{template.category}</p>
+                          </div>
+                          <p className="text-xs font-bold text-green-600">৳{Math.min(...template.availableSizes.map(s => s.price))}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Step 2: Color Selection */}
+                {selectedTemplate && (
+                  <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="w-4 h-4 bg-orange-500 text-white rounded-full flex items-center justify-center text-xs font-bold">2</div>
+                      <h3 className="text-sm font-semibold text-gray-900">Color</h3>
                     </div>
-                    <div className="space-y-2">
-                      {templates.map((template) => (
+                    <div className="grid grid-cols-2 gap-2">
+                      {selectedTemplate.availableColors.map((color) => (
                         <div
-                          key={template._id}
-                          onClick={() => {
-                            setSelectedTemplate(template);
-                            setSelectedColor(template.availableColors[0] || null);
-                            setSelectedSize(template.availableSizes[0] || null);
-                          }}
+                          key={color.name}
+                          onClick={() => setSelectedColor(color)}
                           className={`p-2 rounded border cursor-pointer transition-all ${
-                            selectedTemplate?._id === template._id
+                            selectedColor?.name === color.name
                               ? 'border-orange-500 bg-orange-50'
                               : 'border-gray-200 hover:border-gray-300'
                           }`}
                         >
-                          <div className="flex justify-between items-center">
-                            <div>
-                              <h4 className="text-xs font-semibold text-gray-900">{template.name}</h4>
-                              <p className="text-xs text-gray-500">{template.category}</p>
-                            </div>
-                            <p className="text-xs font-bold text-green-600">৳{Math.min(...template.availableSizes.map(s => s.price))}</p>
-                          </div>
+                          <div
+                            className="w-full h-3 rounded mb-1 border border-gray-200"
+                            style={{ backgroundColor: color.hexCode }}
+                          ></div>
+                          <p className="text-xs font-medium text-gray-900 text-center">{color.name}</p>
                         </div>
                       ))}
                     </div>
                   </div>
+                )}
 
-                  {/* Step 2: Color Selection */}
-                  {selectedTemplate && (
-                    <div className="bg-gray-50 rounded-lg p-3">
-                      <div className="flex items-center gap-2 mb-2">
-                        <div className="w-5 h-5 bg-orange-500 text-white rounded-full flex items-center justify-center text-xs font-bold">2</div>
-                        <h3 className="text-sm font-semibold text-gray-900">Color</h3>
-                      </div>
-                      <div className="grid grid-cols-3 gap-2">
-                        {selectedTemplate.availableColors.map((color) => (
-                          <div
-                            key={color.name}
-                            onClick={() => setSelectedColor(color)}
-                            className={`p-2 rounded border cursor-pointer transition-all ${
-                              selectedColor?.name === color.name
-                                ? 'border-orange-500 bg-orange-50'
-                                : 'border-gray-200 hover:border-gray-300'
-                            }`}
-                          >
-                            <div
-                              className="w-full h-4 rounded mb-1 border border-gray-200"
-                              style={{ backgroundColor: color.hexCode }}
-                            ></div>
-                            <p className="text-xs font-medium text-gray-900 text-center">{color.name}</p>
-                          </div>
-                        ))}
-                      </div>
+                {/* Step 3: Size Selection */}
+                {selectedTemplate && (
+                  <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="w-4 h-4 bg-orange-500 text-white rounded-full flex items-center justify-center text-xs font-bold">3</div>
+                      <h3 className="text-sm font-semibold text-gray-900">Size</h3>
                     </div>
-                  )}
-
-                  {/* Step 3: Size Selection */}
-                  {selectedTemplate && (
-                    <div className="bg-gray-50 rounded-lg p-3">
-                      <div className="flex items-center gap-2 mb-2">
-                        <div className="w-5 h-5 bg-orange-500 text-white rounded-full flex items-center justify-center text-xs font-bold">3</div>
-                        <h3 className="text-sm font-semibold text-gray-900">Size</h3>
-                      </div>
-                      <div className="grid grid-cols-2 gap-2">
-                        {selectedTemplate.availableSizes.map((sizeInfo) => (
-                          <div
-                            key={sizeInfo.size}
-                            onClick={() => setSelectedSize(sizeInfo)}
-                            className={`p-2 rounded border cursor-pointer transition-all ${
-                              selectedSize?.size === sizeInfo.size
-                                ? 'border-orange-500 bg-orange-50'
-                                : 'border-gray-200 hover:border-gray-300'
-                            }`}
-                          >
-                            <p className="font-semibold text-gray-900 text-center text-sm">{sizeInfo.size}</p>
-                            <p className="text-xs text-green-600 text-center font-medium">৳{sizeInfo.price}</p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Step 4: Upload Areas */}
-                  <div className="bg-gray-50 rounded-lg p-3">
-                    <div className="flex items-center gap-2 mb-2">
-                      <div className="w-5 h-5 bg-orange-500 text-white rounded-full flex items-center justify-center text-xs font-bold">4</div>
-                      <h3 className="text-sm font-semibold text-gray-900">Upload</h3>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      {['front', 'back', 'sleeve', 'pocket'].map((area) => (
-                        <div key={area}>
-                          <label className="block text-xs font-medium text-gray-700 mb-1">
-                            {area.charAt(0).toUpperCase() + area.slice(1)} 
-                            {(area === 'front' || area === 'back') && <span className="text-red-500">*</span>}
-                            {(area === 'sleeve' || area === 'pocket') && <span className="text-gray-500"> (+৳{selectedTemplate?.extraImagePrice || 30})</span>}
-                          </label>
-                          <div className="relative">
-                            <input
-                              type="file"
-                              accept="image/*"
-                              onChange={(e) => e.target.files[0] && handleFileUpload(e.target.files[0], area)}
-                              className="hidden"
-                              id={`${area}-upload`}
-                            />
-                            <label
-                              htmlFor={`${area}-upload`}
-                              className={`flex items-center justify-center w-full h-8 border border-dashed rounded cursor-pointer transition-all ${
-                                userDesigns[area].imageUrl
-                                  ? 'border-green-500 bg-green-50'
-                                  : 'border-gray-300 hover:border-gray-400 bg-white hover:bg-gray-50'
-                              }`}
-                            >
-                              {uploadingArea === area ? (
-                                <div className="flex items-center gap-1">
-                                  <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-orange-500"></div>
-                                  <span className="text-xs text-gray-600">Uploading...</span>
-                                </div>
-                              ) : userDesigns[area].imageUrl ? (
-                                <div className="flex items-center gap-1 text-green-600">
-                                  <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                                  </svg>
-                                  <span className="text-xs font-medium">Uploaded</span>
-                                </div>
-                              ) : (
-                                <div className="text-center">
-                                  <span className="text-xs text-gray-500">Upload {area}</span>
-                                </div>
-                              )}
-                            </label>
-                          </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      {selectedTemplate.availableSizes.map((sizeInfo) => (
+                        <div
+                          key={sizeInfo.size}
+                          onClick={() => setSelectedSize(sizeInfo)}
+                          className={`p-2 rounded border cursor-pointer transition-all ${
+                            selectedSize?.size === sizeInfo.size
+                              ? 'border-orange-500 bg-orange-50'
+                              : 'border-gray-200 hover:border-gray-300'
+                          }`}
+                        >
+                          <p className="font-semibold text-gray-900 text-center text-xs">{sizeInfo.size}</p>
+                          <p className="text-xs text-green-600 text-center font-medium">৳{sizeInfo.price}</p>
                         </div>
                       ))}
                     </div>
                   </div>
-                </div>
-              </div>
-            </div>
+                )}
 
-            {/* Right Controls Panel */}
-            <div className="lg:col-span-2 space-y-4">
-              
-              {/* Design Controls */}
-              {selectedDesign && userDesigns[selectedDesign].imageUrl && (
-                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+                {/* Step 4: Upload Areas */}
+                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
                   <div className="flex items-center gap-2 mb-3">
-                    <div className="w-5 h-5 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-bold">⚡</div>
-                    <h3 className="text-sm font-semibold text-gray-900">Design Controls</h3>
+                    <div className="w-4 h-4 bg-orange-500 text-white rounded-full flex items-center justify-center text-xs font-bold">4</div>
+                    <h3 className="text-sm font-semibold text-gray-900">Upload</h3>
                   </div>
                   
-                  <div className="space-y-3">
-                    <div>
-                      <label className="block text-xs font-medium text-gray-700 mb-1">
-                        {selectedDesign.charAt(0).toUpperCase() + selectedDesign.slice(1)} Size
-                      </label>
-                      
-                      <div className="space-y-2">
-                        <div>
-                          <div className="flex justify-between text-xs text-gray-600 mb-1">
-                            <span>Width</span>
-                            <span>{userDesigns[selectedDesign].size.width.toFixed(0)}%</span>
-                          </div>
+                  <div className="space-y-2">
+                    {['front', 'back', 'sleeve', 'pocket'].map((area) => (
+                      <div key={area}>
+                        <label className="block text-xs font-medium text-gray-700 mb-1">
+                          {area.charAt(0).toUpperCase() + area.slice(1)} 
+                          {(area === 'front' || area === 'back') && <span className="text-red-500">*</span>}
+                          {(area === 'sleeve' || area === 'pocket') && <span className="text-gray-500"> (+৳{selectedTemplate?.extraImagePrice || 30})</span>}
+                        </label>
+                        <div className="relative">
                           <input
-                            type="range"
-                            min="8"
-                            max={selectedTemplate?.designAreas?.[selectedDesign]?.maxWidth || 40}
-                            value={userDesigns[selectedDesign].size.width}
-                            onChange={(e) => handleResize(selectedDesign, parseFloat(e.target.value), userDesigns[selectedDesign].size.height)}
-                            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => e.target.files[0] && handleFileUpload(e.target.files[0], area)}
+                            className="hidden"
+                            id={`${area}-upload`}
                           />
-                        </div>
-                        
-                        <div>
-                          <div className="flex justify-between text-xs text-gray-600 mb-1">
-                            <span>Height</span>
-                            <span>{userDesigns[selectedDesign].size.height.toFixed(0)}%</span>
-                          </div>
-                          <input
-                            type="range"
-                            min="8"
-                            max={selectedTemplate?.designAreas?.[selectedDesign]?.maxHeight || 50}
-                            value={userDesigns[selectedDesign].size.height}
-                            onChange={(e) => handleResize(selectedDesign, userDesigns[selectedDesign].size.width, parseFloat(e.target.value))}
-                            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
-                          />
+                          <label
+                            htmlFor={`${area}-upload`}
+                            className={`flex items-center justify-center w-full h-8 border border-dashed rounded cursor-pointer transition-all ${
+                              userDesigns[area].imageUrl
+                                ? 'border-green-500 bg-green-50'
+                                : 'border-gray-300 hover:border-gray-400 bg-white hover:bg-gray-50'
+                            }`}
+                          >
+                            {uploadingArea === area ? (
+                              <div className="flex items-center gap-1">
+                                <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-orange-500"></div>
+                                <span className="text-xs text-gray-600">Uploading...</span>
+                              </div>
+                            ) : userDesigns[area].imageUrl ? (
+                              <div className="flex items-center gap-1 text-green-600">
+                                <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                </svg>
+                                <span className="text-xs font-medium">Uploaded</span>
+                              </div>
+                            ) : (
+                              <div className="text-center">
+                                <span className="text-xs text-gray-500">Upload {area}</span>
+                              </div>
+                            )}
+                          </label>
                         </div>
                       </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Design Controls */}
+                {selectedDesign && userDesigns[selectedDesign].imageUrl && (
+                  <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="w-4 h-4 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-bold">⚡</div>
+                      <h3 className="text-sm font-semibold text-gray-900">Design Controls</h3>
                     </div>
                     
-                    <div className="flex gap-2">
+                    <div className="space-y-3">
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700 mb-2">
+                          {selectedDesign.charAt(0).toUpperCase() + selectedDesign.slice(1)} Size
+                        </label>
+                        
+                        <div className="space-y-2">
+                          <div>
+                            <div className="flex justify-between text-xs text-gray-600 mb-1">
+                              <span>Width</span>
+                              <span>{userDesigns[selectedDesign].size.width.toFixed(0)}%</span>
+                            </div>
+                            <input
+                              type="range"
+                              min="8"
+                              max={selectedTemplate?.designAreas?.[selectedDesign]?.maxWidth || 40}
+                              value={userDesigns[selectedDesign].size.width}
+                              onChange={(e) => handleResize(selectedDesign, parseFloat(e.target.value), userDesigns[selectedDesign].size.height)}
+                              className="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+                            />
+                          </div>
+                          
+                          <div>
+                            <div className="flex justify-between text-xs text-gray-600 mb-1">
+                              <span>Height</span>
+                              <span>{userDesigns[selectedDesign].size.height.toFixed(0)}%</span>
+                            </div>
+                            <input
+                              type="range"
+                              min="8"
+                              max={selectedTemplate?.designAreas?.[selectedDesign]?.maxHeight || 50}
+                              value={userDesigns[selectedDesign].size.height}
+                              onChange={(e) => handleResize(selectedDesign, userDesigns[selectedDesign].size.width, parseFloat(e.target.value))}
+                              className="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                      
                       <button
                         onClick={() => removeDesign(selectedDesign)}
-                        className="flex-1 px-2 py-1 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-xs font-medium"
+                        className="w-full px-2 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-xs font-medium"
                       >
                         Remove Design
                       </button>
-                    </div>
-                    
-                    <div className="text-xs text-gray-500 bg-gray-50 p-2 rounded-md">
-                      <p className="font-medium">💡 Arrow keys to move, Shift for big steps!</p>
+                      
+                      <div className="text-xs text-gray-500 bg-gray-50 p-2 rounded-md">
+                        <p className="font-medium">💡 ← → ↑ ↓ keys • Shift for big steps!</p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              )}
+                )}
 
-              {/* Pricing Summary */}
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                <h3 className="text-sm font-semibold text-gray-900 mb-2">💰 Pricing</h3>
-                <div className="space-y-2">
-                  <div className="flex justify-between text-xs">
-                    <span className="text-gray-600">Base Price:</span>
-                    <span className="font-medium">৳{selectedSize?.price || 0}</span>
+                {/* Pricing Summary */}
+                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="w-4 h-4 bg-green-500 text-white rounded-full flex items-center justify-center text-xs font-bold">৳</div>
+                    <h3 className="text-sm font-semibold text-gray-900">Pricing</h3>
                   </div>
-                  {userDesigns.sleeve.imageUrl && (
+                  <div className="space-y-1">
                     <div className="flex justify-between text-xs">
-                      <span className="text-gray-600">Sleeve:</span>
-                      <span className="font-medium">৳{selectedTemplate?.extraImagePrice || 30}</span>
+                      <span className="text-gray-600">Base Price:</span>
+                      <span className="font-medium">৳{selectedSize?.price || 0}</span>
                     </div>
-                  )}
-                  {userDesigns.pocket.imageUrl && (
-                    <div className="flex justify-between text-xs">
-                      <span className="text-gray-600">Pocket:</span>
-                      <span className="font-medium">৳{selectedTemplate?.extraImagePrice || 30}</span>
+                    {userDesigns.sleeve.imageUrl && (
+                      <div className="flex justify-between text-xs">
+                        <span className="text-gray-600">Sleeve:</span>
+                        <span className="font-medium">৳{selectedTemplate?.extraImagePrice || 30}</span>
+                      </div>
+                    )}
+                    {userDesigns.pocket.imageUrl && (
+                      <div className="flex justify-between text-xs">
+                        <span className="text-gray-600">Pocket:</span>
+                        <span className="font-medium">৳{selectedTemplate?.extraImagePrice || 30}</span>
+                      </div>
+                    )}
+                    <div className="border-t border-gray-200 pt-2 flex justify-between font-bold text-sm">
+                      <span className="text-gray-900">Total:</span>
+                      <span className="text-green-600">৳{calculatePrice}</span>
                     </div>
-                  )}
-                  <div className="border-t border-gray-200 pt-2 flex justify-between font-bold text-sm">
-                    <span className="text-gray-900">Total:</span>
-                    <span className="text-green-600">৳{calculatePrice}</span>
                   </div>
+                  
+                  <button
+                    onClick={handleAddToCart}
+                    className="w-full mt-3 bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-3 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg text-sm"
+                  >
+                    Add to Cart
+                  </button>
                 </div>
-                
-                <button
-                  onClick={handleAddToCart}
-                  className="w-full mt-3 bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-3 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg text-sm"
-                >
-                  Add to Cart
-                </button>
-              </div>
 
-              {/* Help Section */}
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                <h3 className="text-sm font-semibold text-gray-900 mb-2">📱 Need Help?</h3>
-                <p className="text-xs text-gray-600 mb-2">
-                  Contact us on WhatsApp for design assistance.
-                </p>
-                <a
-                  href="https://wa.me/+8801344823831"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-lg transition-colors text-xs font-medium"
-                >
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488"/>
-                  </svg>
-                  Chat on WhatsApp
-                </a>
+                {/* Help Section */}
+                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-4 h-4 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-bold">?</div>
+                    <h3 className="text-sm font-semibold text-gray-900">Need Help?</h3>
+                  </div>
+                  <p className="text-xs text-gray-600 mb-2">
+                    Contact us on WhatsApp for design assistance.
+                  </p>
+                  <a
+                    href="https://wa.me/+8801344823831"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded-lg transition-colors text-xs font-medium w-full justify-center"
+                  >
+                    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488"/>
+                    </svg>
+                    Chat on WhatsApp
+                  </a>
+                </div>
+
               </div>
             </div>
           </div>
