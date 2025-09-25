@@ -53,9 +53,6 @@ export async function DELETE(request) {
     }
 
     // Check if the product belongs to the current seller OR if user is admin
-    const { isAdminUser } = await import('@/lib/authAdmin');
-    const isAdmin = await isAdminUser(request);
-    
     if (!isAdmin && String(product.userId) !== String(userId)) {
       return NextResponse.json({
         success: false,

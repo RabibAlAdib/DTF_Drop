@@ -99,9 +99,6 @@ export async function PUT(request, { params }) {
     }
 
     // Check if admin or owner can update
-    const { isAdminUser } = await import('@/lib/authAdmin');
-    const isAdmin = await isAdminUser(request);
-    
     if (!isAdmin && String(existingOffer.userId) !== String(userId)) {
       return NextResponse.json({
         success: false,
@@ -315,9 +312,6 @@ export async function DELETE(request, { params }) {
     }
 
     // Check if admin or owner can delete
-    const { isAdminUser } = await import('@/lib/authAdmin');
-    const isAdmin = await isAdminUser(request);
-    
     if (!isAdmin && String(existingOffer.userId) !== String(userId)) {
       return NextResponse.json({
         success: false,
