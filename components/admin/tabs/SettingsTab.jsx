@@ -128,7 +128,7 @@ const SettingsTab = () => {
   };
 
   return (
-    <div className="space-y-6 max-h-[60vh] overflow-y-auto pr-2">
+    <div className="space-y-6">
       {/* Header */}
       <div>
         <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">System Settings</h3>

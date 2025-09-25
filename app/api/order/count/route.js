@@ -15,11 +15,13 @@ export async function GET(request) {
 
     await connectDB();
     
-    const count = await Order.countDocuments();
+    const totalOrders = await Order.countDocuments();
+    const completedOrders = await Order.countDocuments({ status: 'delivered' });
     
     return NextResponse.json({
       success: true,
-      count: count
+      count: totalOrders,
+      completedCount: completedOrders
     });
   } catch (error) {
     console.error('Error counting orders:', error);

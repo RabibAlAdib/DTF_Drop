@@ -11,7 +11,7 @@ const StatsTab = () => {
     totalUsers: 0,
     totalProducts: 0,
     totalOrders: 0,
-    totalSellers: 0
+    completedOrders: 0
   });
   const [loading, setLoading] = useState(true);
 
@@ -38,7 +38,7 @@ const StatsTab = () => {
         totalUsers: usersResponse.data?.count || 0,
         totalProducts: productsResponse.data?.count || 0,
         totalOrders: ordersResponse.data?.count || 0,
-        totalSellers: usersResponse.data?.sellersCount || 0
+        completedOrders: ordersResponse.data?.completedCount || 0
       });
     } catch (error) {
       console.error('Error fetching stats:', error);
@@ -52,7 +52,7 @@ const StatsTab = () => {
         totalUsers: 0,
         totalProducts: 0,
         totalOrders: 0,
-        totalSellers: 0
+        completedOrders: 0
       });
     } finally {
       setLoading(false);
@@ -112,11 +112,11 @@ const StatsTab = () => {
           description="Total orders"
         />
         <StatCard
-          title="Sellers"
-          value={stats.totalSellers}
-          icon="🏪"
+          title="Completed Orders"
+          value={stats.completedOrders}
+          icon="✅"
           color="text-orange-600 dark:text-orange-400"
-          description="Active sellers"
+          description="Orders delivered"
         />
       </div>
 
