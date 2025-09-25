@@ -235,9 +235,9 @@ const Navbar = () => {
           />
 
           {/* Mobile Menu */}
-          <div className="md:hidden fixed top-0 right-0 h-full w-80 max-w-[85vw] bg-white dark:bg-gray-900 border-l border-gray-200 dark:border-gray-700 shadow-2xl shadow-black/40 dark:shadow-black/60 z-50 transform transition-all duration-300">
+          <div className="md:hidden fixed inset-y-0 right-0 w-80 max-w-[85vw] bg-white dark:bg-gray-900 border-l border-gray-200 dark:border-gray-700 shadow-2xl shadow-black/40 dark:shadow-black/60 z-50 transform transition-all duration-300 flex flex-col">
             {/* Menu Header */}
-            <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-700">
+            <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-700 flex-shrink-0">
               <h3 className="text-lg font-bold text-gray-900 dark:text-white">
                 Menu
               </h3>
@@ -245,10 +245,10 @@ const Navbar = () => {
                 <ThemeToggle />
                 <button
                   onClick={() => setMobileMenuOpen(false)}
-                  className="p-2.5 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-red-100 dark:hover:bg-red-900/30 hover:text-red-600 dark:hover:text-red-400 transition-all duration-300 group"
+                  className="p-2 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-red-100 dark:hover:bg-red-900/30 hover:text-red-600 dark:hover:text-red-400 transition-all duration-300 group"
                 >
                   <svg
-                    className="w-5 h-5 group-hover:rotate-90 transition-transform duration-300"
+                    className="w-4 h-4 group-hover:rotate-90 transition-transform duration-300"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -264,43 +264,44 @@ const Navbar = () => {
               </div>
             </div>
 
-            {/* Menu Content */}
-            <div className="p-6 space-y-3 bg-gradient-to-b from-white via-gray-50/50 to-gray-100/30 dark:from-gray-900 dark:via-gray-800/80 dark:to-gray-700/50 h-full overflow-y-auto">
+            {/* Menu Content - Scrollable */}
+            <div className="flex-1 overflow-y-auto">
+              <div className="p-4 space-y-3 bg-gradient-to-b from-white via-gray-50/50 to-gray-100/30 dark:from-gray-900 dark:via-gray-800/80 dark:to-gray-700/50 min-h-full">
               {/* Navigation Links */}
               <Link
                 href="/"
-                className="flex items-center gap-4 px-4 py-4 rounded-xl bg-white dark:bg-gray-800 hover:bg-blue-50 dark:hover:bg-gray-700 hover:shadow-md transition-all duration-300 group border border-gray-100 dark:border-gray-700"
+                className="flex items-center gap-3 px-3 py-3 rounded-lg bg-white dark:bg-gray-800 hover:bg-blue-50 dark:hover:bg-gray-700 hover:shadow-sm transition-all duration-300 group border border-gray-100 dark:border-gray-700"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                <div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/30 group-hover:bg-blue-200 dark:group-hover:bg-blue-800/40 transition-colors">
-                  <HomeIcon className="text-blue-600 dark:text-blue-400" />
+                <div className="p-1.5 rounded-md bg-blue-100 dark:bg-blue-900/30 group-hover:bg-blue-200 dark:group-hover:bg-blue-800/40 transition-colors">
+                  <HomeIcon className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                 </div>
-                <span className="font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                <span className="font-medium text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                   Home
                 </span>
               </Link>
 
               <Link
                 href="/all-products"
-                className="flex items-center gap-4 px-4 py-4 rounded-xl bg-white dark:bg-gray-800 hover:bg-green-50 dark:hover:bg-gray-700 hover:shadow-md transition-all duration-300 group border border-gray-100 dark:border-gray-700"
+                className="flex items-center gap-3 px-3 py-3 rounded-lg bg-white dark:bg-gray-800 hover:bg-green-50 dark:hover:bg-gray-700 hover:shadow-sm transition-all duration-300 group border border-gray-100 dark:border-gray-700"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                <div className="p-2 rounded-lg bg-green-100 dark:bg-green-900/30 group-hover:bg-green-200 dark:group-hover:bg-green-800/40 transition-colors">
-                  <BoxIcon className="text-green-600 dark:text-green-400" />
+                <div className="p-1.5 rounded-md bg-green-100 dark:bg-green-900/30 group-hover:bg-green-200 dark:group-hover:bg-green-800/40 transition-colors">
+                  <BoxIcon className="w-4 h-4 text-green-600 dark:text-green-400" />
                 </div>
-                <span className="font-semibold text-gray-900 dark:text-white group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors">
+                <span className="font-medium text-gray-900 dark:text-white group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors">
                   Shop
                 </span>
               </Link>
 
               <Link
                 href="/about"
-                className="flex items-center gap-4 px-4 py-4 rounded-xl bg-white dark:bg-gray-800 hover:bg-purple-50 dark:hover:bg-gray-700 hover:shadow-md transition-all duration-300 group border border-gray-100 dark:border-gray-700"
+                className="flex items-center gap-3 px-3 py-3 rounded-lg bg-white dark:bg-gray-800 hover:bg-purple-50 dark:hover:bg-gray-700 hover:shadow-sm transition-all duration-300 group border border-gray-100 dark:border-gray-700"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                <div className="p-2 rounded-lg bg-purple-100 dark:bg-purple-900/30 group-hover:bg-purple-200 dark:group-hover:bg-purple-800/40 transition-colors">
+                <div className="p-1.5 rounded-md bg-purple-100 dark:bg-purple-900/30 group-hover:bg-purple-200 dark:group-hover:bg-purple-800/40 transition-colors">
                   <svg
-                    className="w-5 h-5 text-purple-600 dark:text-purple-400"
+                    className="w-4 h-4 text-purple-600 dark:text-purple-400"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -313,19 +314,19 @@ const Navbar = () => {
                     />
                   </svg>
                 </div>
-                <span className="font-semibold text-gray-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
+                <span className="font-medium text-gray-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
                   About
                 </span>
               </Link>
 
               <Link
                 href="/contact"
-                className="flex items-center gap-4 px-4 py-4 rounded-xl bg-white dark:bg-gray-800 hover:bg-orange-50 dark:hover:bg-gray-700 hover:shadow-md transition-all duration-300 group border border-gray-100 dark:border-gray-700"
+                className="flex items-center gap-3 px-3 py-3 rounded-lg bg-white dark:bg-gray-800 hover:bg-orange-50 dark:hover:bg-gray-700 hover:shadow-sm transition-all duration-300 group border border-gray-100 dark:border-gray-700"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                <div className="p-2 rounded-lg bg-orange-100 dark:bg-orange-900/30 group-hover:bg-orange-200 dark:group-hover:bg-orange-800/40 transition-colors">
+                <div className="p-1.5 rounded-md bg-orange-100 dark:bg-orange-900/30 group-hover:bg-orange-200 dark:group-hover:bg-orange-800/40 transition-colors">
                   <svg
-                    className="w-5 h-5 text-orange-600 dark:text-orange-400"
+                    className="w-4 h-4 text-orange-600 dark:text-orange-400"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -338,19 +339,19 @@ const Navbar = () => {
                     />
                   </svg>
                 </div>
-                <span className="font-semibold text-gray-900 dark:text-white group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors">
+                <span className="font-medium text-gray-900 dark:text-white group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors">
                   Contact
                 </span>
               </Link>
 
               <Link
                 href="/customization"
-                className="flex items-center gap-4 px-4 py-4 rounded-xl bg-white dark:bg-gray-800 hover:bg-indigo-50 dark:hover:bg-gray-700 hover:shadow-md transition-all duration-300 group border border-gray-100 dark:border-gray-700"
+                className="flex items-center gap-3 px-3 py-3 rounded-lg bg-white dark:bg-gray-800 hover:bg-indigo-50 dark:hover:bg-gray-700 hover:shadow-sm transition-all duration-300 group border border-gray-100 dark:border-gray-700"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                <div className="p-2 rounded-lg bg-indigo-100 dark:bg-indigo-900/30 group-hover:bg-indigo-200 dark:group-hover:bg-indigo-800/40 transition-colors">
+                <div className="p-1.5 rounded-md bg-indigo-100 dark:bg-indigo-900/30 group-hover:bg-indigo-200 dark:group-hover:bg-indigo-800/40 transition-colors">
                   <svg
-                    className="w-5 h-5 text-indigo-600 dark:text-indigo-400"
+                    className="w-4 h-4 text-indigo-600 dark:text-indigo-400"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -363,16 +364,16 @@ const Navbar = () => {
                     />
                   </svg>
                 </div>
-                <span className="font-semibold text-gray-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                <span className="font-medium text-gray-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                   Customization
                 </span>
               </Link>
 
               {/* Search in Mobile Menu */}
-              <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-100 dark:border-gray-700 shadow-sm">
+              <div className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-gray-100 dark:border-gray-700 shadow-sm">
                 <div className="flex items-center gap-2 mb-2">
                   <svg
-                    className="w-5 h-5 text-gray-500 dark:text-gray-400"
+                    className="w-4 h-4 text-gray-500 dark:text-gray-400"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -384,7 +385,7 @@ const Navbar = () => {
                       d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                     />
                   </svg>
-                  <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                     Search Products
                   </span>
                 </div>
@@ -400,11 +401,11 @@ const Navbar = () => {
                     setMobileMenuOpen(false);
                     router.push("/seller");
                   }}
-                  className="w-full flex items-center gap-4 px-4 py-4 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 group"
+                  className="w-full flex items-center gap-3 px-3 py-3 rounded-lg bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-md hover:shadow-lg transition-all duration-300 group"
                 >
-                  <div className="p-2 rounded-lg bg-white/20 group-hover:bg-white/30 transition-colors">
+                  <div className="p-1.5 rounded-md bg-white/20 group-hover:bg-white/30 transition-colors">
                     <svg
-                      className="w-5 h-5 text-white"
+                      className="w-4 h-4 text-white"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -417,9 +418,9 @@ const Navbar = () => {
                       />
                     </svg>
                   </div>
-                  <span className="font-bold text-white">Seller Dashboard</span>
+                  <span className="font-medium text-white">Seller Dashboard</span>
                   <svg
-                    className="w-4 h-4 text-white/70 ml-auto group-hover:text-white transition-colors"
+                    className="w-3 h-3 text-white/70 ml-auto group-hover:text-white transition-colors"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -436,13 +437,13 @@ const Navbar = () => {
 
               {/* User Actions if not logged in */}
               {!user && (
-                <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+                <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
                   <button
                     onClick={() => {
                       setMobileMenuOpen(false);
                       openSignIn();
                     }}
-                    className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl transition-all duration-300 font-bold shadow-lg hover:shadow-xl group"
+                    className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl transition-all duration-300 font-bold shadow-lg hover:shadow-xl group"
                   >
                     <div className="p-1 rounded-full bg-white/20 group-hover:bg-white/30 transition-colors">
                       <Image
@@ -451,9 +452,9 @@ const Navbar = () => {
                         className="w-5 h-5 filter brightness-0 invert"
                       />
                     </div>
-                    <span className="text-lg">Sign In / Register</span>
+                    <span className="text-base">Sign In / Register</span>
                     <svg
-                      className="w-5 h-5 text-white/70 group-hover:text-white transition-colors"
+                      className="w-4 h-4 text-white/70 group-hover:text-white transition-colors"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -468,6 +469,7 @@ const Navbar = () => {
                   </button>
                 </div>
               )}
+              </div>
             </div>
           </div>
         </>
