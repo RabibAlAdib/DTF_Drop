@@ -143,6 +143,8 @@ const Orders = () => {
                     </div>
                 ) : (
                     <div className="space-y-6">
+                        {orderComponent()}
+
                         {orders.map((order, index) => (
                             <div
                                 key={order._id || index}
