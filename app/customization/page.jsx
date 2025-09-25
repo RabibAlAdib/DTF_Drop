@@ -421,9 +421,10 @@ const CustomizationPage = () => {
   
   // Memoized price calculation for better performance
   const calculatePrice = useMemo(() => {
-    if (!selectedSize) return 0;
+    if (!selectedTemplate || !selectedSize) return 0;
     
-    let basePrice = selectedSize.price;
+    // Use template basePrice + selected size additional price
+    let basePrice = selectedTemplate.basePrice + (selectedSize.price || 0);
     let extraPrice = 0;
     
     if (userDesigns.sleeve.imageUrl) {
@@ -434,7 +435,7 @@ const CustomizationPage = () => {
     }
     
     return basePrice + extraPrice;
-  }, [selectedSize, userDesigns.sleeve.imageUrl, userDesigns.pocket.imageUrl, selectedTemplate?.extraImagePrice]);
+  }, [selectedTemplate, selectedSize, userDesigns.sleeve.imageUrl, userDesigns.pocket.imageUrl]);
   
   // Remove design
   const removeDesign = (area) => {
@@ -951,7 +952,7 @@ const CustomizationPage = () => {
                   <div className="space-y-1">
                     <div className="flex justify-between text-xs">
                       <span className="text-gray-600">Base Price:</span>
-                      <span className="font-medium">৳{selectedSize?.price || 0}</span>
+                      <span className="font-medium">৳{selectedTemplate?.basePrice + (selectedSize?.price || 0) || 0}</span>
                     </div>
                     {userDesigns.sleeve.imageUrl && (
                       <div className="flex justify-between text-xs">
