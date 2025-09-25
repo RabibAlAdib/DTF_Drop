@@ -41,6 +41,9 @@ export async function POST(req) {
     const callbackResult = await paymentService.handlePaymentCallback(paymentMethod, callbackData);
 
     if (callbackResult.success) {
+      // Capture previous payment status to avoid duplicate increments
+      const wasPaymentCompleted = order.payment.status === 'completed';
+      
       // Update order payment status
       order.payment = {
         ...order.payment,
@@ -57,7 +60,7 @@ export async function POST(req) {
       await order.save();
 
       // Update sales count for each product when payment is actually completed (avoid duplicates)
-      if (order.payment.status !== 'completed') {
+      if (!wasPaymentCompleted) {
         try {
           const { incrementSalesCount } = await import('@/lib/salesService');
           await incrementSalesCount(order.items);
@@ -66,6 +69,8 @@ export async function POST(req) {
           console.error('❌ Failed to update sales count for completed payment:', salesError);
           // Don't fail the payment process if sales count update fails
         }
+      } else {
+        console.log(`🔄 Payment callback received for already completed order ${order.orderNumber} - skipping sales count update`);
       }
 
       console.log(`Payment completed for order ${order.orderNumber}:`, callbackResult);
