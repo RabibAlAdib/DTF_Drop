@@ -1,9 +1,11 @@
 import { NextResponse } from 'next/server';
 import { auth, currentUser } from '@clerk/nextjs/server';
+import { createClerkClient } from '@clerk/backend';
 import connectDB from '@/config/db';
 import Review from '@/models/Review';
 import Product from '@/models/Product';
 import Order from '@/models/Order';
+import { getAuth } from '@/lib/authUtil';
 
 await connectDB();
 
@@ -112,15 +114,23 @@ export async function GET(req) {
 // POST /api/reviews - Create a new review
 export async function POST(req) {
   try {
-    const { userId } = auth();
-    const user = await currentUser();
+    // Use proper authentication that handles both cookies and Bearer tokens
+    const authResult = await getAuth(req);
     
-    if (!userId || !user) {
+    if (!authResult.success || !authResult.userId) {
       return NextResponse.json({ 
         success: false, 
-        message: "Authentication required" 
+        message: authResult.message || "Authentication required"
       }, { status: 401 });
     }
+
+    const userId = authResult.userId;
+    
+    // Get user data from Clerk
+    const clerkClient = createClerkClient({ 
+      secretKey: process.env.CLERK_SECRET_KEY 
+    });
+    const user = await clerkClient.users.getUser(userId);
 
     const { 
       productId, 
