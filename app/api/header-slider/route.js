@@ -52,12 +52,26 @@ export async function GET(request) {
       query.isVisible = true;
       // Don't include userId for public display
     }
-    // If neither flag is set, return error for security
+    // If neither flag is set, default to showing all slides for authenticated sellers
     else {
-      return NextResponse.json({
-        success: false,
-        message: "Invalid request. Please specify visibleOnly=true for public display or mineOnly=true for management."
-      }, { status: 400 });
+      const { userId } = getAuth(request);
+      if (userId) {
+        const isSeller = await authSeller(userId);
+        if (isSeller) {
+          // Show all slides for seller management (no user filtering)
+          selectFields += ' userId'; // Include userId for seller management
+        } else {
+          return NextResponse.json({
+            success: false,
+            message: "Invalid request. Please specify visibleOnly=true for public display."
+          }, { status: 400 });
+        }
+      } else {
+        return NextResponse.json({
+          success: false,
+          message: "Invalid request. Please specify visibleOnly=true for public display or authenticate for management."
+        }, { status: 400 });
+      }
     }
 
     const slides = await HeaderSlider.find(query)
@@ -86,13 +100,26 @@ export async function POST(request) {
     
     const { userId } = getAuth(request);
     
-    // Check if user is a seller
-    const isSeller = await authSeller(userId);
-    if (!isSeller) {
+    if (!userId) {
       return NextResponse.json({
         success: false,
-        message: "Unauthorized Access. Only Sellers are allowed to add header slides."
-      }, { status: 403 });
+        message: "Authentication required."
+      }, { status: 401 });
+    }
+    
+    // Check if user is admin first
+    const { isAdminUser } = await import('@/lib/authAdmin');
+    const isAdmin = await isAdminUser(request);
+    
+    if (!isAdmin) {
+      // Check if user is a seller
+      const isSeller = await authSeller(userId);
+      if (!isSeller) {
+        return NextResponse.json({
+          success: false,
+          message: "Unauthorized Access. Only Sellers are allowed to add header slides."
+        }, { status: 403 });
+      }
     }
 
     const formData = await request.formData();

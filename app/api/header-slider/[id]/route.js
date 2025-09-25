@@ -13,13 +13,26 @@ export async function PUT(request, { params }) {
     const { userId } = getAuth(request);
     const { id } = params;
     
-    // Check if user is a seller
-    const isSeller = await authSeller(userId);
-    if (!isSeller) {
+    if (!userId) {
       return NextResponse.json({
         success: false,
-        message: "Unauthorized Access. Only Sellers are allowed to update header slides."
-      }, { status: 403 });
+        message: "Authentication required."
+      }, { status: 401 });
+    }
+    
+    // Check if user is admin first
+    const { isAdminUser } = await import('@/lib/authAdmin');
+    const isAdmin = await isAdminUser(request);
+    
+    if (!isAdmin) {
+      // Check if user is a seller
+      const isSeller = await authSeller(userId);
+      if (!isSeller) {
+        return NextResponse.json({
+          success: false,
+          message: "Unauthorized Access. Only Sellers are allowed to update header slides."
+        }, { status: 403 });
+      }
     }
 
     const body = await request.json();
@@ -96,13 +109,26 @@ export async function DELETE(request, { params }) {
     const { userId } = getAuth(request);
     const { id } = params;
     
-    // Check if user is a seller
-    const isSeller = await authSeller(userId);
-    if (!isSeller) {
+    if (!userId) {
       return NextResponse.json({
         success: false,
-        message: "Unauthorized Access. Only Sellers are allowed to delete header slides."
-      }, { status: 403 });
+        message: "Authentication required."
+      }, { status: 401 });
+    }
+    
+    // Check if user is admin first
+    const { isAdminUser } = await import('@/lib/authAdmin');
+    const isAdmin = await isAdminUser(request);
+    
+    if (!isAdmin) {
+      // Check if user is a seller
+      const isSeller = await authSeller(userId);
+      if (!isSeller) {
+        return NextResponse.json({
+          success: false,
+          message: "Unauthorized Access. Only Sellers are allowed to delete header slides."
+        }, { status: 403 });
+      }
     }
 
     // Find the slide and check ownership

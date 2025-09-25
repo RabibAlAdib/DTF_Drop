@@ -66,7 +66,18 @@ export async function PUT(request, { params }) {
   try {
     const { userId, isSeller, error } = await getSellerAuth(request);
     
-    if (!userId || !isSeller || error) {
+    if (!userId) {
+      return NextResponse.json({
+        success: false,
+        message: "Authentication required."
+      }, { status: 401 });
+    }
+    
+    // Check if user is admin first
+    const { isAdminUser } = await import('@/lib/authAdmin');
+    const isAdmin = await isAdminUser(request);
+    
+    if (!isAdmin && (!isSeller || error)) {
       return NextResponse.json({
         success: false,
         message: error || "Unauthorized Access. Only Sellers are allowed to update offers."
@@ -272,7 +283,18 @@ export async function DELETE(request, { params }) {
   try {
     const { userId, isSeller, error } = await getSellerAuth(request);
     
-    if (!userId || !isSeller || error) {
+    if (!userId) {
+      return NextResponse.json({
+        success: false,
+        message: "Authentication required."
+      }, { status: 401 });
+    }
+    
+    // Check if user is admin first
+    const { isAdminUser } = await import('@/lib/authAdmin');
+    const isAdmin = await isAdminUser(request);
+    
+    if (!isAdmin && (!isSeller || error)) {
       return NextResponse.json({
         success: false,
         message: error || "Unauthorized Access. Only Sellers are allowed to delete offers."

@@ -25,7 +25,7 @@ const OfferList = () => {
   const fetchAllOffers = async () => {
     try {
       setLoading(true);
-      const { data } = await axios.get('/api/offer');
+      const { data } = await axios.get('/api/offer?active=false'); // Get all offers including inactive
       
       if (data.success) {
         setOffers(data.offers);

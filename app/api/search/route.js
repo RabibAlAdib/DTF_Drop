@@ -23,7 +23,7 @@ export async function GET(request) {
     const escapedQuery = query.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const searchRegex = new RegExp(escapedQuery, 'i');
     
-    // Search across multiple fields with priority scoring
+    // Search across multiple fields with priority scoring and text index optimization
     const products = await Product.find({
       $or: [
         { name: { $regex: searchRegex } },
@@ -32,7 +32,8 @@ export async function GET(request) {
         { designType: { $regex: searchRegex } }
       ]
     })
-    .select('_id name description category price offerPrice images colorImages designType gender')
+    .select('_id name description category price offerPrice images colorImages designType gender numberofSales ratings')
+    .sort({ numberofSales: -1, ratings: -1, _id: 1 }) // Sort by popularity first
     .limit(limit)
     .lean() // Use lean() for faster queries
     .maxTimeMS(5000); // 5 second timeout

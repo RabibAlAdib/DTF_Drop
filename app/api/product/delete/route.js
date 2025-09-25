@@ -15,13 +15,19 @@ export async function DELETE(request) {
       }, { status: 401 });
     }
     
-    // Check if user is a seller
-    const isSeller = await authSeller(userId);
-    if (!isSeller) {
-      return NextResponse.json({
-        success: false,
-        message: "Unauthorized Access. Only Sellers can delete products."
-      }, { status: 403 });
+    // Check if user is admin first
+    const { isAdminUser } = await import('@/lib/authAdmin');
+    const isAdmin = await isAdminUser(request);
+    
+    if (!isAdmin) {
+      // Check if user is a seller
+      const isSeller = await authSeller(userId);
+      if (!isSeller) {
+        return NextResponse.json({
+          success: false,
+          message: "Unauthorized Access. Only Sellers can delete products."
+        }, { status: 403 });
+      }
     }
 
     const { searchParams } = new URL(request.url);
