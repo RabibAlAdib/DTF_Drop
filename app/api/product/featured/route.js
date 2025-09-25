@@ -31,7 +31,7 @@ export async function GET(request) {
       if (productIds.length > 0) {
         const fullProducts = await Product.find({ _id: { $in: productIds } })
           .lean()
-          .select('name price offerPrice images colorImages category date description gender designType colors sizes ratings numOfReviews variants');
+          .select('name price offerPrice images colorImages category date description gender designType colors sizes ratings numOfReviews variants numberofSales');
 
         // Combine product data with sales data
         const featuredProducts = mostSoldProducts.map(soldItem => {
@@ -63,7 +63,7 @@ export async function GET(request) {
       .sort({ date: -1 })
       .limit(6)
       .lean()
-      .select('name price offerPrice images colorImages category date description gender designType colors sizes ratings numOfReviews variants');
+      .select('name price offerPrice images colorImages category date description gender designType colors sizes ratings numOfReviews variants numberofSales');
     
     return NextResponse.json({
       success: true,
