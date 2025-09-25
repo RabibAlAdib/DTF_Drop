@@ -14,12 +14,9 @@ const ProductList = () => {
   const [loading, setLoading] = useState(true)
   const [deletingProduct, setDeletingProduct] = useState(null)
 
-  const fetchSellerProduct = async () => {
+  const fetchAllProducts = async () => {
     try {
-      const token = await getToken();
-      const { data } = await axios.get('/api/product/seller-list', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const { data } = await axios.get('/api/product/list');
       
       if (data.success) {
         setProducts(data.products);
@@ -59,10 +56,8 @@ const ProductList = () => {
   }
 
   useEffect(() => {
-    if (user) {
-      fetchSellerProduct();
-    }
-  }, [user])
+    fetchAllProducts();
+  }, [])
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -72,7 +67,7 @@ const ProductList = () => {
           <div className="flex justify-between items-center py-6">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Product Management</h1>
-              <p className="mt-1 text-sm text-gray-600">Manage your product inventory</p>
+              <p className="mt-1 text-sm text-gray-600">View and manage all products in the database</p>
             </div>
             <button
               onClick={() => router.push('/seller')}
