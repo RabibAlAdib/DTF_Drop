@@ -34,6 +34,17 @@ const CartModal = ({ isOpen, onClose, product }) => {
     return defaultColors;
   }, [product?.colorImages, product?.colors]);
 
+  // Get the correct product image based on selected color
+  const displayImage = useMemo(() => {
+    if (!selectedColor || !product?.colorImages) {
+      return product?.images?.[0] || '/placeholder-image.jpg';
+    }
+    
+    // Find color-specific image
+    const colorImage = product.colorImages.find(img => img.color === selectedColor);
+    return colorImage?.url || product?.images?.[0] || '/placeholder-image.jpg';
+  }, [selectedColor, product?.colorImages, product?.images]);
+
   // Handle client-side mounting
   useEffect(() => {
     setIsMounted(true);
@@ -140,7 +151,7 @@ const CartModal = ({ isOpen, onClose, product }) => {
             {/* Product Image */}
             <div className="w-24 h-24 bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden flex-shrink-0">
               <Image
-                src={product.images?.[0] || '/placeholder-image.jpg'}
+                src={displayImage}
                 alt={product.name}
                 width={96}
                 height={96}
