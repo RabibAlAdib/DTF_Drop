@@ -67,9 +67,9 @@ const AdminModal = ({ isOpen, onClose }) => {
         ${isMobile ? 'p-2' : ''}
       `}>
         <div className={`
-          bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-hidden
+          bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-6xl max-h-[90vh] 
           ${isMobile ? 'h-[95vh] max-w-full rounded-lg' : 'h-[85vh]'}
-          transform transition-all duration-300 scale-100
+          transform transition-all duration-300 scale-100 flex flex-col
         `}>
           {/* Modal Header */}
           <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20">
@@ -119,10 +119,12 @@ const AdminModal = ({ isOpen, onClose }) => {
           </div>
 
           {/* Tab Content */}
-          <div className="flex-1 overflow-y-auto p-6">
-            {activeTab === 'stats' && loadedTabs.has('stats') && <StatsTab />}
-            {activeTab === 'users' && loadedTabs.has('users') && <UsersTab />}
-            {activeTab === 'settings' && loadedTabs.has('settings') && <SettingsTab />}
+          <div className="flex-1 overflow-y-auto">
+            <div className="p-6">
+              {activeTab === 'stats' && loadedTabs.has('stats') && <StatsTab />}
+              {activeTab === 'users' && loadedTabs.has('users') && <UsersTab />}
+              {activeTab === 'settings' && loadedTabs.has('settings') && <SettingsTab />}
+            </div>
           </div>
         </div>
       </div>
