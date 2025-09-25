@@ -9,6 +9,7 @@ import { toast } from "react-hot-toast";
 import ProductRecommendations from "@/components/ProductRecommendations";
 // Navbar is provided by layout - removed to prevent duplication
 import FeaturedProduct from "@/components/FeaturedProduct";
+import ReviewSection from "@/components/ReviewSection";
 
 // Available colors and sizes
 const AVAILABLE_COLORS = [
@@ -749,6 +750,11 @@ const Product = () => {
             </p>
           </div>
         </div>
+      </div>
+
+      {/* Customer Reviews Section */}
+      <div className="mt-12">
+        <ReviewSection productId={productData._id} />
       </div>
 
       {/* Featured Products */}
