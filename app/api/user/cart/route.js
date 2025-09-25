@@ -2,6 +2,7 @@ import { getAuth } from "@clerk/nextjs/server"
 import connectDB from "@/config/db"
 import User from "@/models/User"
 import { NextResponse } from 'next/server';
+import { updateUserByClerkId } from "@/lib/userLookup";
 
 export async function PUT(request) {
     try {
@@ -25,12 +26,8 @@ export async function PUT(request) {
 
         await connectDB()
 
-        // Update user's cart items in database
-        const user = await User.findOneAndUpdate(
-            { _id: userId },
-            { cartItems: cartItems },
-            { new: true }
-        );
+        // Update user's cart items using the helper
+        const user = await updateUserByClerkId(userId, { cartItems: cartItems });
 
         if (!user) {
             return NextResponse.json({

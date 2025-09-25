@@ -2,6 +2,7 @@ import { Inngest } from "inngest";
 import connectDB from "./db";
 import User from "@/models/User";
 import { createClerkClient } from '@clerk/backend';
+import { updateUserByClerkId, findUserByClerkId } from "@/lib/userLookup";
 
 // Create a client to send and receive events
 export const inngest = new Inngest({ id: "dtf-drop-next" });
@@ -39,6 +40,7 @@ export const syncUserCreation = inngest.createFunction(
       // Save user data to MongoDB
       const userData = {
           _id: id,
+          clerkId: id, // Add clerkId for consistent lookup capability
           name: `${first_name} ${last_name}`,
           email: email_addresses[0].email_address,
           imageUrl: image_url,
@@ -67,13 +69,13 @@ export const syncUserUpdate = inngest.createFunction(
     async ({ event }) => {
         const {id, first_name, last_name, email_addresses, image_url} = event.data;
         const userData = {
-            _id: id,
+            // Don't include _id in update data (it's immutable)
             name: `${first_name} ${last_name}`,
             email: email_addresses[0].email_address,
             imageUrl: image_url,
         };
         await connectDB()
-        await User.findByIdAndUpdate(id, userData)
+        await updateUserByClerkId(id, userData)
     }
 )
 
@@ -86,6 +88,12 @@ export const syncUserDeletion = inngest.createFunction(
     async ({ event }) => {
         const {id} = event.data;
         await connectDB()
-        await User.findByIdAndDelete(id)
+        
+        // Find user using helper to handle all user types
+        const user = await findUserByClerkId(id);
+        if (user) {
+            // Delete using the actual document _id (handles both string and ObjectId)
+            await User.findByIdAndDelete(user._id);
+        }
     }
 )

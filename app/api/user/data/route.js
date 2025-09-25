@@ -2,6 +2,7 @@ import { getAuth, clerkClient } from "@clerk/nextjs/server"
 import connectDB from "@/config/db"
 import User from "@/models/User"
 import { NextResponse } from 'next/server';
+import { findUserByClerkId } from "@/lib/userLookup";
 
 export async function GET(request) {
     let userId = null;
@@ -22,42 +23,8 @@ export async function GET(request) {
         
         await connectDB()
 
-        // Try to find user by _id (standard approach)
-        let user;
-        try {
-            user = await User.findById(userId);
-        } catch (findError) {
-            // Handle CastError for legacy ObjectId users
-            if (findError.name === 'CastError') {
-                console.log('CastError detected for legacy ObjectId user, attempting email lookup:', userId);
-                
-                try {
-                    // Get user data from Clerk to find their email
-                    const clerkUser = await clerkClient.users.getUser(userId);
-                    const userEmail = clerkUser.emailAddresses[0]?.emailAddress;
-                    
-                    if (userEmail) {
-                        // Find existing user by email (legacy ObjectId users)
-                        const existingUser = await User.findOne({ email: userEmail });
-                        if (existingUser) {
-                            user = existingUser;
-                            console.log('Found legacy ObjectId user by email:', { userId, email: userEmail });
-                        } else {
-                            console.log('No existing user found with email, will create new:', userEmail);
-                            user = null;
-                        }
-                    } else {
-                        console.error('Could not get email from Clerk for user:', userId);
-                        user = null;
-                    }
-                } catch (emailLookupError) {
-                    console.error('Error during legacy user email lookup:', emailLookupError);
-                    user = null;
-                }
-            } else {
-                throw findError; // Re-throw other database errors
-            }
-        }
+        // Use the centralized user lookup helper
+        let user = await findUserByClerkId(userId);
 
         if (!user) {
             // Create user if doesn't exist (first visit)
@@ -67,6 +34,7 @@ export async function GET(request) {
                 
                 const userData = {
                     _id: userId,
+                    clerkId: userId, // Add clerkId for future lookups
                     name: `${clerkUser.firstName || ''} ${clerkUser.lastName || ''}`.trim() || 'User',
                     email: clerkUser.emailAddresses[0]?.emailAddress || 'user@example.com',
                     imageUrl: clerkUser.imageUrl || 'https://img.clerk.com/preview.png',
