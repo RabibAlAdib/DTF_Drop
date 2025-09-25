@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState } from 'react'
 import { assets } from '@/assets/assets'
 import Image from 'next/image';
 import Link from 'next/link';
@@ -10,8 +10,6 @@ const ProductCard = ({ product }) => {
 
     const { currency, router, user, favorites, isFavorite, addToFavorites, removeFromFavorites } = useAppContext()
     const [isCartModalOpen, setIsCartModalOpen] = useState(false);
-    const [isTextOverflowing, setIsTextOverflowing] = useState(false);
-    const descriptionRef = useRef(null);
 
     const handleFavoriteToggle = async (e, productId) => {
         e.preventDefault(); // Prevent navigation to product page
@@ -42,21 +40,11 @@ const ProductCard = ({ product }) => {
         setIsCartModalOpen(true);
     };
 
-    // Check if text is overflowing and needs truncation
-    useEffect(() => {
-        const checkOverflow = () => {
-            if (descriptionRef.current) {
-                const element = descriptionRef.current;
-                setIsTextOverflowing(element.scrollHeight > element.clientHeight);
-            }
-        };
-
-        // Check on mount and when window resizes
-        checkOverflow();
-        window.addEventListener('resize', checkOverflow);
-        
-        return () => window.removeEventListener('resize', checkOverflow);
-    }, [product.description]);
+    // Simple text truncation - limit to 80 characters for consistent display
+    const truncateDescription = (text, maxLength = 80) => {
+        if (!text || text.length <= maxLength) return text;
+        return text.substring(0, maxLength).trim() + '...';
+    };
 
     return (
         <>
@@ -104,10 +92,8 @@ const ProductCard = ({ product }) => {
 
                 <div className="px-2 pb-2">
                     <p className="md:text-base font-semibold pt-3 w-full truncate text-gray-900 dark:text-white">{product.name}</p>
-                    <p 
-                       ref={descriptionRef}
-                       className={`w-full text-xs text-gray-600 dark:text-gray-400 max-sm:hidden mt-1 ${isTextOverflowing ? 'text-clamp-2' : 'line-clamp-2'}`}>
-                       {product.description}
+                    <p className="w-full text-xs text-gray-600 dark:text-gray-400 max-sm:hidden mt-1 leading-tight">
+                       {truncateDescription(product.description)}
                     </p>
                     
                     <div className="flex items-center gap-2 mt-2">
