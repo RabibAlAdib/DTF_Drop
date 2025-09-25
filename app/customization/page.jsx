@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef, useCallback, useMemo } from "react"
 import { useAppContext } from "@/context/AppContext";
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
-import Image from "next/image";
+// Removed unused Next.js Image import that conflicted with native Image() constructor
 import { useUser } from '@clerk/nextjs';
 import Footer from '@/components/Footer';
 

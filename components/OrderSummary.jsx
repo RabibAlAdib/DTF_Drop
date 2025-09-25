@@ -416,7 +416,7 @@ const OrderSummary = () => {
                 onChange={(e) => handlePaymentMethodChange(e.target.value)}
                 className="mr-3 w-4 h-4 text-orange-600 bg-gray-100 border-gray-300 focus:ring-orange-500 dark:focus:ring-orange-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
               />
-              <label htmlFor="nagad" className="text-gray-700 dark:text-gray-200 cursor-pointer">
+              <label htmlFor="nagad" className="text-gray-700 dark:text-gray-200 cursor-pointer disable">
                 💳 Nagad
               </label>
             </div>
