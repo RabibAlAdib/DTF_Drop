@@ -194,21 +194,14 @@ const CustomizationPage = () => {
         throw new Error('Authentication required');
       }
 
-      const signatureResponse = await axios.post('/api/cloudinary/signature', {}, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      
-      const signatureData = signatureResponse.data;
-      
       const formData = new FormData();
       formData.append('file', file);
-      formData.append('api_key', signatureData.api_key);
-      formData.append('timestamp', signatureData.timestamp);
-      formData.append('signature', signatureData.signature);
-      formData.append('folder', 'custom-designs');
-      formData.append('transformation', 'c_limit,w_800,h_800,q_auto,f_auto');
       
-      const uploadResponse = await axios.post(signatureData.upload_url, formData, {
+      const uploadResponse = await axios.post('/api/cloudinary/custom-upload', formData, {
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data'
+        },
         timeout: 30000, // 30 second timeout
         onUploadProgress: (progressEvent) => {
           const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
@@ -216,7 +209,11 @@ const CustomizationPage = () => {
         }
       });
       
-      return uploadResponse.data.secure_url;
+      if (uploadResponse.data.success) {
+        return uploadResponse.data.url;
+      } else {
+        throw new Error(uploadResponse.data.message || 'Upload failed');
+      }
       
     } catch (error) {
       console.error('Upload error:', error);
@@ -224,7 +221,10 @@ const CustomizationPage = () => {
         throw new Error('Upload timeout - please try a smaller image');
       }
       if (error.response?.status === 401) {
-        throw new Error('Authentication failed - please refresh and try again');
+        throw new Error('Authentication failed - please sign in and try again');
+      }
+      if (error.response?.data?.message) {
+        throw new Error(error.response.data.message);
       }
       throw new Error('Upload failed - please try again');
     }

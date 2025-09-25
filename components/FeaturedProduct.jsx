@@ -73,41 +73,55 @@ const FeaturedProduct = () => {
             style={{ transitionDelay: `${index * 200}ms` }}
             onClick={() => handleProductClick(product)}
           >
-            {/* Glowing border shadow effect - transparent fill */}
-            <div className="absolute -inset-0.5 border-2 border-transparent bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-lg opacity-0 group-hover:opacity-60 transition duration-1000 group-hover:animate-pulse" style={{backgroundClip: 'padding-box, border-box', background: 'linear-gradient(white, white) padding-box, linear-gradient(45deg, #3b82f6, #8b5cf6, #ec4899) border-box'}}></div>
-            <div className="relative">
-            <Image
-              src={product.images?.[0] || assets.box_icon}
-              alt={product.name}
-              className="group-hover:brightness-75 transition duration-300 w-full h-auto object-cover rounded-lg"
-              width={400}
-              height={300}
-            />
-            <div className="group-hover:-translate-y-4 transition duration-300 absolute bottom-8 left-8 text-white space-y-2">
-              <div className="flex items-center gap-2 flex-wrap">
-                <p className="font-medium text-xl lg:text-2xl drop-shadow-lg">{product.name}</p>
+            {/* Professional glowing border effect */}
+            <div className="absolute -inset-1 bg-gradient-to-r from-orange-500 via-pink-500 to-purple-500 rounded-2xl opacity-0 group-hover:opacity-75 transition-all duration-500 blur-sm group-hover:animate-pulse"></div>
+            
+            <div className="relative bg-white dark:bg-gray-900 rounded-xl overflow-hidden shadow-xl border border-gray-200/50 dark:border-gray-700/50 group-hover:shadow-2xl transition-all duration-500">
+              {/* Image Section with Professional Padding */}
+              <div className="relative p-6 pt-8 bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900">
+                <Image
+                  src={product.images?.[0] || assets.box_icon}
+                  alt={product.name}
+                  className="group-hover:scale-110 transition-all duration-500 w-full h-48 object-contain rounded-lg bg-white/50 dark:bg-gray-800/50 p-4 shadow-sm group-hover:shadow-lg backdrop-blur-sm"
+                  width={400}
+                  height={300}
+                />
+                
+                {/* Sold Badge */}
                 {product.totalQuantitySold && (
-                  <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full">
+                  <div className="absolute top-3 left-3 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg backdrop-blur-sm">
                     {product.totalQuantitySold} sold
-                  </span>
+                  </div>
                 )}
               </div>
-              <div className="flex items-center gap-2 text-sm lg:text-base">
-                {product.offerPrice ? (
-                  <>
-                    <span className="font-semibold">{currency}{product.offerPrice}</span>
-                    <span className="line-through text-gray-300">{currency}{product.price}</span>
-                  </>
-                ) : (
-                  <span className="font-semibold">{currency}{product.price}</span>
-                )}
+              
+              {/* Content Section */}
+              <div className="p-6 pt-4 space-y-3">
+                <h3 className="font-bold text-xl lg:text-2xl text-gray-900 dark:text-white group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors duration-300">
+                  {product.name}
+                </h3>
+                
+                <div className="flex items-center gap-3">
+                  {product.offerPrice ? (
+                    <>
+                      <span className="text-2xl font-bold text-green-600 dark:text-green-400">{currency}{product.offerPrice}</span>
+                      <span className="text-lg text-gray-500 line-through">{currency}{product.price}</span>
+                      <span className="bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 text-xs font-bold px-2 py-1 rounded-full">
+                        SALE
+                      </span>
+                    </>
+                  ) : (
+                    <span className="text-2xl font-bold text-gray-900 dark:text-white">{currency}{product.price}</span>
+                  )}
+                </div>
+                
+                <button 
+                  className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white font-bold py-3 px-6 rounded-xl transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl group-hover:shadow-orange-500/25"
+                >
+                  <span>Shop now</span>
+                  <Image className="h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" src={assets.redirect_icon} alt="Redirect Icon" />
+                </button>
               </div>
-              <button 
-                className="flex items-center gap-1.5 bg-orange-600 hover:bg-orange-700 px-4 py-2 rounded transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl cursor-pointer"
-              >
-                Shop now <Image className="h-3 w-3" src={assets.redirect_icon} alt="Redirect Icon" />
-              </button>
-            </div>
             </div>
           </div>
         ))}
