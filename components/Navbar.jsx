@@ -30,35 +30,35 @@ const Navbar = () => {
 
       {/* Desktop Menu Items - Truly Centered */}
       <div className="hidden md:block justify-self-center">
-        <div className="bg-gray-300 dark:bg-gray-800/30 rounded-full px-2 py-1">
+        <div className="bg-gray-200 dark:bg-gray-800/40 rounded-full px-2 py-1 shadow-sm">
           <div className="flex items-center gap-1">
             <Link
               href="/"
-              className="px-3 py-2 rounded-full hover:bg-white dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-200 transition-all duration-200 text-sm"
+              className="px-4 py-2 rounded-full hover:bg-blue-500 hover:text-white dark:hover:bg-blue-600 dark:hover:text-white hover:shadow-md transition-all duration-300 text-sm font-medium hover:scale-105"
             >
               Home
             </Link>
             <Link
               href="/all-products"
-              className="px-3 py-2 rounded-full hover:bg-white dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-200 transition-all duration-200 text-sm"
+              className="px-4 py-2 rounded-full hover:bg-green-500 hover:text-white dark:hover:bg-green-600 dark:hover:text-white hover:shadow-md transition-all duration-300 text-sm font-medium hover:scale-105"
             >
               Shop
             </Link>
             <Link
               href="/about"
-              className="px-3 py-2 rounded-full hover:bg-white dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-200 transition-all duration-200 text-sm"
+              className="px-4 py-2 rounded-full hover:bg-purple-500 hover:text-white dark:hover:bg-purple-600 dark:hover:text-white hover:shadow-md transition-all duration-300 text-sm font-medium hover:scale-105"
             >
               About Us
             </Link>
             <Link
               href="/contact"
-              className="px-3 py-2 rounded-full hover:bg-white dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-200 transition-all duration-200 text-sm"
+              className="px-4 py-2 rounded-full hover:bg-orange-500 hover:text-white dark:hover:bg-orange-600 dark:hover:text-white hover:shadow-md transition-all duration-300 text-sm font-medium hover:scale-105"
             >
               Contact
             </Link>
             <Link
               href="/customization"
-              className="px-3 py-2 rounded-full hover:bg-white dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-200 transition-all duration-200 text-sm"
+              className="px-4 py-2 rounded-full hover:bg-indigo-500 hover:text-white dark:hover:bg-indigo-600 dark:hover:text-white hover:shadow-md transition-all duration-300 text-sm font-medium hover:scale-105"
             >
               Customization
             </Link>
@@ -265,8 +265,8 @@ const Navbar = () => {
             </div>
 
             {/* Menu Content - Scrollable */}
-            <div className="flex-1 overflow-y-auto">
-              <div className="p-4 space-y-3 bg-gradient-to-b from-white via-gray-50/50 to-gray-100/30 dark:from-gray-900 dark:via-gray-800/80 dark:to-gray-700/50 min-h-full">
+            <div className="flex-1 overflow-y-auto p-4">
+              <div className="space-y-3">
               {/* Navigation Links */}
               <Link
                 href="/"
