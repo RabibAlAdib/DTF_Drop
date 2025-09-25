@@ -2,12 +2,11 @@
 import React, { useState, useEffect } from "react";
 import HeaderSlider from "@/components/HeaderSlider";
 import HomeProducts from "@/components/HomeProducts";
-import Banner from "@/components/Banner";
-import NewsLetter from "@/components/NewsLetter";
 import FeaturedProduct from "@/components/FeaturedProduct";
 import OfferBanner from "@/components/offers/OfferBanner";
 import OfferCard from "@/components/offers/OfferCard";
 import OfferPopup from "@/components/offers/OfferPopup";
+import PromotionalSection from "@/components/PromotionalSection";
 import axios from "axios";
 
 const Home = () => {
@@ -116,8 +115,7 @@ const Home = () => {
         </section>
       )}
 
-      <Banner />
-      <NewsLetter />
+      <PromotionalSection />
 
       {/* Offer Popup - Style 3 */}
       <OfferPopup
