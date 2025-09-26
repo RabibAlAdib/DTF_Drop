@@ -2,15 +2,15 @@ import { NextResponse } from "next/server";
 import connectDB from "@/config/db";
 import CustomOrder from "@/models/CustomOrder";
 import CustomizationTemplate from "@/models/CustomizationTemplate";
-import { getAuth } from '@clerk/nextjs/server';
+import { getUniversalAuth } from '@/lib/authUtil';
 
 // GET - Fetch user's custom orders
 export async function GET(request) {
   try {
     await connectDB();
     
-    const { userId } = getAuth(request);
-    if (!userId) {
+    const { userId, error } = await getUniversalAuth(request);
+    if (!userId || error) {
       return NextResponse.json({
         success: false,
         message: "Authentication required"
@@ -40,8 +40,8 @@ export async function POST(request) {
   try {
     await connectDB();
     
-    const { userId } = getAuth(request);
-    if (!userId) {
+    const { userId, error } = await getUniversalAuth(request);
+    if (!userId || error) {
       return NextResponse.json({
         success: false,
         message: "Authentication required"
