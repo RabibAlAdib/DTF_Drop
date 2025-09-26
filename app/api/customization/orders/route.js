@@ -60,6 +60,14 @@ export async function POST(request) {
       }, { status: 400 });
     }
     
+    // Validate that both front and back designs are provided for final image creation
+    if (!userDesigns.front?.imageUrl || !userDesigns.back?.imageUrl) {
+      return NextResponse.json({
+        success: false,
+        message: "output/final must use front and back design can create 1 final image with the selected position and size"
+      }, { status: 400 });
+    }
+    
     // Fetch template to get pricing
     const template = await CustomizationTemplate.findById(templateId);
     if (!template) {
