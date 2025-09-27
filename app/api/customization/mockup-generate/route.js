@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { v2 as cloudinary } from "cloudinary";
 import { getUniversalAuth } from "@/lib/authUtil";
-import connectDB from "@/lib/config/mongodb";
+import connectDB from "@/config/db";
 import CustomizationTemplate from "@/models/CustomizationTemplate";
 
 // Configure Cloudinary
