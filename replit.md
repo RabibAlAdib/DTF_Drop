@@ -29,7 +29,7 @@ Preferred communication style: Simple, everyday language.
   - User model with cart items, contact info, and join date tracking
   - Product model with comprehensive fields including ratings, reviews, categories, gender targeting, design types, colors, and sizes
   - CustomizationTemplate model for managing custom product categories, colors, sizes, mockup images, and pricing
-  - CustomOrder model for processing custom design orders with image positioning, sizing, and WhatsApp integration
+  - CustomOrder model with preview-based architecture: stores design transforms (position/size/rotation metadata), generated preview URLs, session tokens, and WhatsApp integration links instead of individual design image URLs
 - **File Storage**: Cloudinary for image upload and management with automatic optimization, secure deletion functionality, and custom design file handling
 
 ## Authentication & Authorization
@@ -43,12 +43,15 @@ Preferred communication style: Simple, everyday language.
 - **User Synchronization**: Automatic sync between Clerk user events and MongoDB user records
 - **Webhook Integration**: Real-time processing of authentication events for data consistency
 
-## Customization System
+## Customization System (Preview-Based Architecture)
 - **Product Customization**: Comprehensive system allowing users to select product categories (drop shoulder, T-shirt, polo), colors, and sizes
 - **Design Tools**: Professional drag-and-drop interface for uploading and positioning up to 4 design images (front, back, sleeve, pocket)
-- **Image Management**: Cloudinary integration for secure image uploads with positioning and resizing controls
+- **Preview Generation**: Server-side image composition using Cloudinary transformations to generate real-time mockup previews showing final product appearance
+- **Image Management**: Cloudinary integration for temporary design uploads and automatic preview image generation with positioning and resizing controls
 - **Pricing Logic**: Base price includes front and back designs; sleeve and pocket designs cost BDT 30 extra each
-- **Order Processing**: Custom order creation with WhatsApp integration (+8801344823831) for high-resolution file sharing
+- **Order Processing**: Preview-based custom order creation - users generate mockup previews first, then orders are created with preview URLs and design transforms (position/size/rotation metadata)
+- **WhatsApp Integration**: Direct WhatsApp links generated for each order enabling customers to send high-quality design files for printing (+8801344823831)
+- **Cart Integration**: Custom orders automatically added to cart with preview images, pricing calculations, and WhatsApp links for seamless checkout
 - **Admin Management**: Complete admin panel for sellers to manage customization templates, mockup images, colors, sizes, and pricing
 
 # External Dependencies
