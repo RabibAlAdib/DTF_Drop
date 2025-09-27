@@ -50,40 +50,39 @@ export async function POST(request) {
     
     const data = await request.json();
     
-    // Debug logging to see what's being received
+    // Debug logging for new preview-based structure
     console.log('Custom order request data:', {
       templateId: data.templateId,
       selectedColor: data.selectedColor,
       selectedSize: data.selectedSize,
-      userDesigns: data.userDesigns,
+      previewUrls: data.previewUrls,
+      sessionToken: data.sessionToken,
       userEmail: data.userEmail
     });
     
-    // Validate required fields
-    const { templateId, selectedColor, selectedSize, userDesigns } = data;
+    // Validate required fields for preview-based orders
+    const { templateId, selectedColor, selectedSize, previewUrls, sessionToken, designTransforms } = data;
     
-    if (!templateId || !selectedColor || !selectedSize || !userDesigns) {
-      console.log('Missing required fields:', { templateId: !!templateId, selectedColor: !!selectedColor, selectedSize: !!selectedSize, userDesigns: !!userDesigns });
+    if (!templateId || !selectedColor || !selectedSize || !previewUrls || !sessionToken) {
+      console.log('Missing required fields:', { 
+        templateId: !!templateId, 
+        selectedColor: !!selectedColor, 
+        selectedSize: !!selectedSize, 
+        previewUrls: !!previewUrls,
+        sessionToken: !!sessionToken
+      });
       return NextResponse.json({
         success: false,
-        message: "All required fields must be provided"
+        message: "Template, color, size, preview URLs, and session token are required"
       }, { status: 400 });
     }
     
-    // Debug the userDesigns structure
-    console.log('UserDesigns validation:', {
-      frontImageUrl: userDesigns.front?.imageUrl,
-      backImageUrl: userDesigns.back?.imageUrl,
-      frontExists: !!userDesigns.front?.imageUrl,
-      backExists: !!userDesigns.back?.imageUrl
-    });
-    
-    // Validate that both front and back designs are provided for final image creation
-    if (!userDesigns.front?.imageUrl || !userDesigns.back?.imageUrl) {
-      console.log('Validation failed - missing front or back design URLs');
+    // Validate that at least one preview URL exists
+    if (!previewUrls.front && !previewUrls.back) {
+      console.log('Validation failed - no preview URLs provided');
       return NextResponse.json({
         success: false,
-        message: "Both front and back designs are required. Please upload designs for both front and back areas before creating your order."
+        message: "At least one preview image (front or back) is required. Please generate preview images first."
       }, { status: 400 });
     }
     
@@ -114,12 +113,18 @@ export async function POST(request) {
       }, { status: 400 });
     }
     
-    // Calculate extra images count (excluding front and back)
+    // Calculate extra images count based on design transforms
     let extraImagesCount = 0;
-    if (userDesigns.sleeve?.imageUrl) extraImagesCount++;
-    if (userDesigns.pocket?.imageUrl) extraImagesCount++;
+    if (designTransforms?.sleeve?.hasImage) extraImagesCount++;
+    if (designTransforms?.pocket?.hasImage) extraImagesCount++;
     
-    // Create order
+    // Create WhatsApp link for high-quality file sharing
+    const whatsappNumber = '+8801344823831';
+    const orderReference = `CUSTOM_${Date.now()}_${userId.slice(-8)}`;
+    const whatsappMessage = `Hi! I've placed a custom order (Ref: ${orderReference}) for ${template.category} in ${selectedColor}, size ${selectedSize}. Please find my high-quality design files attached for printing. Total: BDT ${sizeInfo.price + (extraImagesCount * template.extraImagePrice)}`;
+    const whatsappLink = `https://wa.me/${whatsappNumber.replace('+', '')}?text=${encodeURIComponent(whatsappMessage)}`;
+    
+    // Create order with new schema structure
     const order = new CustomOrder({
       userId,
       userEmail: data.userEmail,
@@ -127,10 +132,30 @@ export async function POST(request) {
       category: template.category,
       selectedColor,
       selectedSize,
-      userDesigns,
+      
+      // New preview-based fields
+      designTransforms: designTransforms || {
+        front: { hasImage: !!previewUrls.front, position: { x: 50, y: 40 }, size: { width: 25, height: 30 }, rotation: 0 },
+        back: { hasImage: !!previewUrls.back, position: { x: 50, y: 40 }, size: { width: 25, height: 30 }, rotation: 0 },
+        sleeve: { hasImage: false, position: { x: 80, y: 30 }, size: { width: 12, height: 15 }, rotation: 0 },
+        pocket: { hasImage: false, position: { x: 25, y: 35 }, size: { width: 8, height: 12 }, rotation: 0 }
+      },
+      previewUrls: {
+        front: previewUrls.front || null,
+        back: previewUrls.back || null
+      },
+      sessionToken,
+      previewGeneratedAt: new Date(),
+      
+      // Pricing
       basePrice: sizeInfo.price,
       extraImagesCount,
       extraImagePrice: template.extraImagePrice,
+      
+      // WhatsApp integration
+      whatsappLink,
+      
+      // Customer notes
       customerNotes: data.customerNotes || ''
     });
     
@@ -139,8 +164,15 @@ export async function POST(request) {
     return NextResponse.json({
       success: true,
       message: "Custom order created successfully",
-      order,
-      whatsappMessage: `Please send your design files via WhatsApp for better quality printing. Order ID: ${order.orderId}`
+      order: {
+        orderId: order.orderId,
+        totalPrice: order.totalPrice,
+        previewUrls: order.previewUrls,
+        whatsappLink: order.whatsappLink,
+        status: order.status
+      },
+      whatsappMessage: `Order ${order.orderId} created! Send your high-quality design files via WhatsApp for best printing quality.`,
+      whatsappLink
     });
     
   } catch (error) {

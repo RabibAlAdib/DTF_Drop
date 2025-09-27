@@ -548,49 +548,73 @@ const CustomizationPage = () => {
     }
     
     try {
-      const toastId = toast.loading('Adding to cart...');
+      const toastId = toast.loading('Creating custom order...');
       
-      // Calculate complete pricing
-      const totalPrice = calculatePrice;
+      const token = await getToken();
+      if (!token) {
+        throw new Error('Authentication required');
+      }
       
-      // Create WhatsApp message for high-quality file sharing
-      const whatsappNumber = '+8801344823831';
-      const orderReference = `${Date.now()}_${user.id}`;
-      const whatsappMessage = `Hi! I've placed a custom order (Ref: ${orderReference}) for ${selectedTemplate.category} in ${selectedColor.name}, size ${selectedSize.size}. Please find my high-quality design files attached for printing. Total: BDT ${totalPrice}`;
-      const whatsappLink = `https://wa.me/${whatsappNumber.replace('+', '')}?text=${encodeURIComponent(whatsappMessage)}`;
+      // Prepare design transforms data (position/size/rotation without imageUrls)
+      const designTransforms = {};
+      Object.keys(userDesigns).forEach(area => {
+        designTransforms[area] = {
+          hasImage: !!userDesigns[area].imageUrl,
+          position: userDesigns[area].position,
+          size: userDesigns[area].size,
+          rotation: userDesigns[area].rotation
+        };
+      });
       
-      // Add custom item to cart using existing cart functionality
-      const customCartItem = {
-        customOrder: {
-          orderId: orderReference,
-          templateId: selectedTemplate._id,
-          category: selectedTemplate.category,
-          color: selectedColor.name,
-          size: selectedSize.size,
-          totalPrice: totalPrice,
-          previewUrls: previewUrls,
-          sessionToken: sessionToken,
-          whatsappLink: whatsappLink
-        },
-        // Make it compatible with regular cart items
-        color: selectedColor.name,
-        size: selectedSize.size,
-        name: `Custom ${selectedTemplate.category}`,
-        price: totalPrice,
-        image: previewUrls.front || previewUrls.back
+      // Create custom order via API
+      const customOrderData = {
+        templateId: selectedTemplate._id,
+        selectedColor: selectedColor.name,
+        selectedSize: selectedSize.size,
+        previewUrls: previewUrls,
+        sessionToken: sessionToken,
+        designTransforms: designTransforms,
+        userEmail: user.emailAddresses[0]?.emailAddress,
+        customerNotes: ''
       };
       
-      // Use existing cart functionality
-      await addToCart(selectedTemplate._id, customCartItem, 1);
+      const response = await axios.post('/api/customization/orders', customOrderData, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       
-      toast.success('Custom design added to cart!', { id: toastId });
+      if (response.data.success) {
+        const order = response.data.order;
+        
+        // Add the created order to cart
+        const customCartItem = {
+          customOrder: {
+            orderId: order.orderId,
+            templateId: selectedTemplate._id,
+            category: selectedTemplate.category,
+            color: selectedColor.name,
+            size: selectedSize.size,
+            totalPrice: order.totalPrice,
+            previewUrls: order.previewUrls,
+            whatsappLink: order.whatsappLink
+          },
+          // Make it compatible with regular cart items
+          color: selectedColor.name,
+          size: selectedSize.size,
+          name: `Custom ${selectedTemplate.category}`,
+          price: order.totalPrice,
+          image: order.previewUrls.front || order.previewUrls.back
+        };
+        
+        await addToCart(selectedTemplate._id, customCartItem, 1);
+        
+        toast.success('Custom order created and added to cart!', { id: toastId });
         
         // Show WhatsApp integration message with direct link
         toast.success(
           <div className="text-center">
-            <div className="font-medium mb-2">Custom order created!</div>
+            <div className="font-medium mb-2">Order {order.orderId} created!</div>
             <a 
-              href={whatsappLink}
+              href={order.whatsappLink}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors"
@@ -608,10 +632,14 @@ const CustomizationPage = () => {
             position: 'top-center'
           }
         );
+        
+      } else {
+        toast.error(response.data.message || 'Failed to create custom order', { id: toastId });
+      }
       
     } catch (error) {
       console.error('Custom order creation error:', error);
-      toast.error(error.message || 'Failed to add to cart. Please try again.', { id: toastId });
+      toast.error(error.response?.data?.message || error.message || 'Failed to create custom order. Please try again.', { id: toastId });
     }
   };
   
