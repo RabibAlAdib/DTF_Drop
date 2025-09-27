@@ -28,13 +28,21 @@ const CustomizationPage = () => {
   const [loading, setLoading] = useState(true);
   const [leftMenuVisible, setLeftMenuVisible] = useState(true);
   
-  // Design state
+  // Design state - now using client-side files instead of uploaded URLs
   const [userDesigns, setUserDesigns] = useState({
-    front: { imageUrl: null, position: { x: 50, y: 40 }, size: { width: 25, height: 30 }, rotation: 0 },
-    back: { imageUrl: null, position: { x: 50, y: 40 }, size: { width: 25, height: 30 }, rotation: 0 },
-    sleeve: { imageUrl: null, position: { x: 80, y: 30 }, size: { width: 12, height: 15 }, rotation: 0 },
-    pocket: { imageUrl: null, position: { x: 25, y: 35 }, size: { width: 8, height: 12 }, rotation: 0 }
+    front: { file: null, imageUrl: null, position: { x: 50, y: 40 }, size: { width: 25, height: 30 }, rotation: 0 },
+    back: { file: null, imageUrl: null, position: { x: 50, y: 40 }, size: { width: 25, height: 30 }, rotation: 0 },
+    sleeve: { file: null, imageUrl: null, position: { x: 80, y: 30 }, size: { width: 12, height: 15 }, rotation: 0 },
+    pocket: { file: null, imageUrl: null, position: { x: 25, y: 35 }, size: { width: 8, height: 12 }, rotation: 0 }
   });
+  
+  // Preview state
+  const [previewUrls, setPreviewUrls] = useState({
+    front: null,
+    back: null
+  });
+  const [sessionToken, setSessionToken] = useState(null);
+  const [generatingPreview, setGeneratingPreview] = useState(false);
   
   const [currentView, setCurrentView] = useState('front');
   const [isDragging, setIsDragging] = useState(false);
@@ -257,7 +265,7 @@ const CustomizationPage = () => {
     }
   };
   
-  // Optimized file upload with enhanced validation and compression
+  // Client-side file handling with validation
   const handleFileUpload = async (file, area) => {
     if (!file) return;
     
@@ -268,7 +276,7 @@ const CustomizationPage = () => {
       return;
     }
     
-    // Client-side file size validation (before processing)
+    // Client-side file size validation
     if (file.size > 10 * 1024 * 1024) { // 10MB hard limit
       toast.error('File is too large. Please use an image smaller than 10MB.');
       return;
@@ -291,7 +299,7 @@ const CustomizationPage = () => {
       if (file.size > 1 * 1024 * 1024) { // 1MB threshold for compression
         toast.loading('Optimizing image size...', { id: toastId });
         try {
-          const targetSize = file.size > 5 * 1024 * 1024 ? 1536 : 2048; // More aggressive for very large files
+          const targetSize = file.size > 5 * 1024 * 1024 ? 1536 : 2048;
           processedFile = await compressImage(file, targetSize);
           
           // Show compression stats
@@ -312,22 +320,23 @@ const CustomizationPage = () => {
         return;
       }
       
-      // Upload with progress feedback
-      toast.loading('Uploading to cloud...', { id: toastId });
+      // Create object URL for client-side preview and upload file to temp storage
+      toast.loading('Uploading for positioning...', { id: toastId });
       const imageUrl = await uploadImageToCloudinary(processedFile);
       
-      // Update state with new design
+      // Update state with both file and temporary URL for positioning
       setUserDesigns(prev => ({
         ...prev,
         [area]: {
           ...prev[area],
-          imageUrl
+          file: processedFile,
+          imageUrl // Temporary URL for positioning
         }
       }));
       
       setSelectedDesign(area); // Auto-select uploaded design
       toast.success(
-        `${area.charAt(0).toUpperCase() + area.slice(1)} design uploaded! Click and drag to position.`, 
+        `${area.charAt(0).toUpperCase() + area.slice(1)} design ready! Position it, then generate preview.`, 
         { id: toastId, duration: 3000 }
       );
     } catch (error) {
@@ -336,6 +345,70 @@ const CustomizationPage = () => {
     } finally {
       setUploadingArea(null);
     }
+  };
+  
+  // Generate preview mockup images
+  const generatePreview = async (view = 'front') => {
+    if (!selectedTemplate || !selectedColor) {
+      toast.error('Please select a template and color first');
+      return;
+    }
+    
+    try {
+      setGeneratingPreview(true);
+      const toastId = toast.loading(`Generating ${view} preview...`);
+      
+      const token = await getToken();
+      if (!token) {
+        throw new Error('Authentication required');
+      }
+      
+      // Prepare user designs data for the API
+      const designsForApi = {};
+      Object.keys(userDesigns).forEach(area => {
+        if (userDesigns[area].imageUrl) {
+          designsForApi[area] = {
+            imageUrl: userDesigns[area].imageUrl,
+            position: userDesigns[area].position,
+            size: userDesigns[area].size,
+            rotation: userDesigns[area].rotation
+          };
+        }
+      });
+      
+      const response = await axios.post('/api/customization/mockup-generate', {
+        templateId: selectedTemplate._id,
+        selectedColor: selectedColor.name,
+        userDesigns: designsForApi,
+        view: view
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      if (response.data.success) {
+        setPreviewUrls(prev => ({
+          ...prev,
+          [view]: response.data.previewUrl
+        }));
+        
+        setSessionToken(response.data.sessionToken);
+        
+        toast.success(`${view.charAt(0).toUpperCase() + view.slice(1)} preview generated!`, { id: toastId });
+      } else {
+        toast.error(response.data.message || 'Failed to generate preview', { id: toastId });
+      }
+    } catch (error) {
+      console.error('Preview generation error:', error);
+      toast.error(error.response?.data?.message || 'Failed to generate preview. Please try again.');
+    } finally {
+      setGeneratingPreview(false);
+    }
+  };
+  
+  // Generate previews for both front and back
+  const generateAllPreviews = async () => {
+    await generatePreview('front');
+    await generatePreview('back');
   };
   
   // Enhanced drag functionality with debouncing
@@ -451,7 +524,7 @@ const CustomizationPage = () => {
     }
   };
   
-  // Add to cart functionality - Now creates proper CustomOrder
+  // Add to cart functionality - Uses generated preview images
   const handleAddToCart = async () => {
     if (!selectedTemplate || !selectedColor || !selectedSize) {
       toast.error('Please select a product, color, and size');
@@ -463,61 +536,82 @@ const CustomizationPage = () => {
       return;
     }
     
+    // Check if previews have been generated
+    if (!previewUrls.front && !previewUrls.back) {
+      toast.error('Please generate preview images first');
+      return;
+    }
+    
     if (!user) {
       toast.error('Please sign in to place custom orders');
       return;
     }
     
     try {
-      const token = await getToken();
+      const toastId = toast.loading('Adding to cart...');
       
-      // Create custom order via proper API
-      const customOrderData = {
-        templateId: selectedTemplate._id,
-        selectedColor: selectedColor.name,
-        selectedSize: selectedSize.size,
-        userDesigns: userDesigns,
-        userEmail: user.emailAddresses[0]?.emailAddress,
-        customerNotes: ''
+      // Calculate complete pricing
+      const totalPrice = calculatePrice;
+      
+      // Create WhatsApp message for high-quality file sharing
+      const whatsappNumber = '+8801344823831';
+      const orderReference = `${Date.now()}_${user.id}`;
+      const whatsappMessage = `Hi! I've placed a custom order (Ref: ${orderReference}) for ${selectedTemplate.category} in ${selectedColor.name}, size ${selectedSize.size}. Please find my high-quality design files attached for printing. Total: BDT ${totalPrice}`;
+      const whatsappLink = `https://wa.me/${whatsappNumber.replace('+', '')}?text=${encodeURIComponent(whatsappMessage)}`;
+      
+      // Add custom item to cart using existing cart functionality
+      const customCartItem = {
+        customOrder: {
+          orderId: orderReference,
+          templateId: selectedTemplate._id,
+          category: selectedTemplate.category,
+          color: selectedColor.name,
+          size: selectedSize.size,
+          totalPrice: totalPrice,
+          previewUrls: previewUrls,
+          sessionToken: sessionToken,
+          whatsappLink: whatsappLink
+        },
+        // Make it compatible with regular cart items
+        color: selectedColor.name,
+        size: selectedSize.size,
+        name: `Custom ${selectedTemplate.category}`,
+        price: totalPrice,
+        image: previewUrls.front || previewUrls.back
       };
       
-      const toastId = toast.loading('Creating custom order...');
+      // Use existing cart functionality
+      await addToCart(selectedTemplate._id, customCartItem, 1);
       
-      const response = await axios.post('/api/customization/orders', customOrderData, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      
-      if (response.data.success) {
-        toast.success('Custom order created successfully!', { id: toastId });
+      toast.success('Custom design added to cart!', { id: toastId });
         
-        // Show WhatsApp message with order details
+        // Show WhatsApp integration message with direct link
         toast.success(
-          `Order ID: ${response.data.order.orderId}. ${response.data.whatsappMessage}`,
+          <div className="text-center">
+            <div className="font-medium mb-2">Custom order created!</div>
+            <a 
+              href={whatsappLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors"
+            >
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.69"/>
+              </svg>
+              Send High-Quality Files
+            </a>
+            <div className="text-xs text-gray-500 mt-1">Click to send files via WhatsApp</div>
+          </div>,
           { 
             id: 'whatsapp-msg', 
-            duration: 8000,
+            duration: 10000,
             position: 'top-center'
           }
         );
-        
-        // Optional: Also add to cart for checkout integration
-        addToCart(selectedTemplate._id, {
-          color: selectedColor.name,
-          size: selectedSize.size,
-          customOrder: {
-            orderId: response.data.order.orderId,
-            templateId: selectedTemplate._id,
-            totalPrice: calculatePrice
-          }
-        }, 1);
-        
-      } else {
-        toast.error(response.data.message || 'Failed to create custom order', { id: toastId });
-      }
       
     } catch (error) {
       console.error('Custom order creation error:', error);
-      toast.error(error.response?.data?.message || 'Failed to create custom order. Please try again.');
+      toast.error(error.message || 'Failed to add to cart. Please try again.', { id: toastId });
     }
   };
   
@@ -972,12 +1066,68 @@ const CustomizationPage = () => {
                     </div>
                   </div>
                   
-                  <button
-                    onClick={handleAddToCart}
-                    className="w-full mt-3 bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-3 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg text-sm"
-                  >
-                    Add to Cart
-                  </button>
+                  {/* Preview Section */}
+                  {(previewUrls.front || previewUrls.back) && (
+                    <div className="mt-3 p-3 bg-gray-50 rounded-lg">
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="w-4 h-4 bg-purple-500 text-white rounded-full flex items-center justify-center text-xs">✓</div>
+                        <h4 className="text-sm font-semibold text-gray-900">Generated Preview</h4>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        {previewUrls.front && (
+                          <div className="text-center">
+                            <img
+                              src={previewUrls.front}
+                              alt="Front Preview"
+                              className="w-full h-20 object-contain bg-white rounded border"
+                            />
+                            <p className="text-xs text-gray-600 mt-1">Front</p>
+                          </div>
+                        )}
+                        {previewUrls.back && (
+                          <div className="text-center">
+                            <img
+                              src={previewUrls.back}
+                              alt="Back Preview"
+                              className="w-full h-20 object-contain bg-white rounded border"
+                            />
+                            <p className="text-xs text-gray-600 mt-1">Back</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Action Buttons */}
+                  <div className="mt-3 space-y-2">
+                    <button
+                      onClick={generateAllPreviews}
+                      disabled={generatingPreview || !userDesigns.front.imageUrl || !userDesigns.back.imageUrl}
+                      className="w-full bg-purple-500 hover:bg-purple-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold py-2 px-3 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg text-sm flex items-center justify-center gap-2"
+                    >
+                      {generatingPreview ? (
+                        <>
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                          Generating...
+                        </>
+                      ) : (
+                        <>
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                          </svg>
+                          Generate Preview
+                        </>
+                      )}
+                    </button>
+                    
+                    <button
+                      onClick={handleAddToCart}
+                      disabled={!previewUrls.front && !previewUrls.back}
+                      className="w-full bg-orange-500 hover:bg-orange-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold py-2 px-3 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg text-sm"
+                    >
+                      Add to Cart
+                    </button>
+                  </div>
                 </div>
 
                 {/* Help Section */}
