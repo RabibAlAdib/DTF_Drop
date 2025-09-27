@@ -51,7 +51,7 @@ const ProductCard = ({ product }) => {
             <Link 
                 href={`/product/${product._id}`}
                 prefetch={true}
-                className="flex flex-col items-start gap-0.5 w-full cursor-pointer px-2"
+                className="flex flex-col items-start gap-0.5 w-full h-full cursor-pointer px-2 justify-between"
             >
                 <div className="cursor-pointer group relative bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 rounded-xl w-full h-48 md:h-56 overflow-hidden shadow-lg border border-gray-200/50 dark:border-gray-700/50 group-hover:shadow-2xl group-hover:shadow-orange-500/20 dark:group-hover:shadow-purple-500/30 transition-all duration-500 group-hover:border-orange-300/50 dark:group-hover:border-purple-500/50">
                     {/* Professional background glow effect */}

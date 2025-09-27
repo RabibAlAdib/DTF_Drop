@@ -118,11 +118,11 @@ const AllProducts = () => {
                 {/* Row 3: Products Grid - Full Width */}
                 <div className="px-6 md:px-16 lg:px-32">
                     {/* Products Grid */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6 pb-14">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6 pb-14 items-stretch">
                         {filteredProducts.map((product, index) => (
                             <div
                                 key={product._id || index}
-                                className="border-2 border-transparent rounded-lg hover:animate-border-glow transition-all duration-300 animate-fade-in-up"
+                                className="border-2 border-transparent rounded-lg hover:animate-border-glow transition-all duration-300 animate-fade-in-up h-full"
                                 style={{ animationDelay: `${index * 50}ms` }}
                             >
                                 <ProductCard product={product} />

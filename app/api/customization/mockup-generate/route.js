@@ -53,8 +53,17 @@ export async function POST(request) {
       }, { status: 400 });
     }
     
-    // Get the mockup URL for the specified view
-    const mockupUrl = colorInfo.mockupImages[view];
+    // Handle both old array format and new object format for backward compatibility
+    let mockupUrl;
+    
+    if (Array.isArray(colorInfo.mockupImages)) {
+      // Legacy format: array of strings - use first image as default
+      mockupUrl = colorInfo.mockupImages[0];
+    } else if (typeof colorInfo.mockupImages === 'object') {
+      // New format: object with view properties
+      mockupUrl = colorInfo.mockupImages[view];
+    }
+    
     if (!mockupUrl) {
       return NextResponse.json({
         success: false,
