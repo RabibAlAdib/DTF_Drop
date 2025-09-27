@@ -90,10 +90,28 @@ const ProductCard = ({ product }) => {
                     </button>
                 </div>
 
-                <div className="px-2 pb-2">
-                    <p className="md:text-base font-semibold pt-3 w-full truncate text-gray-900 dark:text-white">{product.name}</p>
-                    <p className="w-full text-xs text-gray-600 dark:text-gray-400 max-sm:hidden mt-1 leading-tight">
-                       {truncateDescription(product.description)}
+                <div className="px-2 pb-2 min-h-[120px] max-h-[120px] flex flex-col overflow-hidden">
+                    <p 
+                        className="text-sm md:text-base font-semibold pt-3 w-full text-gray-900 dark:text-white leading-tight min-h-0 overflow-hidden"
+                        style={{ 
+                            display: '-webkit-box',
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: 'vertical',
+                            wordBreak: 'break-word'
+                        }}
+                    >
+                        {product.name}
+                    </p>
+                    <p 
+                        className="w-full text-xs text-gray-600 dark:text-gray-400 max-sm:hidden mt-1 leading-tight flex-shrink-0 overflow-hidden"
+                        style={{ 
+                            display: '-webkit-box',
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: 'vertical',
+                            wordBreak: 'break-word'
+                        }}
+                    >
+                       {truncateDescription(product.description, 60)}
                     </p>
                     
                     <div className="flex items-center gap-2 mt-2">
