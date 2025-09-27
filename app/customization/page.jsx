@@ -55,11 +55,57 @@ const CustomizationPage = () => {
   
   // Canvas/mockup refs
   const mockupRef = useRef(null);
+  const hasInitialized = useRef(false);
   
-  // Fetch templates on load
-  useEffect(() => {
-    fetchTemplates();
+  // Define fetchTemplates before useEffect
+  const fetchTemplates = useCallback(async () => {
+    console.log('🔄 fetchTemplates: Starting...');
+    try {
+      const response = await axios.get('/api/customization/templates');
+      console.log('📡 fetchTemplates: API response:', response.data);
+      
+      if (response.data.success && response.data.templates.length > 0) {
+        const templatesData = response.data.templates;
+        const firstTemplate = templatesData[0];
+        
+        console.log('✅ fetchTemplates: Setting templates:', templatesData.length, 'templates');
+        console.log('✅ fetchTemplates: First template:', firstTemplate.name);
+        
+        // Update all state in a single batch
+        setTemplates(templatesData);
+        setSelectedTemplate(firstTemplate);
+        
+        if (firstTemplate.availableColors.length > 0) {
+          setSelectedColor(firstTemplate.availableColors[0]);
+        }
+        
+        if (firstTemplate.availableSizes.length > 0) {
+          setSelectedSize(firstTemplate.availableSizes[0]);
+        }
+        
+        console.log('🎯 fetchTemplates: All states set, now setting loading=false');
+      } else {
+        console.warn('⚠️ fetchTemplates: No templates found or unsuccessful response');
+      }
+    } catch (error) {
+      console.error('❌ fetchTemplates: Error:', error);
+      toast.error('Failed to load customization options');
+    } finally {
+      console.log('🏁 fetchTemplates: Setting loading=false');
+      setLoading(false);
+      console.log('✨ fetchTemplates: Completed');
+    }
   }, []);
+  
+  // Fetch templates on load - prevent double execution in strict mode
+  useEffect(() => {
+    if (hasInitialized.current) {
+      return;
+    }
+    
+    hasInitialized.current = true;
+    fetchTemplates();
+  }, [fetchTemplates]);
 
   // Keyboard controls
   useEffect(() => {
@@ -103,29 +149,6 @@ const CustomizationPage = () => {
     return () => window.removeEventListener('keydown', handleKeyPress);
   }, [selectedDesign, userDesigns]);
   
-  const fetchTemplates = async () => {
-    try {
-      const response = await axios.get('/api/customization/templates');
-      if (response.data.success) {
-        setTemplates(response.data.templates);
-        if (response.data.templates.length > 0) {
-          setSelectedTemplate(response.data.templates[0]);
-          if (response.data.templates[0].availableColors.length > 0) {
-            setSelectedColor(response.data.templates[0].availableColors[0]);
-          }
-          if (response.data.templates[0].availableSizes.length > 0) {
-            setSelectedSize(response.data.templates[0].availableSizes[0]);
-          }
-        }
-      }
-    } catch (error) {
-      console.error('Error fetching templates:', error);
-      toast.error('Failed to load customization options');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   // Optimized image compression with smart algorithms
   const compressImage = (file, maxSizeKB = 2048, initialQuality = 0.85) => {
     return new Promise((resolve, reject) => {
