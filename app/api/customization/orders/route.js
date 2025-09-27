@@ -50,21 +50,40 @@ export async function POST(request) {
     
     const data = await request.json();
     
+    // Debug logging to see what's being received
+    console.log('Custom order request data:', {
+      templateId: data.templateId,
+      selectedColor: data.selectedColor,
+      selectedSize: data.selectedSize,
+      userDesigns: data.userDesigns,
+      userEmail: data.userEmail
+    });
+    
     // Validate required fields
     const { templateId, selectedColor, selectedSize, userDesigns } = data;
     
     if (!templateId || !selectedColor || !selectedSize || !userDesigns) {
+      console.log('Missing required fields:', { templateId: !!templateId, selectedColor: !!selectedColor, selectedSize: !!selectedSize, userDesigns: !!userDesigns });
       return NextResponse.json({
         success: false,
         message: "All required fields must be provided"
       }, { status: 400 });
     }
     
+    // Debug the userDesigns structure
+    console.log('UserDesigns validation:', {
+      frontImageUrl: userDesigns.front?.imageUrl,
+      backImageUrl: userDesigns.back?.imageUrl,
+      frontExists: !!userDesigns.front?.imageUrl,
+      backExists: !!userDesigns.back?.imageUrl
+    });
+    
     // Validate that both front and back designs are provided for final image creation
     if (!userDesigns.front?.imageUrl || !userDesigns.back?.imageUrl) {
+      console.log('Validation failed - missing front or back design URLs');
       return NextResponse.json({
         success: false,
-        message: "output/final must use front and back design can create 1 final image with the selected position and size"
+        message: "Both front and back designs are required. Please upload designs for both front and back areas before creating your order."
       }, { status: 400 });
     }
     
