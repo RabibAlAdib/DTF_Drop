@@ -26,6 +26,9 @@ const CustomizationPage = () => {
   const [selectedColor, setSelectedColor] = useState(null);
   const [selectedSize, setSelectedSize] = useState(null);
   const [loading, setLoading] = useState(true);
+  
+  // Use ref to track if data has been loaded (persists across remounts)
+  const dataLoaded = useRef(false);
   const [leftMenuVisible, setLeftMenuVisible] = useState(true);
   
   // Design state - now using client-side files instead of uploaded URLs
@@ -59,41 +62,32 @@ const CustomizationPage = () => {
   
   // Define fetchTemplates before useEffect
   const fetchTemplates = useCallback(async () => {
-    console.log('🔄 fetchTemplates: Starting...');
     try {
       const response = await axios.get('/api/customization/templates');
-      console.log('📡 fetchTemplates: API response:', response.data);
       
       if (response.data.success && response.data.templates.length > 0) {
         const templatesData = response.data.templates;
         const firstTemplate = templatesData[0];
         
-        console.log('✅ fetchTemplates: Setting templates:', templatesData.length, 'templates');
-        console.log('✅ fetchTemplates: First template:', firstTemplate.name);
-        
         // Update all state in a single batch
         setTemplates(templatesData);
         setSelectedTemplate(firstTemplate);
         
-        if (firstTemplate.availableColors.length > 0) {
+        if (firstTemplate.availableColors?.length > 0) {
           setSelectedColor(firstTemplate.availableColors[0]);
         }
         
-        if (firstTemplate.availableSizes.length > 0) {
+        if (firstTemplate.availableSizes?.length > 0) {
           setSelectedSize(firstTemplate.availableSizes[0]);
         }
         
-        console.log('🎯 fetchTemplates: All states set, now setting loading=false');
-      } else {
-        console.warn('⚠️ fetchTemplates: No templates found or unsuccessful response');
+        dataLoaded.current = true;
       }
     } catch (error) {
-      console.error('❌ fetchTemplates: Error:', error);
+      console.error('Error fetching templates:', error);
       toast.error('Failed to load customization options');
     } finally {
-      console.log('🏁 fetchTemplates: Setting loading=false');
       setLoading(false);
-      console.log('✨ fetchTemplates: Completed');
     }
   }, []);
   
@@ -106,6 +100,7 @@ const CustomizationPage = () => {
     hasInitialized.current = true;
     fetchTemplates();
   }, [fetchTemplates]);
+
 
   // Keyboard controls
   useEffect(() => {
@@ -666,7 +661,8 @@ const CustomizationPage = () => {
     }
   };
   
-  if (loading) {
+  // Simple loading based on templates array length
+  if (templates.length === 0) {
     return (
       <div className="flex justify-center items-center min-h-screen bg-gray-50">
         <div className="text-center">
@@ -677,24 +673,18 @@ const CustomizationPage = () => {
     );
   }
   
-  if (templates.length === 0) {
+  // Add defensive null checks to prevent render-time exceptions
+  if (!selectedTemplate || !selectedColor || !selectedSize) {
     return (
-      <>
-        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
-          <div className="text-center p-8">
-            <div className="w-24 h-24 mx-auto mb-6 bg-gray-200 rounded-full flex items-center justify-center">
-              <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-              </svg>
-            </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">No Templates Available</h2>
-            <p className="text-gray-600">Please contact admin to add customization templates.</p>
-          </div>
+      <div className="flex justify-center items-center min-h-screen bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-orange-500 mb-4"></div>
+          <p className="text-gray-600 font-medium">Initializing customization options...</p>
         </div>
-        <Footer />
-      </>
+      </div>
     );
   }
+
 
   return (
     <>
