@@ -41,10 +41,10 @@ const customOrderSchema = new mongoose.Schema({
     enum: ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL']
   },
   
-  // User design data
-  userDesigns: {
+  // User design transform data (positions, sizes, rotations - no individual imageUrls)
+  designTransforms: {
     front: {
-      imageUrl: { type: String },
+      hasImage: { type: Boolean, default: false },
       position: {
         x: { type: Number, default: 50 },
         y: { type: Number, default: 40 }
@@ -56,7 +56,7 @@ const customOrderSchema = new mongoose.Schema({
       rotation: { type: Number, default: 0 }
     },
     back: {
-      imageUrl: { type: String },
+      hasImage: { type: Boolean, default: false },
       position: {
         x: { type: Number, default: 50 },
         y: { type: Number, default: 40 }
@@ -68,7 +68,7 @@ const customOrderSchema = new mongoose.Schema({
       rotation: { type: Number, default: 0 }
     },
     sleeve: {
-      imageUrl: { type: String },
+      hasImage: { type: Boolean, default: false },
       position: {
         x: { type: Number, default: 80 },
         y: { type: Number, default: 30 }
@@ -80,7 +80,7 @@ const customOrderSchema = new mongoose.Schema({
       rotation: { type: Number, default: 0 }
     },
     pocket: {
-      imageUrl: { type: String },
+      hasImage: { type: Boolean, default: false },
       position: {
         x: { type: Number, default: 25 },
         y: { type: Number, default: 35 }
@@ -92,6 +92,16 @@ const customOrderSchema = new mongoose.Schema({
       rotation: { type: Number, default: 0 }
     }
   },
+
+  // Generated preview URLs
+  previewUrls: {
+    front: { type: String },
+    back: { type: String }
+  },
+  
+  // Session and preview metadata
+  sessionToken: { type: String },
+  previewGeneratedAt: { type: Date },
   
   // Pricing calculation
   basePrice: { 
@@ -119,10 +129,13 @@ const customOrderSchema = new mongoose.Schema({
     default: 'pending' 
   },
   
-  // Design files
+  // Design files and WhatsApp integration
   highResFilesReceived: { 
     type: Boolean, 
     default: false 
+  },
+  whatsappLink: { 
+    type: String // Direct WhatsApp link for sending high-quality files
   },
   whatsappInstructions: { 
     type: String,
