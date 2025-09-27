@@ -56,10 +56,15 @@ export async function POST(request) {
     // Handle both old array format and new object format for backward compatibility
     let mockupUrl;
     
-    if (Array.isArray(colorInfo.mockupImages)) {
-      // Legacy format: array of strings - use first image as default
+    // Handle Mongoose Document arrays and regular arrays/objects
+    if (colorInfo.mockupImages && colorInfo.mockupImages.constructor.name === 'Document') {
+      // Legacy format: Mongoose Document array - convert to plain array
+      const plainArray = colorInfo.mockupImages.toObject ? colorInfo.mockupImages.toObject() : colorInfo.mockupImages;
+      mockupUrl = Array.isArray(plainArray) ? plainArray[0] : plainArray;
+    } else if (Array.isArray(colorInfo.mockupImages) && colorInfo.mockupImages.length > 0) {
+      // Legacy format: regular array of strings
       mockupUrl = colorInfo.mockupImages[0];
-    } else if (typeof colorInfo.mockupImages === 'object') {
+    } else if (typeof colorInfo.mockupImages === 'object' && colorInfo.mockupImages[view]) {
       // New format: object with view properties
       mockupUrl = colorInfo.mockupImages[view];
     }
