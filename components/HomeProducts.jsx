@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import "./HomeProductsScrollbar.css";
 import ProductCard from "./ProductCard";
 import { useAppContext } from "@/context/AppContext";
 import { useInView } from "react-intersection-observer";
@@ -17,6 +18,28 @@ const HomeProducts = () => {
 
   const displayedProducts = products.slice(0, visibleCount);
   const hasMoreProducts = visibleCount < products.length;
+
+  const [scrollLeft, setScrollLeft] = useState(0);
+  const [scrollWidth, setScrollWidth] = useState(0);
+  const [clientWidth, setClientWidth] = useState(0);
+  const scrollRef = React.useRef(null);
+
+  // Update scroll values on scroll
+  const handleScroll = () => {
+    if (scrollRef.current) {
+      setScrollLeft(scrollRef.current.scrollLeft);
+      setScrollWidth(scrollRef.current.scrollWidth);
+      setClientWidth(scrollRef.current.clientWidth);
+    }
+  };
+
+  // Update on mount and when products change
+  React.useEffect(() => {
+    if (scrollRef.current) {
+      setScrollWidth(scrollRef.current.scrollWidth);
+      setClientWidth(scrollRef.current.clientWidth);
+    }
+  }, [displayedProducts.length]);
 
   return (
     <div className="flex flex-col items-center pt-14 relative">
@@ -37,22 +60,22 @@ const HomeProducts = () => {
           Popular products
         </p>
       </div>
-      
-      {/* Horizontal scrolling container */}
-      <div className="w-full overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent mt-6 pb-4">
-        <div 
+
+      {/* Horizontal scrolling container with custom gradient scrollbar */}
+  <div className="w-full overflow-x-auto mt-6 pb-5 relative custom-scrollbar" style={{ WebkitOverflowScrolling: 'touch' }} ref={scrollRef} onScroll={handleScroll}>
+        <div
           className="flex gap-6 transition-all duration-500 ease-in-out"
-          style={{ width: `${displayedProducts.length * 280 + (displayedProducts.length - 1) * 24}px` }}
+          style={{ minWidth: `${displayedProducts.length * 280 + (displayedProducts.length - 1) * 24}px` }}
         >
           {displayedProducts.map((product, index) => (
-            <div 
+            <div
               key={index}
               className={`flex-shrink-0 w-64 transform transition-all duration-700 hover:scale-102 ${
                 inView ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
               }`}
-              style={{ 
+              style={{
                 transitionDelay: `${index * 100}ms`,
-                animationDelay: `${index * 100}ms` 
+                animationDelay: `${index * 100}ms`
               }}
             >
               <div className="relative group">

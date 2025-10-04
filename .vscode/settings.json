@@ -1,0 +1,7 @@
+{
+    "terminal.explorerKind": "external",
+    "terminal.integrated.automationProfile.windows": {
+        "path": "C:\\Windows\\System32\\cmd.exe",
+        "args": []
+    },
+}

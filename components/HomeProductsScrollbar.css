@@ -1,0 +1,26 @@
+.custom-scrollbar::-webkit-scrollbar {
+  width: 16px; /* Adjust width as needed */
+  height: 16px; /* Adjust height as needed */
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: linear-gradient(to right, #000000, #c4b5fd, #fbcfe8);
+  border-radius: 12px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(
+    156,
+    163,
+    175,
+    0.5
+  ); /* Adjust color and transparency */
+  border-radius: 13px; /* Adjust roundness */
+  border: 4px solid #000000; /* Space around thumb */
+}
+.custom-scrollbar {
+  scrollbar-color: #ff5500 #cccccc;
+  scrollbar-width: 20px; /* Adjust width as needed */
+}
+
+
+
+      

@@ -90,7 +90,7 @@ const ProductCard = ({ product }) => {
                     </button>
                 </div>
 
-                <div className="px-2 pb-2 min-h-[120px] max-h-[120px] flex flex-col overflow-hidden">
+                <div className="px-2 pb-2 min-h-[auto] max-h-[auto] flex flex-col overflow-hidden">
                     <p 
                         className="text-sm md:text-base font-semibold pt-3 w-full text-gray-900 dark:text-white leading-tight min-h-0 overflow-hidden"
                         style={{ 
