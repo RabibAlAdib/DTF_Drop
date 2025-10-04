@@ -64,7 +64,7 @@ const OfferPopup = ({ offer, isOpen, onClose, className = "" }) => {
     if (offer.discountType === 'percentage') {
       return `${offer.discountValue}% OFF`;
     } else {
-      return `$${offer.discountValue} OFF`;
+      return `BDT ${offer.discountValue} OFF`;
     }
   };
 
@@ -183,7 +183,7 @@ const OfferPopup = ({ offer, isOpen, onClose, className = "" }) => {
               <div className="bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 p-4 rounded-lg">
                 <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Minimum Order</div>
                 <div className="text-lg font-semibold text-orange-600 dark:text-orange-400">
-                  ${offer.minimumOrderValue}
+                  BDT {offer.minimumOrderValue}
                 </div>
               </div>
             )}
@@ -273,7 +273,7 @@ const OfferPopup = ({ offer, isOpen, onClose, className = "" }) => {
           {/* Fine Print */}
           <div className="text-xs text-gray-500 dark:text-gray-400 text-center mt-4 leading-relaxed">
             * Offer valid for limited time only. Terms and conditions apply. 
-            {offer.minimumOrderValue > 0 && ` Minimum order of $${offer.minimumOrderValue} required.`}
+            {offer.minimumOrderValue > 0 && ` Minimum order of BDT ${offer.minimumOrderValue} required.`}
             {offer.usageLimit && ` Limited to ${offer.usageLimit} total uses.`}
           </div>
         </div>

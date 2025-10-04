@@ -45,7 +45,7 @@ const OfferCard = ({ offer, className = "" }) => {
     if (offer.discountType === 'percentage') {
       return `${offer.discountValue}% OFF`;
     } else {
-      return `$${offer.discountValue} OFF`;
+      return `BDT ${offer.discountValue} OFF`;
     }
   };
 
@@ -125,7 +125,7 @@ const OfferCard = ({ offer, className = "" }) => {
             <div className="flex items-center justify-between">
               <span className="text-xs text-gray-500 dark:text-gray-400">Min Order:</span>
               <span className="text-xs font-medium text-gray-900 dark:text-white">
-                ${offer.minimumOrderValue}
+                BDT {offer.minimumOrderValue}
               </span>
             </div>
           )}

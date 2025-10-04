@@ -8,8 +8,8 @@ import { toast } from 'react-hot-toast';
 import Loading from "@/components/Loading";
 
 const EditOffer = ({ params }) => {
+  const { id } = React.use(params); // ✅ This is the new way
   const { getToken, router } = useAppContext();
-  const { id } = params;
   
   // Form state
   const [title, setTitle] = useState('');

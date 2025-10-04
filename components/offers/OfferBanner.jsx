@@ -45,7 +45,7 @@ const OfferBanner = ({ offer, className = "" }) => {
     if (offer.discountType === 'percentage') {
       return `${offer.discountValue}% OFF`;
     } else {
-      return `$${offer.discountValue} OFF`;
+      return `BDT ${offer.discountValue} OFF`;
     }
   };
 
@@ -100,7 +100,7 @@ const OfferBanner = ({ offer, className = "" }) => {
             
             {offer.minimumOrderValue > 0 && (
               <div className="text-xs lg:text-sm opacity-75">
-                Min order: ${offer.minimumOrderValue}
+                Min order: BDT {offer.minimumOrderValue}
               </div>
             )}
 

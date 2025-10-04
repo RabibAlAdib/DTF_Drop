@@ -25,12 +25,17 @@ const OfferList = () => {
   const fetchAllOffers = async () => {
     try {
       setLoading(true);
-      const { data } = await axios.get('/api/offer?active=false'); // Get all offers including inactive
-      
+      const { data } = await axios.get('/api/offer?active=false');
       if (data.success) {
         setOffers(data.offers);
         setFilteredOffers(data.offers);
-        setStats(data.stats || {});
+        // Ensure stats is always an object with default values
+        setStats({
+          total: data.stats?.total ?? data.offers.length,
+          active: data.stats?.active ?? data.offers.filter(o => o.isCurrentlyValid).length,
+          expired: data.stats?.expired ?? data.offers.filter(o => o.isExpired).length,
+          inactive: data.stats?.inactive ?? data.offers.filter(o => !o.isActive).length,
+        });
       } else {
         toast.error(data.message || "Failed to fetch offers");
       }
@@ -80,6 +85,7 @@ const OfferList = () => {
       });
       
       if (data.success) {
+        {data}
         toast.success(`Offer ${!currentStatus ? 'activated' : 'deactivated'} successfully!`);
         fetchAllOffers(); // Refresh the list
       } else {
@@ -187,6 +193,7 @@ const OfferList = () => {
               Create New Offer
             </button>
           </div>
+
 
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 pb-6">

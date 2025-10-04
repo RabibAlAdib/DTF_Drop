@@ -57,7 +57,7 @@ const ProductCard = ({ product }) => {
                     {/* Professional background glow effect */}
                     <div className="absolute inset-0 bg-gradient-to-br from-orange-400/0 via-pink-400/0 to-purple-400/0 group-hover:from-orange-400/5 group-hover:via-pink-400/5 group-hover:to-purple-400/5 transition-all duration-700"></div>
                     
-                    <div className="relative w-full h-full p-4 pt-6">
+                    <div className="relative w-full h-full p-4 mt-4 pt-6">
                         <Image
                             src={product.images[0]}
                             alt={product.name}

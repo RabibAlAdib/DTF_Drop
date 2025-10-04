@@ -19,6 +19,7 @@ const AVAILABLE_COLORS = [
   "Coffee",
   "Offwhite",
   "NevyBlue",
+  "Lite Radish",
 ];
 const AVAILABLE_SIZES = ["M", "L", "XL"]; //'XXL(Special Order)'
 // Color mapping for display

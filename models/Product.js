@@ -40,7 +40,7 @@ const productSchema = new mongoose.Schema({
     color: { 
       type: String, 
       required: true,
-      enum: ['Black', 'White', 'Lite Pink', 'Coffee', 'Offwhite', 'NevyBlue']
+      enum: ['Black', 'White', 'Lite Radish', 'Lite Pink', 'Coffee', 'Offwhite', 'NevyBlue']
     },
     url: { type: String, required: true }
   }],
@@ -74,9 +74,9 @@ const productSchema = new mongoose.Schema({
     required: true,
     enum: [
       // Canonical values (current)
-      'Anime', 'Typography', 'Game', 'WWE', 'Sports', 'Motivational', 'Jokes', 'Islamic', 'Customized', 'Cartoon', 'Movie/TV', 'Music/Band', 'Minimalist', 'Abstract', 'Nature', 'Festival/Seasonal', 'Couple/Friendship', 'Quotes', 'Retro/Vintage', 'Geek/Tech', 'Streetwear', 'Hip-Hop/Rap', 'Graffiti/Urban', 'Fantasy/Mythology', 'Sci-Fi', 'Superheroes/Comics', 'Animals/Pets', 'Cars/Bikes', 'Food/Drinks', 'Travel/Adventure', 'National/Patriotic', 'Memes', 'Spiritual/Inspirational', 'Kids/Family', 'Occupations (Doctor, Engineer, etc.)', 'College/University Life', 'Fitness/Gym', 'Luxury/High Fashion', 'Gaming Esports Teams',
+      'Anime', 'Typography', 'Game', 'WWE', 'Solid', 'Sports', 'Motivational', 'Jokes', 'Islamic', 'Customized', 'Cartoon', 'Movie/TV', 'Music/Band', 'Minimalist', 'Abstract', 'Nature', 'Festival/Seasonal', 'Couple/Friendship', 'Quotes', 'Retro/Vintage', 'Geek/Tech', 'Streetwear', 'Hip-Hop/Rap', 'Graffiti/Urban', 'Fantasy/Mythology', 'Sci-Fi', 'Superheroes/Comics', 'Animals/Pets', 'Cars/Bikes', 'Food/Drinks', 'Travel/Adventure', 'National/Patriotic', 'Memes', 'Spiritual/Inspirational', 'Kids/Family', 'Occupations (Doctor, Engineer, etc.)', 'College/University Life', 'Fitness/Gym', 'Luxury/High Fashion', 'Gaming Esports Teams',
       // Legacy values for backward compatibility
-      'anime', 'typography', 'game', 'wwe', 'sports', 'motivational', 'jokes', 'islamic', 'customized', 'cartoon', 'movie/tv', 'music/band', 'minimalist', 'abstract', 'nature', 'festival/seasonal', 'couple/friendship', 'quotes', 'retro/vintage', 'geek/tech', 'streetwear', 'hip-hop/rap', 'graffiti/urban', 'fantasy/mythology', 'sci-fi', 'superheroes/comics', 'animals/pets', 'cars/bikes', 'food/drinks', 'travel/adventure', 'national/patriotic', 'memes', 'spiritual/inspirational', 'kids/family', 'occupations', 'college/university', 'fitness/gym', 'luxury/fashion', 'gaming', 'esports'
+      'anime', 'typography', 'game', 'wwe', 'solid','sports', 'motivational', 'jokes', 'islamic', 'customized', 'cartoon', 'movie/tv', 'music/band', 'minimalist', 'abstract', 'nature', 'festival/seasonal', 'couple/friendship', 'quotes', 'retro/vintage', 'geek/tech', 'streetwear', 'hip-hop/rap', 'graffiti/urban', 'fantasy/mythology', 'sci-fi', 'superheroes/comics', 'animals/pets', 'cars/bikes', 'food/drinks', 'travel/adventure', 'national/patriotic', 'memes', 'spiritual/inspirational', 'kids/family', 'occupations', 'college/university', 'fitness/gym', 'luxury/fashion', 'gaming', 'esports'
     ],
     default: 'Customized'
   },
@@ -85,7 +85,7 @@ const productSchema = new mongoose.Schema({
   colors: { 
     type: [String], 
     required: true,
-    enum: ['Black', 'White', 'Lite Pink', 'Coffee', 'Offwhite', 'NevyBlue'],
+    enum: ['Black', 'White', 'Lite Radish','Lite Pink', 'Coffee', 'Offwhite', 'NevyBlue'],
     default: ['Black']
   },
   sizes: { 
