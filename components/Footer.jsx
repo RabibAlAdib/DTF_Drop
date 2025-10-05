@@ -74,10 +74,13 @@ const Footer = () => {
                   className="hover:opacity-80 transition-opacity"
                   title="Instagram"
                 >
-                  <svg className="w-6 h-6 fill-pink-500 dark:fill-pink-400" viewBox="0 0 24 24">
-                    <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 6.618 5.367 11.987 11.988 11.987s11.987-5.369 11.987-11.987C24.004 5.367 18.635.001 12.017.001zM8.449 16.988c-1.297 0-2.348-1.051-2.348-2.348s1.051-2.348 2.348-2.348 2.348 1.051 2.348 2.348-1.051 2.348-2.348 2.348zm7.718 0c-1.297 0-2.348-1.051-2.348-2.348s1.051-2.348 2.348-2.348 2.348 1.051 2.348 2.348-1.051 2.348-2.348 2.348z"/>
-                    <path d="M17.96 8.233H6.04c-.22 0-.4.18-.4.4v7.004c0 .22.18.4.4.4h11.92c.22 0 .4-.18.4-.4V8.633c0-.22-.18-.4-.4-.4zM12 16.013c-2.208 0-4-1.792-4-4s1.792-4 4-4 4 1.792 4 4-1.792 4-4 4zm4.7-7.013c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1z"/>
-                  </svg>
+                  <Image
+                    src={assets.instagram_icon} // Make sure assets.instagram_icon points to '/assets/instagram_icon.svg'
+                    alt="Instagram"
+                    className="w-7 h-7 hover:opacity-80 transition-opacity "
+                    width={26}
+                    height={26}
+                  />
                 </a>
                 <a 
                   href="https://www.tiktok.com/@dtf.drop" 
