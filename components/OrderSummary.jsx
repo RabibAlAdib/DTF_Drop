@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
 
-const OrderSummary = () => {
+const OrderSummary = ({ isGift = false, giftMessage = '', recipientName = '' }) => {
 
   const { currency, router, getCartCount, getCartAmount, cartItems, products, userData, user, getToken, setCartItems } = useAppContext()
   const [selectedAddress, setSelectedAddress] = useState(null);
@@ -13,6 +13,7 @@ const OrderSummary = () => {
   const [promoDiscount, setPromoDiscount] = useState(0);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('cash_on_delivery');
   const [deliveryCharge, setDeliveryCharge] = useState(0);
+  const [deliveryNotes, setDeliveryNotes] = useState('');
 
   const [userAddresses, setUserAddresses] = useState([]);
 
@@ -210,19 +211,24 @@ const OrderSummary = () => {
       }
 
       // Prepare order data
-      const orderData = {
-        customerInfo,
-        items: orderItems,
-        payment: {
-          method: selectedPaymentMethod
-        },
-        delivery: {
-          address: customerInfo.address,
-          notes: ''
-        },
-        promoCode: appliedPromo?.code || '',
-        discountAmount: promoDiscount || 0
-      };
+        const orderData = {
+          customerInfo,
+          items: orderItems,
+          payment: {
+            method: selectedPaymentMethod
+          },
+          delivery: {
+            address: customerInfo.address,
+            deliveryNotes,
+          },
+          promoCode: appliedPromo?.code || '',
+          discountAmount: promoDiscount || 0,
+          giftInfo: {
+            isGift,
+            giftMessage,
+            recipientName
+          }
+        };
 
       // Create order
       const token = await getToken();
@@ -421,6 +427,19 @@ const OrderSummary = () => {
               </label>
             </div>
           </div>
+        </div>
+
+        <div className="mt-4">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Delivery Notes (Optional)
+          </label>
+          <textarea
+            value={deliveryNotes}
+            onChange={(e) => setDeliveryNotes(e.target.value)}
+            rows={3}
+            placeholder="Any special delivery instructions..."
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
         </div>
 
         <hr className="border-gray-500/30 my-5" />

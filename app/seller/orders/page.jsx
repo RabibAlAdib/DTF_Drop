@@ -350,6 +350,13 @@ const Orders = () => {
                                                     {order.payment.status}
                                                 </span>
                                             </p>
+                                            <p>
+                                                {order.delivery.deliveryNotes && (
+                                                    <p>
+                                                        <strong>Notes:</strong> {order.delivery.deliveryNotes}
+                                                    </p>
+                                                )}
+                                            </p>
                                         </div>
                                     </div>
 
@@ -359,13 +366,13 @@ const Orders = () => {
                                         </h4>
                                         <div className="text-sm">
                                             <p>
-                                                <strong>Method:</strong>{" "}
-                                                {order.delivery.method}
+                                                <strong>Method: </strong> {order.delivery.isDhaka? " Inside Dhaka" : " Outside Dhaka"}
+                                               
                                             </p>
                                             <p>
-                                                <strong>Fee:</strong> {currency}
-                                                {order.delivery.fee}
+                                                <strong>Fee:</strong> {currency} {order.delivery.deliveryCharge}
                                             </p>
+                                                
                                         </div>
                                     </div>
 
@@ -438,7 +445,7 @@ const Orders = () => {
                                         <div className="text-sm space-y-1 bg-pink-50 p-3 rounded">
                                             <p>
                                                 <strong>Gift Message:</strong>{" "}
-                                                {order.giftInfo.message}
+                                                {order.giftInfo.giftMessage || ''}
                                             </p>
                                             <p>
                                                 <strong>Recipient:</strong>{" "}

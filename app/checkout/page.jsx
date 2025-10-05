@@ -209,10 +209,13 @@ const CheckoutPage = () => {
         totalAmount: orderCalculation.calculation.totalAmount
       },
       delivery: {
-        address: customerInfo.address,
+        address: orderData.delivery.address || orderData.customerInfo.address,
         isDhaka: orderCalculation.calculation.delivery.isDhaka,
         deliveryCharge: orderCalculation.calculation.deliveryCharge,
-        deliveryNotes
+        estimatedDeliveryDate: calculateEstimatedDelivery(orderCalculation.calculation.delivery.isDhaka),
+        deliveryNotes: orderData.delivery.deliveryNotes || '',
+        specialInstructions: orderData.delivery.specialInstructions || '',
+        deliverySlot: orderData.delivery.deliverySlot || 'any'
       },
       payment: {
         method: paymentMethod,

@@ -1,11 +1,15 @@
 'use client'
-import React from "react";
+import React, { useState } from "react";
 import { assets } from "@/assets/assets";
 import OrderSummary from "@/components/OrderSummary";
 import Image from "next/image";
 import { useAppContext } from "@/context/AppContext";
 
 const Cart = () => {
+  const [deliveryNotes, setDeliveryNotes] = useState('');
+  const [isGift, setIsGift] = useState(false);
+  const [giftMessage, setGiftMessage] = useState('');
+  const [recipientName, setRecipientName] = useState('');
 
   const { products, router, cartItems, addToCart, updateCartQuantity, getCartCount } = useAppContext();
 
@@ -13,6 +17,42 @@ const Cart = () => {
     <>
       <div className="flex flex-col md:flex-row gap-10 px-6 md:px-16 lg:px-32 pt-14 mb-20">
         <div className="flex-1">
+            {/* Gift Option UI */}
+            <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded">
+              <label className="flex items-center gap-2 font-medium text-yellow-800">
+                <input
+                  type="checkbox"
+                  checked={isGift}
+                  onChange={e => setIsGift(e.target.checked)}
+                  className="accent-orange-600"
+                />
+                Order as a Gift
+              </label>
+              {isGift && (
+                <div className="mt-4 space-y-3">
+                  <div>
+                    <label className="block text-sm font-medium text-yellow-700 mb-1">Gift Message</label>
+                    <input
+                      type="text"
+                      value={giftMessage}
+                      onChange={e => setGiftMessage(e.target.value)}
+                      className="w-full px-3 py-2 border border-yellow-300 rounded focus:outline-none"
+                      placeholder="Write a message for the recipient"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-yellow-700 mb-1">Recipient Name</label>
+                    <input
+                      type="text"
+                      value={recipientName}
+                      onChange={e => setRecipientName(e.target.value)}
+                      className="w-full px-3 py-2 border border-yellow-300 rounded focus:outline-none"
+                      placeholder="Recipient's name"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
           <div className="flex items-center justify-between mb-8 border-b border-gray-500/30 pb-6">
             <p className="text-2xl md:text-3xl text-gray-500">
               Your <span className="font-medium text-orange-600">Cart</span>
@@ -130,8 +170,13 @@ const Cart = () => {
             />
             Continue Shopping
           </button>
+          
         </div>
-        <OrderSummary />
+        <OrderSummary
+          isGift={isGift}
+          giftMessage={giftMessage}
+          recipientName={recipientName}
+        />
       </div>
     </>
   );
